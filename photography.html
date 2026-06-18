@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eleonora Benso — 03. Photography / Concert</title>
+<style>
+  @font-face{font-family:"HelveticaNeueMedium"; src:url(assets/fonts/HelveticaNeueMedium.otf) format("opentype"); font-weight:400 700; font-display:swap;}
+  :root{--bg:#f0efec; --ink:#0b0b0c; --gray:#a3a3a3;}
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{background:var(--bg); color:var(--ink);
+    font-family:"HelveticaNeueMedium","Helvetica Neue",Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased; min-height:100svh; overflow-x:hidden;}
+
+  .project{
+    /* >>> KNOBS <<<  (numbers only) */
+    --pad:clamp(22px,3vw,46px);
+    --ast-h:clamp(34px,4vw,64px);  --ast-y:0px;
+    --head-sz:clamp(34px,6.5vw,104px);       /* size of 03. + PHOTOGRAPHY */
+    --num-gap:clamp(20px,2.4vw,44px);         /* gap between asterisk and "03." */
+    --head-top:18vh;                          /* vertical position of the heading */
+    --title-sz:clamp(22px,2.4vw,38px);        /* "Concert" */
+    --foot-sz:clamp(15px,1.5vw,23px);  --foot-lh:1.3;
+    --year-y:0.4em;      /* offset colonna anni in EM: scala col font -> identico a ogni larghezza.  + = piu giu, 0 = baseline */
+
+    position:relative; min-height:100svh; padding:var(--pad);
+    display:flex; flex-direction:column;
+  }
+  /* asterisk + 03. on the left, PHOTOGRAPHY pushed to the right margin */
+  .p-head{display:flex; align-items:center; justify-content:space-between;
+    margin-top:var(--head-top); font-weight:700; line-height:1;}
+  .p-head-left{display:flex; align-items:center; gap:var(--num-gap);}
+  .p-head .ast{height:var(--ast-h); width:auto; transform:translateY(var(--ast-y)); flex:none;}
+  .p-head .num{font-size:var(--head-sz);}
+  .p-head .name{font-size:var(--head-sz); text-transform:uppercase; letter-spacing:-.01em; margin-right:-.01em;}
+
+  .p-title{font-size:var(--title-sz); font-weight:700; margin-top:auto;}
+
+  /* footer: programmi a sinistra, anni a destra allineati in ALTO (2024 sulla riga "Programs used:") */
+  .p-foot{display:flex; justify-content:space-between; align-items:flex-end;
+    margin-top:clamp(28px,5vh,70px); color:var(--gray);
+    font-size:var(--foot-sz); line-height:var(--foot-lh);}
+  .p-foot .year{text-align:right;}
+
+  /* ===================== PHOTOGRAPHY — galleria a scroll orizzontale GUIDATO dallo scroll verticale =====================
+     La sezione e' alta: mentre scrolli giu, .pin resta bloccata (sticky) e la striscia foto trasla
+     in orizzontale attraverso tutti i frame. Scorre solo la foto, la didascalia resta ferma.
+     L'altezza della sezione la calcola lo script in base al numero di frame (--scroll-speed regola la velocita).
+     >>> KNOBS <<<
+     --img-h        : altezza foto (verticali 2:3, orizzontali 3:2 -> niente crop)
+     --pair-gap     : spazio tra le due foto in un frame "duo"
+     --scroll-speed : px verticali per px orizzontali (piu alto = scroll piu lungo/lento) */
+  .ph-pair{
+    --pad:clamp(22px,3vw,46px);
+    --img-h:clamp(320px,72vh,800px);
+    --pair-gap:clamp(28px,8vw,150px);
+    --foot-sz:clamp(15px,1.5vw,23px); --foot-lh:1.3;
+    --scroll-speed:1.6;
+    position:relative; min-height:100svh;
+  }
+  .ph-pair .pin{position:sticky; top:0; height:100svh; box-sizing:border-box; padding:var(--pad);
+    display:flex; flex-direction:column; overflow:hidden;}
+  .ph-pair .track-wrap{flex:1; overflow:hidden;}
+  .ph-pair .track{display:flex; height:100%; will-change:transform;}
+  .ph-pair .frame{flex:0 0 100%; display:flex; justify-content:center; align-items:center; gap:var(--pair-gap);}
+  .ph-pair .frame img{height:var(--img-h); width:auto; max-width:100%; object-fit:contain; display:block;}
+  .ph-pair .frame.duo img{max-width:calc((100% - var(--pair-gap)) / 2);}
+  .ph-pair .cap{color:var(--gray); font-size:var(--foot-sz); line-height:var(--foot-lh); flex:none;}
+
+  /* ===================== slide .TASK (testo) — stessa logica delle altre pagine =====================
+     .task-h = ".TASK" (rientrato), .task-p = paragrafo, .dash = linea tratteggiata a tutta larghezza,
+     .meet = nome sezione, .vi-foot = programmi (sx) + anno (dx). */
+  .vi-next{
+    --pad:clamp(22px,3vw,46px);
+    --task-sz:clamp(18px,2.1vw,32px); --task-lh:1.25;
+    --task-indent:30%;  --task-width:56%;
+    --gap-task-dash:clamp(54px,10vh,140px);
+    --gap-dash-meet:clamp(54px,10vh,140px);
+    --gap-meet-foot:clamp(24px,4.5vh,60px);
+    --meet-sz:clamp(22px,2.6vw,40px);
+    --foot-sz:clamp(15px,1.5vw,23px); --foot-lh:1.3;
+    --dash-len:12px; --dash-gap:9px; --dash-thick:2.6px;
+    --year-y:0.4em;
+    min-height:100svh; box-sizing:border-box; padding:var(--pad);
+    display:flex; flex-direction:column; justify-content:center;
+  }
+  .vi-next .task-h{margin:0 0 clamp(18px,2.5vh,30px) var(--task-indent);
+    font-size:var(--meet-sz); font-weight:700;}
+  .vi-next .task-p{max-width:var(--task-width);
+    font-size:var(--task-sz); line-height:var(--task-lh); font-weight:400;}
+  .vi-next .dash{height:var(--dash-thick); border:0;
+    margin:var(--gap-task-dash) calc(-1 * var(--pad)) 0;
+    background:repeating-linear-gradient(to right,
+      var(--ink) 0 var(--dash-len),
+      transparent var(--dash-len) calc(var(--dash-len) + var(--dash-gap)));}
+  .vi-next .meet{margin-top:var(--gap-dash-meet); font-size:var(--meet-sz); font-weight:700;}
+  .vi-next .vi-foot{display:flex; justify-content:space-between; align-items:flex-end;
+    margin-top:var(--gap-meet-foot); color:var(--gray);
+    font-size:var(--foot-sz); line-height:var(--foot-lh);}
+
+  /* ========= vi-next2 — .TASK finale + bottone Back to content ========= */
+  .vi-next2{--back-gap:clamp(120px,28vh,300px); --back-pad-y:0.55em; --back-pad-x:0.9em;}
+  .vi-next2 .back-btn{align-self:flex-start; margin-top:var(--back-gap);
+    font-size:var(--foot-sz); font-weight:600; color:var(--ink); text-decoration:none;
+    border:1.6px dashed var(--ink); padding:var(--back-pad-y) var(--back-pad-x);
+    background:transparent; cursor:pointer;}
+  .vi-next2 .back-btn:hover{background:var(--ink); color:var(--bg); border-style:solid;}
+
+  /* spread di "A day in the rattery" in scroll orizzontale: stessa meccanica di .ph-pair.
+     Lo spread riempie l'altezza disponibile (senza sforare) e galleggia con margini come nel mockup.
+     >>> KNOBS <<<  --pad = margine intorno allo spread ; --rat-gap = stacco tra spread e didascalia */
+  .rat-spreads{--pair-gap:0px; --pad:clamp(26px,4vw,60px); --rat-gap:clamp(26px,4.5vh,64px);}
+  .rat-spreads .pin{gap:var(--rat-gap);}
+  .rat-spreads .frame img{height:auto; max-height:100%; max-width:100%; width:auto; object-fit:contain;}
+  .rat-spreads .cap{font-size:clamp(16px,1.7vw,26px);}
+
+  /* ===================== slide "Area 51" — video centrato sulla pagina (scroll verticale) =====================
+     >>> KNOBS <<<  --vid-h = altezza del video (piu basso = piu margini intorno) */
+  .area51{
+    --pad:clamp(22px,3vw,46px);
+    --vid-h:clamp(300px,74vh,860px);
+    --label-sz:clamp(16px,1.7vw,26px); --foot-lh:1.3;
+    min-height:100svh; box-sizing:border-box; padding:var(--pad);
+    display:flex; flex-direction:column;
+  }
+  .area51 .vid{flex:1; min-height:0; display:flex; align-items:center; justify-content:center;}
+  .area51 .vid video{height:var(--vid-h); max-width:100%; width:auto; object-fit:contain; display:block; background:#000;}
+  .area51 .cap{color:var(--gray); font-size:var(--label-sz); line-height:var(--foot-lh); flex:none;}
+</style>
+</head>
+<body>
+  <main class="project" id="concert">
+    <div class="p-head">
+      <div class="p-head-left">
+        <img class="ast" src="assets/img/ast-gold.png" alt="">
+        <span class="num">03.</span>
+      </div>
+      <span class="name">Photography</span>
+    </div>
+
+    <div class="p-title">Concert</div>
+
+    <div class="p-foot">
+      <div class="programs">Programs used:<br>Lightroom<br>Photoshop<br>Dehancer</div>
+      <div class="year">2024<br>2025<br>2026</div>
+    </div>
+  </main>
+
+  <section class="ph-pair" id="portraits">
+    <div class="pin">
+      <div class="track-wrap">
+        <div class="track">
+          <div class="frame duo">
+            <img src="assets/img/pc-1.jpg" width="1365" height="2048" alt="Portrait">
+            <img src="assets/img/pc-2.jpg" width="1365" height="2048" alt="Portrait">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/pc-3.jpg" width="1365" height="2048" alt="Portrait">
+            <img src="assets/img/pc-4.jpg" width="1365" height="2048" alt="Portrait">
+          </div>
+          <div class="frame"><img src="assets/img/pc-5.jpg" width="2048" height="1365" alt="Close up"></div>
+          <div class="frame duo">
+            <img src="assets/img/pc-6.jpg" width="1365" height="2048" alt="Portrait">
+            <img src="assets/img/pc-7.jpg" width="1365" height="2048" alt="Portrait">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/pc-8.jpg" width="1365" height="2048" alt="Portrait">
+            <img src="assets/img/pc-9.jpg" width="1365" height="2048" alt="Portrait">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/pc-11.jpg" width="1365" height="2048" alt="Portrait">
+            <img src="assets/img/pc-12.jpg" width="1365" height="2048" alt="Portrait">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/pc-13.jpg" width="1365" height="2048" alt="Portrait">
+            <img src="assets/img/pc-14.jpg" width="1365" height="2048" alt="Portrait">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/pc-15.jpg" width="1365" height="2048" alt="Portrait">
+            <img src="assets/img/pc-16.jpg" width="1365" height="2048" alt="Portrait">
+          </div>
+        </div>
+      </div>
+      <div class="cap">Portraits and close ups</div>
+    </div>
+  </section>
+
+  <section class="ph-pair" id="wide-medium">
+    <div class="pin">
+      <div class="track-wrap">
+        <div class="track">
+          <div class="frame duo">
+            <img src="assets/img/concert-1.jpg" width="1365" height="2048" alt="Concert">
+            <img src="assets/img/concert-2.jpg" width="1365" height="2048" alt="Concert">
+          </div>
+          <div class="frame"><img src="assets/img/concert-3.jpg" width="2048" height="1365" alt="Concert"></div>
+          <div class="frame"><img src="assets/img/concert-4.jpg" width="2048" height="1365" alt="Concert"></div>
+          <div class="frame duo">
+            <img src="assets/img/concert-5.jpg" width="1365" height="2048" alt="Concert">
+            <img src="assets/img/concert-6.jpg" width="1365" height="2048" alt="Concert">
+          </div>
+          <div class="frame"><img src="assets/img/concert-7.jpg" width="2048" height="1365" alt="Concert"></div>
+          <div class="frame"><img src="assets/img/concert-8.jpg" width="2048" height="1365" alt="Concert"></div>
+          <div class="frame"><img src="assets/img/concert-9.jpg" width="2048" height="1365" alt="Concert"></div>
+          <div class="frame"><img src="assets/img/concert-10.jpg" width="2048" height="1365" alt="Concert"></div>
+          <div class="frame duo">
+            <img src="assets/img/concert-11.jpg" width="1365" height="2048" alt="Concert">
+            <img src="assets/img/concert-12.jpg" width="1365" height="2048" alt="Concert">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/concert-13.jpg" width="1365" height="2048" alt="Concert">
+            <img src="assets/img/concert-14.jpg" width="1365" height="2048" alt="Concert">
+          </div>
+          <div class="frame"><img src="assets/img/concert-15.jpg" width="2048" height="1365" alt="Concert"></div>
+        </div>
+      </div>
+      <div class="cap">Wide and medium shots</div>
+    </div>
+  </section>
+
+  <section class="vi-next">
+    <h3 class="task-h">.TASK</h3>
+    <p class="task-p">Photograph and edit a series of concerts, from intimate single-band shows to large multi-act events, working fast to capture the distinct personality of each performer under challenging low light and outside conditions, then handling the full editing and color grading pipeline to deliver the final images.</p>
+    <hr class="dash">
+    <div class="meet">Journalism</div>
+    <div class="vi-foot">
+      <div>Programs used:<br>Lightroom<br>Premiere</div>
+      <div>2024</div>
+    </div>
+  </section>
+
+  <section class="ph-pair rat-spreads" id="rattery-spreads">
+    <div class="pin">
+      <div class="track-wrap">
+        <div class="track">
+          <div class="frame"><img src="assets/img/rattery.png" width="3508" height="2480" alt="A Day in the Rattery — title"></div>
+          <div class="frame"><img src="assets/img/rattery-2.png" width="3508" height="2480" alt="A day in the rattery"></div>
+          <div class="frame"><img src="assets/img/rattery-3.png" width="3508" height="2480" alt="A day in the rattery"></div>
+          <div class="frame"><img src="assets/img/rattery-4.png" width="3508" height="2480" alt="A day in the rattery"></div>
+          <div class="frame"><img src="assets/img/rattery-5.png" width="3508" height="2480" alt="A day in the rattery"></div>
+          <div class="frame"><img src="assets/img/rattery-6.png" width="3508" height="2480" alt="A day in the rattery"></div>
+          <div class="frame"><img src="assets/img/rattery-7.png" width="3508" height="2480" alt="A day in the rattery"></div>
+          <div class="frame"><img src="assets/img/rattery-8.png" width="3508" height="2480" alt="A day in the rattery"></div>
+        </div>
+      </div>
+      <div class="cap">A day in the rattery</div>
+    </div>
+  </section>
+
+  <section class="area51">
+    <div class="vid">
+      <video controls preload="metadata" playsinline poster="assets/img/area51-poster.jpg">
+        <source src="assets/video/area51.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="cap">Area 51</div>
+  </section>
+
+  <section class="vi-next street-doc">
+    <h3 class="task-h">.TASK</h3>
+    <p class="task-p">Photograph and edit two photojournalism projects: an individual reportage documenting "Ratteria Casetta in Canada", a rattery in Emilia-Romagna that promotes rats as pets, and a group reportage on "Area 51", a non-profit in Rozzano that provides free food and essential goods to families in need every day.</p>
+    <hr class="dash">
+    <div class="meet">Street &amp; Documentary</div>
+    <div class="vi-foot">
+      <div>Programs used:<br>Lightroom<br>Photoshop<br>Dehancer</div>
+      <div>2024<br>2025<br>2026</div>
+    </div>
+  </section>
+
+  <section class="ph-pair" id="animals">
+    <div class="pin">
+      <div class="track-wrap">
+        <div class="track">
+          <div class="frame"><img src="assets/img/animals-1.jpg" width="2048" height="1365" alt="Animals"></div>
+          <div class="frame duo">
+            <img src="assets/img/animals-2.jpg" width="1152" height="2048" alt="Animals">
+            <img src="assets/img/animals-3.jpg" width="1365" height="2048" alt="Animals">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/animals-4.jpg" width="1365" height="2048" alt="Animals">
+            <img src="assets/img/animals-5.jpg" width="1365" height="2048" alt="Animals">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/animals-6.jpg" width="1365" height="2048" alt="Animals">
+            <img src="assets/img/animals-7.jpg" width="1365" height="2048" alt="Animals">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/animals-8.jpg" width="1365" height="2048" alt="Animals">
+            <img src="assets/img/animals-9.jpg" width="1365" height="2048" alt="Animals">
+          </div>
+          <div class="frame"><img src="assets/img/animals-10.jpg" width="2048" height="1365" alt="Animals"></div>
+          <div class="frame duo">
+            <img src="assets/img/animals-11.jpg" width="1365" height="2048" alt="Animals">
+            <img src="assets/img/animals-12.jpg" width="1365" height="2048" alt="Animals">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/animals-13.jpg" width="1365" height="2048" alt="Animals">
+            <img src="assets/img/animals-14.jpg" width="1365" height="2048" alt="Animals">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/animals-15.jpg" width="1365" height="2048" alt="Animals">
+            <img src="assets/img/animals-16.jpg" width="1365" height="2048" alt="Animals">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/animals-17.jpg" width="1365" height="2048" alt="Animals">
+            <img src="assets/img/animals-18.jpg" width="1365" height="2048" alt="Animals">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/animals-19.jpg" width="1365" height="2048" alt="Animals">
+            <img src="assets/img/animals-20.jpg" width="1365" height="2048" alt="Animals">
+          </div>
+          <div class="frame"><img src="assets/img/animals-21.jpg" width="2048" height="1365" alt="Butterfly"></div>
+          <div class="frame duo">
+            <img src="assets/img/animals-22.jpg" width="1365" height="2048" alt="Animals">
+            <img src="assets/img/animals-23.jpg" width="1365" height="2048" alt="Animals">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/animals-24.jpg" width="1365" height="2048" alt="Animals">
+            <img src="assets/img/animals-25.jpg" width="1365" height="2048" alt="Animals">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/animals-26.jpg" width="1365" height="2048" alt="Animals">
+            <img src="assets/img/animals-27.jpg" width="1365" height="2048" alt="Animals">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/animals-28.jpg" width="1365" height="2048" alt="Budgie">
+            <img src="assets/img/animals-29.jpg" width="1365" height="2048" alt="Dog">
+          </div>
+        </div>
+      </div>
+      <div class="cap">Animals (lots of cats)</div>
+    </div>
+  </section>
+
+  <section class="ph-pair" id="people">
+    <div class="pin">
+      <div class="track-wrap">
+        <div class="track">
+          <div class="frame duo">
+            <img src="assets/img/people-1.jpg" width="1365" height="2048" alt="People">
+            <img src="assets/img/people-2.jpg" width="1365" height="2048" alt="People">
+          </div>
+          <div class="frame"><img src="assets/img/people-3.jpg" width="2048" height="1152" alt="People"></div>
+          <div class="frame duo">
+            <img src="assets/img/people-4.jpg" width="1365" height="2048" alt="People">
+            <img src="assets/img/people-5.jpg" width="1365" height="2048" alt="People">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/people-6.jpg" width="1365" height="2048" alt="People">
+            <img src="assets/img/people-7.jpg" width="1365" height="2048" alt="People">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/people-8.jpg" width="1152" height="2048" alt="People">
+            <img src="assets/img/people-9.jpg" width="1152" height="2048" alt="People">
+          </div>
+        </div>
+      </div>
+      <div class="cap">People</div>
+    </div>
+  </section>
+
+  <section class="ph-pair" id="protests">
+    <div class="pin">
+      <div class="track-wrap">
+        <div class="track">
+          <div class="frame duo">
+            <img src="assets/img/protests-1.jpg" width="4000" height="6000" alt="Protests">
+            <img src="assets/img/protests-2.jpg" width="4000" height="6000" alt="Protests">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/protests-3.jpg" width="4000" height="6000" alt="Protests">
+            <img src="assets/img/protests-4.jpg" width="4000" height="6000" alt="Protests">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/protests-5.jpg" width="3793" height="5690" alt="Protests">
+            <img src="assets/img/protests-6.jpg" width="4000" height="6000" alt="Protests">
+          </div>
+          <div class="frame"><img src="assets/img/protests-7.jpg" width="6000" height="4000" alt="Protests"></div>
+          <div class="frame"><img src="assets/img/protests-8.jpg" width="6000" height="4000" alt="Protests"></div>
+          <div class="frame"><img src="assets/img/protests-9.jpg" width="6000" height="4000" alt="Protests"></div>
+          <div class="frame duo">
+            <img src="assets/img/protests-10.jpg" width="4000" height="6000" alt="Protests">
+            <img src="assets/img/protests-11.jpg" width="4000" height="6000" alt="Protests">
+          </div>
+          <div class="frame"><img src="assets/img/protests-12.jpg" width="5678" height="3785" alt="Protests"></div>
+          <div class="frame"><img src="assets/img/protests-13.jpg" width="6000" height="4000" alt="Protests"></div>
+          <div class="frame duo">
+            <img src="assets/img/protests-14.jpg" width="4000" height="6000" alt="Protests">
+            <img src="assets/img/protests-15.jpg" width="4000" height="6000" alt="Protests">
+          </div>
+          <div class="frame"><img src="assets/img/protests-16.jpg" width="6000" height="4000" alt="Protests"></div>
+          <div class="frame"><img src="assets/img/protests-17.jpg" width="6000" height="4000" alt="Protests"></div>
+          <div class="frame"><img src="assets/img/protests-18.jpg" width="6000" height="4000" alt="Protests"></div>
+          <div class="frame"><img src="assets/img/protests-dx.jpg" width="4000" height="6000" alt="Protests"></div>
+        </div>
+      </div>
+      <div class="cap">Protests</div>
+    </div>
+  </section>
+
+  <section class="vi-next street-doc" id="grading">
+    <h3 class="task-h">.TASK</h3>
+    <p class="task-p">A personal photography practice built around subjects that genuinely interest me, always shot on the street and in the moment across a range of cameras from reflex to mirrorless to analog. Every shot demands speed and instinct as much as intention, and editing has become a space to develop a recognizable visual style.</p>
+    <hr class="dash">
+    <div class="meet">Grading</div>
+    <div class="vi-foot">
+      <div>Programs used:<br>Lightroom</div>
+      <div>Present</div>
+    </div>
+  </section>
+
+  <section class="ph-pair" id="grading-process">
+    <div class="pin">
+      <div class="track-wrap">
+        <div class="track">
+          <div class="frame duo">
+            <img src="assets/img/grading-1.jpg" width="1365" height="2048" alt="Color grading process">
+            <img src="assets/img/grading-2.jpg" width="1365" height="2048" alt="Color grading process">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/grading-3.jpg" width="1365" height="2048" alt="Color grading process">
+            <img src="assets/img/grading-4.jpg" width="1365" height="2048" alt="Color grading process">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/grading-5.jpg" width="1365" height="2048" alt="Color grading process">
+            <img src="assets/img/grading-6.jpg" width="1365" height="2048" alt="Color grading process">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/grading-8.jpg" width="1365" height="2048" alt="Color grading process">
+            <img src="assets/img/grading-7.jpg" width="1365" height="2048" alt="Color grading process">
+          </div>
+        </div>
+      </div>
+      <div class="cap">My color grading process</div>
+    </div>
+  </section>
+
+  <section class="vi-next vi-next2">
+    <h3 class="task-h">.TASK</h3>
+    <p class="task-p">A walkthrough of my color grading process on a single, edited in Lightroom, moving through curves, tone adjustments, and color grading step by step, from raw file to final result. The goal is always to reveal the colors and light already present in the shot, pushing them further without adding anything that wasn't there.</p>
+    <hr class="dash">
+    <a class="back-btn" href="index.html#contents">Back to content</a>
+  </section>
+
+  <script>
+    /* scroll orizzontale guidato dallo scroll verticale, per OGNI sezione .ph-pair in sequenza:
+       ognuna si blocca (sticky) a turno e fa scorrere la sua striscia foto. L'altezza di ciascuna
+       sezione e' calcolata in base alla larghezza dei suoi frame e a --scroll-speed. */
+    (function(){
+      var secs=Array.prototype.slice.call(document.querySelectorAll('.ph-pair'));
+      if(!secs.length) return;
+      var items=secs.map(function(sec){
+        return {sec:sec, track:sec.querySelector('.track'), wrap:sec.querySelector('.track-wrap'), maxX:0};
+      });
+      var ticking=false;
+      function applyAll(){
+        ticking=false;
+        var vh=window.innerHeight;
+        items.forEach(function(it){
+          var total=it.sec.offsetHeight - vh;
+          var passed=Math.min(Math.max(-it.sec.getBoundingClientRect().top,0), total);
+          var p = total>0 ? passed/total : 0;
+          it.track.style.transform='translate3d('+(-p*it.maxX)+'px,0,0)';
+        });
+      }
+      function measureAll(){
+        var vh=window.innerHeight;
+        items.forEach(function(it){
+          var speed=parseFloat(getComputedStyle(it.sec).getPropertyValue('--scroll-speed'))||1.5;
+          it.maxX=Math.max(it.track.scrollWidth - it.wrap.clientWidth, 0);
+          it.sec.style.height=(vh + it.maxX*speed)+'px';
+        });
+        applyAll();
+      }
+      function onScroll(){ if(!ticking){ ticking=true; requestAnimationFrame(applyAll); } }
+      window.addEventListener('scroll', onScroll, {passive:true});
+      window.addEventListener('resize', measureAll);
+      window.addEventListener('load', measureAll);
+      document.querySelectorAll('.ph-pair img').forEach(function(im){ im.addEventListener('load', measureAll); });
+      measureAll();
+    })();
+  </script>
+
+</body>
+</html>

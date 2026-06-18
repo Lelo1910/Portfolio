@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eleonora Benso — 05. Personal / Capodanno</title>
+<style>
+  @font-face{font-family:"HelveticaNeueMedium"; src:url(assets/fonts/HelveticaNeueMedium.otf) format("opentype"); font-weight:400 700; font-display:swap;}
+  :root{--bg:#f0efec; --ink:#0b0b0c; --gray:#a3a3a3; --year-y:0.4em;}
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{background:var(--bg); color:var(--ink);
+    font-family:"HelveticaNeueMedium","Helvetica Neue",Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased; min-height:100svh; overflow-x:hidden;}
+
+  .project{
+    /* >>> KNOBS <<<  (numbers only) */
+    --pad:clamp(22px,3vw,46px);
+    --ast-h:clamp(34px,4vw,64px);  --ast-y:0px;
+    --head-sz:clamp(34px,6.5vw,104px);       /* size of 05. + PERSONAL */
+    --num-gap:clamp(20px,2.4vw,44px);         /* gap between asterisk and "05." */
+    --head-top:18vh;                          /* vertical position of the heading */
+    --title-sz:clamp(22px,2.4vw,38px);        /* "Capodanno" */
+    --foot-sz:clamp(15px,1.5vw,23px);  --foot-lh:1.3;
+
+    position:relative; min-height:100svh; padding:var(--pad);
+    display:flex; flex-direction:column;
+  }
+  /* asterisk + 05. on the left, PERSONAL pushed to the right margin */
+  .p-head{display:flex; align-items:center; justify-content:space-between;
+    margin-top:var(--head-top); font-weight:700; line-height:1;}
+  .p-head-left{display:flex; align-items:center; gap:var(--num-gap);}
+  .p-head .ast{height:var(--ast-h); width:auto; transform:translateY(var(--ast-y)); flex:none;}
+  .p-head .num{font-size:var(--head-sz);}
+  .p-head .name{font-size:var(--head-sz); text-transform:uppercase; letter-spacing:-.01em; margin-right:-.01em;}
+
+  .p-title{font-size:var(--title-sz); font-weight:700; margin-top:auto;}
+
+  .p-foot{display:flex; justify-content:space-between; align-items:flex-end;
+    margin-top:clamp(28px,5vh,70px); color:var(--gray);
+    font-size:var(--foot-sz); line-height:var(--foot-lh);}
+
+  /* ===================== CAPODANNO — galleria video a scroll orizzontale GUIDATO dallo scroll verticale =====================
+     Stessa meccanica della pagina Photography: la sezione e' alta, .pin resta bloccata (sticky)
+     e la striscia dei 3 video trasla in orizzontale mentre scrolli giu. Scorre solo la striscia,
+     la didascalia resta ferma. L'altezza della sezione la calcola lo script in fondo alla pagina.
+     >>> KNOBS <<<
+     --vid-h        : altezza video (4:3 -> niente crop)
+     --scroll-speed : px verticali per px orizzontali (piu alto = scroll piu lungo/lento) */
+  .ph-pair{
+    --pad:clamp(22px,3vw,46px);
+    --vid-h:clamp(320px,72vh,800px);
+    --img-h:clamp(320px,72vh,800px);
+    --pair-gap:clamp(28px,8vw,150px);
+    --foot-sz:clamp(15px,1.5vw,23px); --foot-lh:1.3;
+    --scroll-speed:1.6;
+    position:relative; min-height:100svh;
+  }
+  .ph-pair .pin{position:sticky; top:0; height:100svh; box-sizing:border-box; padding:var(--pad);
+    display:flex; flex-direction:column; overflow:hidden;}
+  .ph-pair .track-wrap{flex:1; overflow:hidden;}
+  .ph-pair .track{display:flex; height:100%; will-change:transform; backface-visibility:hidden; -webkit-backface-visibility:hidden;}
+  .ph-pair .frame{flex:0 0 100%; display:flex; justify-content:center; align-items:center; gap:var(--pair-gap);}
+  .ph-pair .frame video{height:var(--vid-h); width:auto; max-width:100%; object-fit:contain; display:block; background:var(--bg);}
+  .ph-pair .frame img{height:var(--img-h); width:auto; max-width:100%; object-fit:contain; display:block;}
+  .ph-pair .frame.duo img{max-width:calc((100% - var(--pair-gap)) / 2);}
+  .ph-pair .cap{color:var(--gray); font-size:var(--foot-sz); line-height:var(--foot-lh); flex:none;}
+  /* video con sfondo BIANCO (es. me-4): multiply fonde il bianco col colore della pagina -> niente bordi bianchi.
+     Il background sul .frame fa da "backdrop" per il blend (il .track ha una transform che isola lo stacking context). */
+  .ph-pair .frame.on-white{background:var(--bg);}
+  .ph-pair .frame.on-white video{mix-blend-mode:multiply; background:transparent;}
+
+  /* ===================== slide .TASK (testo) — stessa logica delle altre pagine =====================
+     .task-h = ".TASK" (rientrato), .task-p = paragrafo, .dash = linea tratteggiata a tutta larghezza,
+     .meet = nome prossima sezione, .vi-foot = programmi (sx) + anni (dx). */
+  .vi-next{
+    --pad:clamp(22px,3vw,46px);
+    --task-sz:clamp(18px,2.1vw,32px); --task-lh:1.25;
+    --task-indent:30%;  --task-width:56%;
+    --gap-task-dash:clamp(54px,10vh,140px);
+    --gap-dash-meet:clamp(54px,10vh,140px);
+    --gap-meet-foot:clamp(24px,4.5vh,60px);
+    --meet-sz:clamp(22px,2.6vw,40px);
+    --foot-sz:clamp(15px,1.5vw,23px); --foot-lh:1.3;
+    --dash-len:12px; --dash-gap:9px; --dash-thick:2.6px;
+    min-height:100svh; box-sizing:border-box; padding:var(--pad);
+    display:flex; flex-direction:column; justify-content:center;
+  }
+  .vi-next .task-h{margin:0 0 clamp(18px,2.5vh,30px) var(--task-indent);
+    font-size:var(--meet-sz); font-weight:700;}
+  .vi-next .task-p{max-width:var(--task-width);
+    font-size:var(--task-sz); line-height:var(--task-lh); font-weight:400;}
+  .vi-next .dash{height:var(--dash-thick); border:0;
+    margin:var(--gap-task-dash) calc(-1 * var(--pad)) 0;
+    background:repeating-linear-gradient(to right,
+      var(--ink) 0 var(--dash-len),
+      transparent var(--dash-len) calc(var(--dash-len) + var(--dash-gap)));}
+  .vi-next .meet{margin-top:var(--gap-dash-meet); font-size:var(--meet-sz); font-weight:700;}
+  .vi-next .vi-foot{display:flex; justify-content:space-between; align-items:flex-end;
+    margin-top:var(--gap-meet-foot); color:var(--gray);
+    font-size:var(--foot-sz); line-height:var(--foot-lh);}
+
+  /* ========= vi-next2 — .TASK finale + bottone Back to content ========= */
+  .vi-next2{--back-gap:clamp(120px,28vh,300px); --back-pad-y:0.55em; --back-pad-x:0.9em;}
+  .vi-next2 .back-btn{align-self:flex-start; margin-top:var(--back-gap);
+    font-size:var(--foot-sz); font-weight:600; color:var(--ink); text-decoration:none;
+    border:1.6px dashed var(--ink); padding:var(--back-pad-y) var(--back-pad-x);
+    background:transparent; cursor:pointer;}
+  .vi-next2 .back-btn:hover{background:var(--ink); color:var(--bg); border-style:solid;}
+</style>
+</head>
+<body>
+  <main class="project" id="capodanno">
+    <div class="p-head">
+      <div class="p-head-left">
+        <img class="ast" src="assets/img/ast-pink.png" alt="">
+        <span class="num">05.</span>
+      </div>
+      <span class="name">Personal</span>
+    </div>
+
+    <div class="p-title">Capodanno</div>
+
+    <div class="p-foot">
+      <div class="programs">Programs used:<br>Premiere</div>
+      <div class="year">2023</div>
+    </div>
+  </main>
+
+  <section class="ph-pair" id="capodanno-videos">
+    <div class="pin">
+      <div class="track-wrap">
+        <div class="track">
+          <div class="frame"><video src="assets/video/5.mp4" controls playsinline preload="metadata"></video></div>
+          <div class="frame"><video src="assets/video/6.mp4" controls playsinline preload="metadata"></video></div>
+          <div class="frame"><video src="assets/video/7.mp4" controls playsinline preload="metadata"></video></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="vi-next">
+    <h3 class="task-h">.TASK</h3>
+    <p class="task-p">A personal video project in three parts, each with a distinct theme, shot spontaneously without a storyboard and edited in Premiere with Dehancer, experimenting with color grading, graphics, and mixed media techniques. Part of an ongoing practice of documenting progress over perfection, published on Instagram.</p>
+    <hr class="dash">
+    <div class="meet">Motion experiments</div>
+    <div class="vi-foot">
+      <div>Programs used:<br>After effects</div>
+      <div>2023<br>2024</div>
+    </div>
+  </section>
+
+  <section class="ph-pair" id="motion-experiments">
+    <div class="pin">
+      <div class="track-wrap">
+        <div class="track">
+          <div class="frame"><video src="assets/video/me-1.mp4" controls playsinline preload="metadata"></video></div>
+          <div class="frame"><video src="assets/video/me-2.mp4" controls playsinline preload="metadata"></video></div>
+          <div class="frame"><video src="assets/video/me-3.mp4" controls playsinline preload="metadata"></video></div>
+          <div class="frame on-white"><video src="assets/video/me-4.mp4" controls playsinline preload="metadata"></video></div>
+          <div class="frame"><video src="assets/video/me-5.mp4" controls playsinline preload="metadata"></video></div>
+          <div class="frame"><video src="assets/video/me-6.mp4" controls playsinline preload="metadata"></video></div>
+          <div class="frame"><video src="assets/video/me-7.mp4" controls playsinline preload="metadata"></video></div>
+          <div class="frame"><video src="assets/video/me-9.mp4" controls playsinline preload="metadata"></video></div>
+          <div class="frame"><video src="assets/video/me-8.mp4" controls playsinline preload="metadata"></video></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="vi-next">
+    <h3 class="task-h">.TASK</h3>
+    <p class="task-p">A personal motion graphics and editing practice experimenting with After Effects, transitions, typography, and visual effects without a fixed brief, driven purely by curiosity and the desire to push technical skills further. These and others were also published on Instagram as an ongoing document of the progress.</p>
+    <hr class="dash">
+    <div class="meet">Photography</div>
+    <div class="vi-foot">
+      <div>Programs used:<br>Lightroom<br>Photoshop</div>
+      <div>2024<br>2025<br>2026</div>
+    </div>
+  </section>
+
+  <section class="ph-pair" id="personal-photography">
+    <div class="pin">
+      <div class="track-wrap">
+        <div class="track">
+          <div class="frame duo">
+            <img src="assets/img/pp/1.jpg" width="1365" height="2048" alt="Photography">
+            <img src="assets/img/pp/2.jpg" width="1365" height="2048" alt="Photography">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/pp/3.jpg" width="1365" height="2048" alt="Photography">
+            <img src="assets/img/pp/4.jpg" width="1365" height="2048" alt="Photography">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/pp/5.jpg" width="1365" height="2048" alt="Photography">
+            <img src="assets/img/pp/6.jpg" width="1112" height="1600" alt="Photography">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/pp/7.jpg" width="1365" height="2048" alt="Photography">
+            <img src="assets/img/pp/8.jpg" width="1365" height="2048" alt="Photography">
+          </div>
+          <div class="frame"><img src="assets/img/pp/9.jpg" width="2048" height="1536" alt="Photography"></div>
+          <div class="frame"><img src="assets/img/pp/10.jpg" width="2048" height="1365" alt="Photography"></div>
+          <div class="frame"><img src="assets/img/pp/11.jpg" width="2048" height="1365" alt="Photography"></div>
+          <div class="frame duo">
+            <img src="assets/img/pp/12.jpg" width="1365" height="2048" alt="Photography">
+            <img src="assets/img/pp/13.jpg" width="1365" height="2048" alt="Photography">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/pp/14.jpg" width="1365" height="2048" alt="Photography">
+            <img src="assets/img/pp/15.jpg" width="1365" height="2048" alt="Photography">
+          </div>
+          <div class="frame"><img src="assets/img/pp/16.jpg" width="2048" height="1536" alt="Photography"></div>
+          <div class="frame"><img src="assets/img/pp/17.jpg" width="2048" height="1152" alt="Photography"></div>
+          <div class="frame"><img src="assets/img/pp/18.jpg" width="2048" height="1152" alt="Photography"></div>
+          <div class="frame"><img src="assets/img/pp/19.jpg" width="2048" height="1365" alt="Photography"></div>
+          <div class="frame"><img src="assets/img/pp/20.jpg" width="2048" height="1152" alt="Photography"></div>
+          <div class="frame"><img src="assets/img/pp/21.jpg" width="2048" height="1152" alt="Photography"></div>
+          <div class="frame"><img src="assets/img/pp/22.jpg" width="2048" height="1365" alt="Photography"></div>
+          <div class="frame"><img src="assets/img/pp/23.jpg" width="2048" height="1536" alt="Photography"></div>
+          <div class="frame"><img src="assets/img/pp/24.jpg" width="2048" height="1536" alt="Photography"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="vi-next vi-next2">
+    <h3 class="task-h">.TASK</h3>
+    <p class="task-p">A growing collection of photographs of the people closest to me, captured spontaneously across different moments, places, and lights. Each image is less about technical perfection and more about presence and connection, contributing to an evolving personal visual language that I document and share on Instagram.</p>
+    <hr class="dash">
+    <a class="back-btn" href="index.html#contents">Back to content</a>
+  </section>
+
+  <script>
+    /* scroll orizzontale guidato dallo scroll verticale, per OGNI sezione .ph-pair:
+       la sezione si blocca (sticky) e fa scorrere la sua striscia di video. L'altezza di ciascuna
+       sezione e' calcolata in base alla larghezza dei suoi frame e a --scroll-speed. */
+    (function(){
+      var secs=Array.prototype.slice.call(document.querySelectorAll('.ph-pair'));
+      if(!secs.length) return;
+      var items=secs.map(function(sec){
+        return {sec:sec, track:sec.querySelector('.track'), wrap:sec.querySelector('.track-wrap'), maxX:0};
+      });
+      var ticking=false;
+      function applyAll(){
+        ticking=false;
+        var vh=window.innerHeight;
+        items.forEach(function(it){
+          var total=it.sec.offsetHeight - vh;
+          var passed=Math.min(Math.max(-it.sec.getBoundingClientRect().top,0), total);
+          var p = total>0 ? passed/total : 0;
+          it.track.style.transform='translate3d('+Math.round(-p*it.maxX)+'px,0,0)';
+        });
+      }
+      function measureAll(){
+        var vh=window.innerHeight;
+        items.forEach(function(it){
+          var speed=parseFloat(getComputedStyle(it.sec).getPropertyValue('--scroll-speed'))||1.5;
+          it.maxX=Math.max(it.track.scrollWidth - it.wrap.clientWidth, 0);
+          it.sec.style.height=(vh + it.maxX*speed)+'px';
+        });
+        applyAll();
+      }
+      function onScroll(){ if(!ticking){ ticking=true; requestAnimationFrame(applyAll); } }
+      window.addEventListener('scroll', onScroll, {passive:true});
+      window.addEventListener('resize', measureAll);
+      window.addEventListener('load', measureAll);
+      document.querySelectorAll('.ph-pair video').forEach(function(v){ v.addEventListener('loadedmetadata', measureAll); });
+      measureAll();
+    })();
+  </script>
+
+  <script>
+    /* un solo video alla volta: quando ne parte uno, gli altri si mettono in pausa (niente audio sovrapposto) */
+    (function(){
+      var vids=Array.prototype.slice.call(document.querySelectorAll('.ph-pair video'));
+      vids.forEach(function(v){
+        v.addEventListener('play', function(){
+          vids.forEach(function(o){ if(o!==v) o.pause(); });
+        });
+      });
+    })();
+  </script>
+
+</body>
+</html>

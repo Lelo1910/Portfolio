@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eleonora Benso — 01. Visual Identity / Fantacycling</title>
+<style>
+  @font-face{font-family:"HelveticaNeueMedium"; src:url(assets/fonts/HelveticaNeueMedium.otf) format("opentype"); font-weight:400 700; font-display:swap;}
+  :root{--bg:#f0efec; --ink:#0b0b0c; --gray:#a3a3a3; --year-y:0.4em;}
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{background:var(--bg); color:var(--ink);
+    font-family:"HelveticaNeueMedium","Helvetica Neue",Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased; min-height:100svh; overflow-x:hidden;}
+
+  .project{
+    /* >>> KNOBS <<<  (numbers only) */
+    --pad:clamp(22px,3vw,46px);
+    --ast-h:clamp(34px,4vw,64px);  --ast-y:0px;
+    --head-sz:clamp(34px,6.5vw,104px);       /* size of 01. + VISUAL IDENTITY */
+    --num-gap:clamp(20px,2.4vw,44px);         /* gap between asterisk and "01." */
+    --head-top:18vh;                          /* vertical position of the heading */
+    --title-sz:clamp(22px,2.4vw,38px);        /* "Fantacycling" */
+    --foot-sz:clamp(15px,1.5vw,23px);  --foot-lh:1.3;
+
+    position:relative; min-height:100svh; padding:var(--pad);
+    display:flex; flex-direction:column;
+  }
+  /* asterisk + 01. on the left, VISUAL IDENTITY pushed to the right margin */
+  .p-head{display:flex; align-items:center; justify-content:space-between;
+    margin-top:var(--head-top); font-weight:700; line-height:1;}
+  .p-head-left{display:flex; align-items:center; gap:var(--num-gap);}
+  .p-head .ast{height:var(--ast-h); width:auto; transform:translateY(var(--ast-y)); flex:none;}
+  .p-head .num{font-size:var(--head-sz);}
+  .p-head .name{font-size:var(--head-sz); text-transform:uppercase; letter-spacing:-.01em;}
+
+  .p-title{font-size:var(--title-sz); font-weight:700; margin-top:auto;}
+
+  .p-foot{display:flex; justify-content:space-between; align-items:flex-end;
+    margin-top:clamp(28px,5vh,70px); color:var(--gray);
+    font-size:var(--foot-sz); line-height:var(--foot-lh);}
+
+  /* brand image fills the full width, never cropped (scroll down to see all) */
+  .p-board{width:100%; margin:0; padding:0; display:block; background:var(--bg);}
+  .p-board img{width:100%; height:auto; display:block;}
+
+  /* video section — bg fills any horizontal gaps */
+  .p-video{background:#B0B0E9; margin:0; padding:0; display:block; width:100%;}
+  .p-video video{width:100%; height:auto; display:block;}
+
+  .vi-next{
+    --pad:clamp(22px,3vw,46px);
+    --task-sz:clamp(18px,2.1vw,32px); --task-lh:1.25;
+    --task-indent:30%;  --task-width:56%;
+    --gap-task-dash:clamp(54px,10vh,140px);
+    --gap-dash-meet:clamp(54px,10vh,140px);
+    --gap-meet-foot:clamp(24px,4.5vh,60px);
+    --meet-sz:clamp(22px,2.6vw,40px);
+    --foot-sz:clamp(15px,1.5vw,23px); --foot-lh:1.3;
+    --dash-len:12px; --dash-gap:9px; --dash-thick:2.6px;
+    min-height:100svh; box-sizing:border-box; padding:var(--pad);
+    display:flex; flex-direction:column; justify-content:center;
+  }
+  .vi-next .task-h{margin:0 0 clamp(18px,2.5vh,30px) var(--task-indent);
+    font-size:var(--meet-sz); font-weight:700;}
+  .vi-next .task-p{max-width:var(--task-width);
+    font-size:var(--task-sz); line-height:var(--task-lh); font-weight:400;}
+  .vi-next .dash{height:var(--dash-thick); border:0;
+    margin:var(--gap-task-dash) calc(-1 * var(--pad)) 0;
+    background:repeating-linear-gradient(to right,
+      var(--ink) 0 var(--dash-len),
+      transparent var(--dash-len) calc(var(--dash-len) + var(--dash-gap)));}
+  .vi-next .meet{margin-top:var(--gap-dash-meet); font-size:var(--meet-sz); font-weight:700;}
+  .vi-next .vi-foot{display:flex; justify-content:space-between; align-items:flex-end;
+    margin-top:var(--gap-meet-foot); color:var(--gray);
+    font-size:var(--foot-sz); line-height:var(--foot-lh);}
+
+  /* ========= vi-next2 — .TASK di Piazze Negate + bottone Back to content =========
+     KNOBs: --back-gap = distanza dash->bottone; --back-pad-y/x = padding interno bottone */
+  .vi-next2{--back-gap:clamp(120px,28vh,300px); --back-pad-y:0.55em; --back-pad-x:0.9em;}
+  .vi-next2 .back-btn{align-self:flex-start; margin-top:var(--back-gap);
+    font-size:var(--foot-sz); font-weight:600; color:var(--ink); text-decoration:none;
+    border:1.6px dashed var(--ink); padding:var(--back-pad-y) var(--back-pad-x);
+    background:transparent; cursor:pointer;}
+  .vi-next2 .back-btn:hover{background:var(--ink); color:var(--bg); border-style:solid;}
+
+  /* fit-to-screen: whole image visible on one screen, never cropped, responsive */
+  .p-fit{min-height:100svh; display:flex; align-items:center; justify-content:center;
+    background:var(--bg); margin:0; padding:0;}
+  .p-fit img{max-width:100%; max-height:100svh; width:auto; height:auto; display:block;}
+
+  /* ===== FantaCycling brand board — full-screen panels, content re-centred ===== */
+  /* Each region is a solid-colour panel that fills its share of the screen; the
+     logo/mark/type sit centred inside (object-fit:contain). 50/50 split kept.    */
+  .fc-board{width:100%; height:100svh; display:flex; overflow:hidden;}
+  .fc-col{width:50%; height:100%; display:flex; flex-direction:column;}
+  .fc-panel{width:100%; overflow:hidden;}
+  .fc-panel img{width:100%; height:100%; object-fit:contain; object-position:center; display:block;}
+  .fc-panel.marks {background:#0e1877; height:72.75%;}
+  .fc-panel.sagace{background:#e4e1f2;  height:27.25%;}
+  .fc-panel.logos-w{background:#fff;  height:22.85%;}
+  .fc-panel.logos-k{background:#000;  height:22.85%;}
+  .fc-colors{height:54.30%; display:grid;
+    grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(2,1fr);}
+  .fc-colors>div{width:100%; height:100%;}
+  .fc-c-yellow{background:#f8c021;} .fc-c-navy{background:#0e1877;} .fc-c-peri{background:#5b5ada;}
+  .fc-c-red{background:#ce2600;} .fc-c-lav{background:#e4e1f2;}
+  .fc-c-pattern{background:#0e1877; position:relative; overflow:hidden;}
+  .fc-c-pattern svg{position:absolute; inset:0; width:100%; height:100%;}
+
+  /* ========= FANTACYCLING — RIDERS PAGE (scroll #2) =========
+     KNOB --riders-bg = periwinkle surround (matches the artwork's own background,
+     so any extra space reads as one seamless purple field — no border). */
+  .fc-riders{
+    --riders-bg:#afb0e8;
+    width:100%; height:100svh;
+    background:var(--riders-bg);
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+  }
+  .fc-riders img{
+    width:100%; height:100%;
+    object-fit:contain;        /* riders shown at full slide size + scale with the viewport, never cropped */
+    object-position:center;
+    display:block;
+  }
+
+  /* ========= FANTACYCLING — AFFISSIONI / MOCKUP (scroll #3) =========
+     Due foto impilate: ognuna occupa ESATTAMENTE metà schermo.
+     >>> KNOBS <<<
+     --ad-split   = quota verticale della foto in ALTO (50% = metà esatta)
+     --ad-top-pos = punto di interesse 1ª foto (pensilina): tiene il poster
+                    (centro-destra) sempre in vista quando il responsive taglia
+     --ad-bot-pos = punto di interesse 2ª foto (billboard) */
+  .fc-ads{
+    --ad-split:50%;
+    --ad-top-pos:60% 70%;
+    --ad-bot-pos:50% 50%;
+    --ad-bot-zoom:1;        /* zoom billboard — su desktop lo alza la media query sotto */
+    width:100%; height:100svh;
+    display:flex; flex-direction:column;
+    overflow:hidden; background:var(--bg);
+  }
+  .fc-ad{width:100%; overflow:hidden;}
+  .fc-ad.top{height:var(--ad-split);}
+  .fc-ad.bot{height:calc(100% - var(--ad-split));}
+  .fc-ad img{width:100%; height:100%; object-fit:cover; display:block;}
+  .fc-ad.top img{object-position:var(--ad-top-pos);}
+  .fc-ad.bot img{object-position:var(--ad-bot-pos); transform:scale(var(--ad-bot-zoom)); transform-origin:center;}
+  @media (min-width:900px){ .fc-ads{ --ad-bot-zoom:1.25; } }  /* billboard un filo piu zoomato solo su desktop */
+
+  /* ========= FANTACYCLING — MOCKUP PAGINA 2 (scroll #4) =========
+     Stessa logica della slide 3: due foto impilate, ognuna metà schermo, cover.
+     >>> KNOBS <<<  --ad2-split = quota foto in alto ; --ad2-*-pos = punto d'interesse */
+  .fc-ads2{
+    --ad2-split:50%;
+    --ad2-top-pos:50% 50%;   /* biglietti da visita */
+    --ad2-bot-pos:50% 50%;   /* billboard su muro */
+    width:100%; height:100svh;
+    display:flex; flex-direction:column;
+    overflow:hidden; background:var(--bg);
+  }
+  .fc-ad2{width:100%; overflow:hidden;}
+  .fc-ad2.top{height:var(--ad2-split);}
+  .fc-ad2.bot{height:calc(100% - var(--ad2-split));}
+  .fc-ad2 img{width:100%; height:100%; object-fit:cover; display:block;}
+  .fc-ad2.top img{object-position:var(--ad2-top-pos);}
+  .fc-ad2.bot img{object-position:var(--ad2-bot-pos);}
+
+  /* ========= FANTACYCLING — MOCKUP PRODOTTI / PAGINA 3 (scroll #5) =========
+     Griglia 1+2: borraccia a sinistra (piena altezza) ; guanto (alto) + calzino (basso) a destra.
+     Ogni cella ha lo sfondo dello STESSO colore dell'immagine + object-fit:contain:
+     il colore riempie tutta la cella (zero spazio vuoto) e il prodotto non viene MAI tagliato.
+     >>> KNOBS <<<  --p3-split-x = larghezza colonna sx ; --p3-split-y = quota guanto a dx */
+  .fc-prod{
+    --p3-split-x:50%;
+    --p3-split-y:50%;
+    width:100%; height:100svh; display:flex; overflow:hidden;
+  }
+  .fc-prod .col-l{width:var(--p3-split-x); height:100%; overflow:hidden; background:#f8c021;}
+  .fc-prod .col-r{width:calc(100% - var(--p3-split-x)); height:100%;
+    display:flex; flex-direction:column; overflow:hidden;}
+  .fc-prod .cell{width:100%; overflow:hidden;}
+  .fc-prod .cell.top{height:var(--p3-split-y); background:#cd2600;}
+  .fc-prod .cell.bot{height:calc(100% - var(--p3-split-y)); background:#ebe9f6;}
+  .fc-prod img{width:100%; height:100%; object-fit:contain; display:block;}
+
+  /* ========= FANTACYCLING — MOCKUP PRODOTTI 2 / PAGINA 4 (scroll #6) =========
+     Due colonne 50/50: sacca a sinistra (sfondo SOLIDO blu -> contain, intera),
+     taccuino+penna a destra (sfondo GRADIENTE oro -> cover, riempie senza stacchi).
+     >>> KNOBS <<<  --p4-split-x = larghezza colonna sacca ; --p4-nb-pos = punto d'interesse taccuino */
+  .fc-prod2{
+    --p4-split-x:50%;
+    --p4-nb-pos:50% 50%;
+    width:100%; height:100svh; display:flex; overflow:hidden;
+  }
+  .fc-prod2 .col-l{width:var(--p4-split-x); height:100%; overflow:hidden; background:#00007c;}
+  .fc-prod2 .col-l img{width:100%; height:100%; object-fit:contain; display:block;}
+  .fc-prod2 .col-r{width:calc(100% - var(--p4-split-x)); height:100%; overflow:hidden; background:#bd932b;}
+  .fc-prod2 .col-r img{width:100%; height:100%; object-fit:cover; object-position:var(--p4-nb-pos); display:block;}
+
+  /* ========= FANTACYCLING — DIVISA / PAGINA 5 (scroll #7) =========
+     Maglia + pantaloncini (Front & Back) su lavanda SOLIDA.
+     Divisa centrata e RIDOTTA, con margine lavanda tutt'intorno (staccata dai bordi).
+     >>> KNOBS <<<  --kit-bg = colore sfondo ; --kit-scale = grandezza divisa (1 = riempie tutto, più basso = più piccola/staccata) */
+  .fc-kit{
+    --kit-bg:#e4e1f2;
+    --kit-scale:.72;
+    width:100%; height:100svh; overflow:hidden; background:var(--kit-bg);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .fc-kit img{width:calc(100% * var(--kit-scale)); height:calc(100% * var(--kit-scale));
+    object-fit:contain; display:block;}
+
+  /* ========= FANTACYCLING — SOCIAL SHOWCASE / PAGINA 6 (scroll #8) =========
+     Profilo IG + post + caroselli + icona, su lavanda SOLIDA.
+     Centrato e RIDOTTO, con margine lavanda tutt'intorno (staccato dai bordi). Cornice nera dell'asset già rimossa.
+     >>> KNOBS <<<  --soc-bg = colore sfondo ; --soc-scale = grandezza showcase (1 = riempie tutto, più basso = più piccolo) */
+  .fc-social{
+    --soc-bg:#e4e1f1;
+    --soc-scale:.86;
+    width:100%; height:100svh; overflow:hidden; background:var(--soc-bg);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .fc-social img{width:calc(100% * var(--soc-scale)); height:calc(100% * var(--soc-scale));
+    object-fit:contain; display:block;}
+
+  /* ========= FANTACYCLING — APP UI / PAGINA 7 (scroll #9) =========
+     4 schermate app (Home, Racers, Racer Sheet, My Team) + App Icon, su lavanda SOLIDA.
+     Centrato e RIDOTTO, margine lavanda tutt'intorno (staccato). Cornice nera dell'asset già rimossa.
+     >>> KNOBS <<<  --app-bg = colore sfondo ; --app-scale = grandezza (1 = riempie tutto, più basso = più piccolo) */
+  .fc-app{
+    --app-bg:#e4e1f2;
+    --app-scale:.88;
+    width:100%; height:100svh; overflow:hidden; background:var(--app-bg);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .fc-app img{width:calc(100% * var(--app-scale)); height:calc(100% * var(--app-scale));
+    object-fit:contain; display:block;}
+
+  /* ========= FANTACYCLING - VIDEO / PAGINA 8 (scroll #10) =========
+     Video del sito fantacycling.com INTERO su sfondo viola chiaro (lavanda), con bordo tutt'intorno.
+     Autoplay, muto, in loop. Sinistra e alto del video restano INTATTI; le sottili cuciture di rendering
+     su DESTRA e BASSO vengono coperte da un filo di lavanda (stesso colore dello sfondo) tramite ::after.
+     >>> KNOBS <<<  --vid-bg = colore sfondo/bordo ; --vid-scale = grandezza video ;
+                    --vid-edge = spessore del filo che copre le cuciture a destra/basso (alzalo se ne vedi ancora) */
+  .fc-video{
+    --vid-bg:#e4e1f2;
+    --vid-scale:.9;
+    --vid-edge:2px;
+    width:100%; height:100svh; overflow:hidden; background:var(--vid-bg);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .fc-video .vwrap{
+    position:relative;
+    width:min(calc(100% * var(--vid-scale)), calc(100svh * var(--vid-scale) * 1918 / 1240));
+    aspect-ratio:1918 / 1240;
+    overflow:hidden;
+    background:var(--vid-bg);
+  }
+  .fc-video video{
+    width:100%; height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .fc-video .vwrap::after{
+    content:"";
+    position:absolute; inset:0;
+    border-right:var(--vid-edge) solid var(--vid-bg);
+    border-bottom:var(--vid-edge) solid var(--vid-bg);
+    pointer-events:none;
+  }
+
+  /* ========= MEET ARCHIVE - slide 2 pannelli (dopo MEET) =========
+     Sinistra: testo "MEET ARCHIVE" (vettoriale, bianco) su fondo nero. Destra: foto a tutto campo.
+     Il testo e' dimensionato in ALTEZZA (svh) cosi' resta UGUALE su ogni larghezza di schermo.
+     >>> KNOBS <<<
+       --ma-text-h    = ALTEZZA del blocco di testo (svh = % altezza schermo) -> alza per ingrandire, abbassa per ridurre
+       --ma-text-x/y  = posizione (margine sinistro % pannello / margine alto % schermo)
+       --ma-text-maxw = larghezza massima di sicurezza su schermi stretti
+       --ma-photo-pos = inquadratura foto (object-position) */
+  .ma-slide{
+    --ma-bg:#000000;
+    --ma-text-h:71svh;
+    --ma-text-maxw:90%;
+    --ma-text-x:6%;
+    --ma-text-y:13%;
+    --ma-photo-pos:50% 50%;
+    width:100%; height:100svh; display:flex; overflow:hidden; background:var(--ma-bg);
+  }
+  .ma-slide .ma-left{ position:relative; width:50%; height:100%; background:var(--ma-bg); }
+  .ma-slide .ma-text{
+    position:absolute; left:var(--ma-text-x); top:var(--ma-text-y);
+    max-height:var(--ma-text-h); max-width:var(--ma-text-maxw);
+    width:auto; height:auto; display:block;
+  }
+  .ma-slide .ma-right{ width:50%; height:100%; overflow:hidden; }
+  .ma-slide .ma-photo{
+    width:100%; height:100%; object-fit:cover; object-position:var(--ma-photo-pos); display:block;
+  }
+
+  /* ========= MOODBOARD - slide =========
+     Fondo nero. La composizione (moodboard.png = tela completa del design, SENZA testi) e le label (svg)
+     stanno in una "stage" che combacia con la tela del design (aspect 1.406) a larghezza piena, spostata un po'
+     a SINISTRA cosi' la roccia si allinea ~alla "D" di MOODBOARD (un filo a sinistra). Il titolo e' separato,
+     in alto a sinistra. La stage e' piu' alta dello schermo -> si taglia un po' sopra/sotto (ok).
+     >>> KNOBS <<<
+       --mb-bg        = colore fondo
+       --mb-stage-x   = spostamento orizzontale di composizione+label (negativo = verso sinistra)
+       --mb-stage-y   = posizione verticale (50% = centro; cambia cosa si taglia sopra/sotto)
+       --mb-stage-w   = larghezza stage (100% = piena; abbassa per rimpicciolire tutto)
+       --mb-labels-scale = dimensione SOLO delle label (1 = base; <1 = piu' piccole)
+       --mb-title-h   = dimensione titolo (uguale a MEET ARCHIVE)
+       --mb-title-x/y = posizione titolo */
+  .mb-slide{
+    --mb-bg:#000000;
+    --mb-stage-x:6%;
+    --mb-stage-y:50%;
+    --mb-stage-w:90%;
+    --mb-labels-scale:0.85;
+    --mb-title-h:4.36svh;
+    --mb-title-x:3%;
+    --mb-title-y:13.9%;
+    position:relative; width:100%; height:100svh; overflow:hidden; background:var(--mb-bg);
+  }
+  .mb-slide .mb-stage{
+    position:absolute; left:var(--mb-stage-x); top:var(--mb-stage-y); transform:translateY(-50%);
+    width:var(--mb-stage-w); aspect-ratio:3536 / 2516;
+  }
+  .mb-slide .mb-img{ width:100%; height:100%; display:block; }
+  .mb-slide .mb-labels{
+    position:absolute; left:13%; top:36%; width:69%; height:auto; display:block;
+    transform:scale(var(--mb-labels-scale)); transform-origin:center center;
+  }
+  .mb-slide .mb-title{
+    position:absolute; left:var(--mb-title-x); top:var(--mb-title-y);
+    height:var(--mb-title-h); width:auto; display:block; z-index:3;
+  }
+
+  /* ========= TIMELINE - slide (tecnologie obsolete) =========
+     Due immagini sovrapposte (fotografica + a particelle, STESSO layout) con CROSSFADE legato allo scroll:
+     scrollando GIU' la versione a particelle compare in opacita' sopra la fotografica; scrollando SU' riappare
+     la fotografica. La slide e' alta --tl-scroll (200svh): il contenuto resta "incollato" (sticky) mentre scorri
+     e l'opacita' va 0->1. Immagini non troppo grandi (~52svh) -> spazio nero ai lati.
+     >>> KNOBS <<<
+       --tl-bg     = colore fondo
+       --tl-h      = altezza immagini (52svh = come il design)
+       --tl-y      = posizione verticale (50% = centro)
+       --tl-scroll = quanto scroll serve per il crossfade (200svh = 1 schermata; alza = transizione piu' lenta) */
+  .tl-slide{
+    --tl-bg:#000000;
+    --tl-h:52svh;
+    --tl-y:50%;
+    --tl-scroll:200svh;
+    position:relative; width:100%; height:var(--tl-scroll); background:var(--tl-bg);
+  }
+  .tl-slide .tl-sticky{
+    position:sticky; top:0; height:100svh; overflow:hidden;
+  }
+  .tl-slide .tl-img{
+    position:absolute; left:50%; top:var(--tl-y); transform:translate(-50%,-50%);
+    height:var(--tl-h); width:auto; max-width:94%; display:block;
+  }
+  .tl-slide .tl-over{ opacity:0; will-change:opacity; }
+
+  /* ========= FINALI - slide (3 video poster MEET Archive) =========
+     Scroll classico (no sticky). 3 video verticali (9:16) centrati verticalmente su fondo nero.
+     Allineamento orizzontale = STESSO padding della slide vi-next, cosi': floppy combacia col bordo SX di
+     "MEET Archive", blackberry col bordo DX di "2025", tamagotchi al centro. Gap uguali (flex space-between).
+     Gli spazi vuoti restano neri.
+     >>> KNOBS <<<
+       --fin-bg  = colore fondo
+       --fin-h   = altezza dei video (82svh; alza/abbassa -> i gap si regolano da soli)
+       --fin-pad = margine laterale (= padding di vi-next; serve per l'allineamento a MEET Archive/2025) */
+  .fin-slide{
+    --fin-bg:#000000;
+    --fin-h:82svh;
+    --fin-pad:clamp(22px,3vw,46px);
+    position:relative; width:100%; height:100svh; overflow:hidden; background:var(--fin-bg);
+    box-sizing:border-box; padding:0 var(--fin-pad);
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .fin-slide video{
+    height:var(--fin-h); width:auto; aspect-ratio:9 / 16; display:block;
+    object-fit:cover; background:#000;
+  }
+
+  /* ========= PIAZZE NEGATE - HERO / slide 1 — STEP 3: sfondo + foto + titolo =========
+     Fondo viola + overlay NOISE. Foto ancorata in basso. Titolo PIAZZENEGATE (PNG, una riga + logo)
+     in alto, ancorato al viewport.
+     >>> KNOBS <<<
+       --pn-bg        = colore fondo viola
+       --pn-noise-op  = intensita' del noise (0=niente, 1=max)
+       --pn-photo-l   = distanza foto dal bordo SINISTRO (vw: negativo = piu' a sinistra/fuori)
+       --pn-photo-b   = distanza foto dal fondo (vw: negativo = scende sotto il bordo)
+       --pn-photo-w   = larghezza foto (vw)
+       --pn-title-l   = distanza titolo dal bordo SINISTRO (vw)
+       --pn-title-t   = distanza titolo dall'alto (vw)
+       --pn-title-w   = larghezza titolo+logo (vw)
+       --pn-sub-l     = distanza sottotitolo dal bordo SINISTRO (vw) — allineato alla E di nEgate
+       --pn-sub-t     = distanza sottotitolo dall'alto (vw)
+       --pn-sub-w     = larghezza sottotitolo (vw) */
+  .pn-hero{
+    --pn-bg:#7F04FA;
+    --pn-noise-op:0.6;
+    --pn-photo-l:-11.8vw;  --pn-photo-b:-9.75vw;  --pn-photo-w:92.1vw;
+    --pn-title-l:2.3vw;   --pn-title-t:12.8vw;   --pn-title-w:calc(100% - 2.3vw - clamp(22px,3vw,46px));
+    --pn-sub-l:64.7vw;    --pn-sub-t:25.8vw;    --pn-sub-w:30vw;
+    position:relative; width:100%; height:100svh; overflow:hidden; background:var(--pn-bg);
+  }
+  .pn-hero .pn-photo{position:absolute; left:var(--pn-photo-l); bottom:var(--pn-photo-b);
+    width:var(--pn-photo-w); height:auto; display:block; z-index:1;}
+  .pn-hero .pn-title{position:absolute; left:var(--pn-title-l); top:var(--pn-title-t);
+    width:var(--pn-title-w); height:auto; display:block; z-index:3;}
+  .pn-hero .pn-sub{position:absolute; left:var(--pn-sub-l); top:var(--pn-sub-t);
+    width:var(--pn-sub-w); height:auto; display:block; z-index:3;}
+  /* NOISE overlay: copre l'INTERA slide */
+  /* NOISE overlay: grana ripetuta in TILES (piccola e fitta) in mix-blend-mode:multiply.
+     Il bianco sparisce, restano i puntini scuri. --pn-noise-size = dimensione del tile (px). */
+  .pn-hero{ --pn-noise-size:340px; }
+  .pn-hero .pn-noise{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-image:url(assets/img/pn-grain.jpg);
+    background-repeat:repeat;
+    background-size:var(--pn-noise-size) var(--pn-noise-size);
+    z-index:5; pointer-events:none; opacity:var(--pn-noise-op);
+    mix-blend-mode:multiply;
+  }
+
+  /* ========= PIAZZE NEGATE - SLIDE 2 =========
+     Sfondo viola #7F04FA + grana tiles (multiply). Tre elementi (tutti SOTTO il noise, z-index<5):
+       - "OUR CAMPAIGN QUESTION" (SVG) in alto a sinistra
+       - paragrafo (PNG) in alto a destra
+       - logo PIAZZENEGATE (SVG) in BASSO a SINISTRA (allineato alla slide 1)
+     >>> KNOBS <<< (vw, scala con la larghezza)
+       --pn2-cq-l/t/w     = campaign question: sinistra / alto / larghezza
+       --pn2-txt-l/t/w    = paragrafo: sinistra / alto / larghezza
+       --pn2-logo-l/b/w   = logo: sinistra / FONDO / larghezza
+       --pn2-sky-l/b/w    = skyline: sinistra / FONDO / larghezza (ancorata basso-sx) */
+  .pn2{
+    --pn-bg:#7F04FA;
+    --pn-noise-op:0.6;
+    --pn-noise-size:340px;
+    --pn2-cq-l:2.85vw;   --pn2-cq-t:12.8vw;   --pn2-cq-w:31vw;
+    --pn2-txt-l:calc(100% - clamp(22px,3vw,46px) - var(--pn2-txt-w));    --pn2-txt-t:12.8vw;  --pn2-txt-w:55vw;
+    --pn2-logo-l:2.3vw;  --pn2-logo-b:4vw;    --pn2-logo-w:22vw;
+    --pn2-sky-l:0vw;     --pn2-sky-b:0vw;     --pn2-sky-w:121.7vw;
+    position:relative; width:100%; height:100svh; overflow:hidden; background:var(--pn-bg);
+  }
+  .pn2 .pn2-sky{position:absolute; left:var(--pn2-sky-l); bottom:var(--pn2-sky-b);
+    width:var(--pn2-sky-w); height:auto; display:block; z-index:1;}
+  .pn2 .pn2-cq{position:absolute; left:var(--pn2-cq-l); top:var(--pn2-cq-t);
+    width:var(--pn2-cq-w); height:auto; display:block; z-index:2;}
+  .pn2 .pn2-txt{position:absolute; left:var(--pn2-txt-l); top:var(--pn2-txt-t);
+    width:var(--pn2-txt-w); height:auto; display:block; z-index:2;}
+  .pn2 .pn2-logo{position:absolute; left:var(--pn2-logo-l); bottom:var(--pn2-logo-b);
+    width:var(--pn2-logo-w); height:auto; display:block; z-index:2;}
+  .pn2 .pn-noise{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-image:url(assets/img/pn-grain.jpg);
+    background-repeat:repeat;
+    background-size:var(--pn-noise-size) var(--pn-noise-size);
+    z-index:5; pointer-events:none; opacity:var(--pn-noise-op);
+    mix-blend-mode:multiply;
+  }
+
+  /* ========= PIAZZE NEGATE - SLIDE 3 — OUR CAMPAIGN SYSTEM + TERRITORIAL block =========
+     No skyline. OUR CAMPAIGN SYSTEM nella stessa posizione di OUR CAMPAIGN QUESTION (slide 2).
+     TERRITORIAL block (titolo + 3 items) allineato alla stessa altezza, a destra.
+     >>> KNOBS <<<
+       --pn3-cq-l/t/w   = OUR CAMPAIGN SYSTEM (NON muovere: uguale slide 2)
+       --pn3-txt-l/t/w  = TERRITORIAL block: sinistra / alto (allineato a cq) / larghezza
+       --pn3-logo-l/b/w = logo PIAZZENEGATE basso-sx */
+  /* ===== STACK slide 3+4+5: fade-in successivi (TERRITORIAL -> PUBBLIC COMM -> LOCAL ADV) ===== */
+  .pn34-stack{ position:relative; width:100%; height:300svh; }
+  .pn34-stack .pn34-sticky{ position:sticky; top:0; height:100svh; width:100%; }
+  .pn34-stack .pn3,
+  .pn34-stack .pn4,
+  .pn34-stack .pn5{ position:absolute; inset:0; }
+  .pn34-stack .pn3{ z-index:1; }
+  .pn34-stack .pn4{ z-index:2; opacity:0; will-change:opacity; }
+  .pn34-stack .pn5{ z-index:3; opacity:0; will-change:opacity; }
+
+  .pn3{
+    --pn-bg:#7F04FA;
+    --pn-noise-op:0.6;
+    --pn-noise-size:340px;
+    --pn3-cq-l:2.85vw;   --pn3-cq-t:12.8vw;   --pn3-cq-w:31vw;
+    --pn3-txt-l:39.65vw; --pn3-txt-t:12.8vw;  --pn3-txt-w:27.2vw;
+    --pn3-logo-l:2.3vw;  --pn3-logo-b:4vw;    --pn3-logo-w:22vw;
+    width:100%; height:100svh; overflow:hidden; background:var(--pn-bg);
+  }
+  .pn3 .pn3-cq{position:absolute; left:var(--pn3-cq-l); top:var(--pn3-cq-t);
+    width:var(--pn3-cq-w); height:auto; display:block; z-index:2;}
+  .pn3 .pn3-txt{position:absolute; left:var(--pn3-txt-l); top:var(--pn3-txt-t);
+    width:var(--pn3-txt-w); height:auto; display:block; z-index:2;}
+  .pn3 .pn3-logo{position:absolute; left:var(--pn3-logo-l); bottom:var(--pn3-logo-b);
+    width:var(--pn3-logo-w); height:auto; display:block; z-index:2;}
+  .pn3 .pn-noise{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-image:url(assets/img/pn-grain.jpg);
+    background-repeat:repeat;
+    background-size:var(--pn-noise-size) var(--pn-noise-size);
+    z-index:5; pointer-events:none; opacity:var(--pn-noise-op);
+    mix-blend-mode:multiply;
+  }
+
+  /* ========= PIAZZE NEGATE - SLIDE 4 — overlay LOCAL ADVERTISEMENT (fade-in sopra slide 3) ========= */
+  .pn4{
+    --pn-bg:#7F04FA;
+    --pn-noise-op:0.6;
+    --pn-noise-size:340px;
+    --pn4-cq-l:2.85vw;   --pn4-cq-t:12.8vw;   --pn4-cq-w:31vw;
+    --pn4-txt-l:39.65vw; --pn4-txt-t:12.8vw;  --pn4-txt-w:21vw;
+    --pn4-logo-l:2.3vw;  --pn4-logo-b:4vw;    --pn4-logo-w:22vw;
+    width:100%; height:100svh; overflow:hidden; background:var(--pn-bg);
+  }
+  .pn4 .pn4-cq{position:absolute; left:var(--pn4-cq-l); top:var(--pn4-cq-t);
+    width:var(--pn4-cq-w); height:auto; display:block; z-index:2;}
+  .pn4 .pn4-txt{position:absolute; left:var(--pn4-txt-l); top:var(--pn4-txt-t);
+    width:var(--pn4-txt-w); height:auto; display:block; z-index:2;}
+  .pn4 .pn4-logo{position:absolute; left:var(--pn4-logo-l); bottom:var(--pn4-logo-b);
+    width:var(--pn4-logo-w); height:auto; display:block; z-index:2;}
+  .pn4 .pn-noise{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-image:url(assets/img/pn-grain.jpg);
+    background-repeat:repeat;
+    background-size:var(--pn-noise-size) var(--pn-noise-size);
+    z-index:5; pointer-events:none; opacity:var(--pn-noise-op);
+    mix-blend-mode:multiply;
+  }
+
+  /* ========= PIAZZE NEGATE - SLIDE 5 — overlay LOCAL ADVERTISEMENT (fade-in sopra PUBBLIC COMM) ========= */
+  .pn5{
+    --pn-bg:#7F04FA;
+    --pn-noise-op:0.6;
+    --pn-noise-size:340px;
+    --pn5-cq-l:2.85vw;   --pn5-cq-t:12.8vw;   --pn5-cq-w:31vw;
+    --pn5-txt-l:39.65vw; --pn5-txt-t:12.8vw;  --pn5-txt-w:18.8vw;
+    --pn5-logo-l:2.3vw;  --pn5-logo-b:4vw;    --pn5-logo-w:22vw;
+    width:100%; height:100svh; overflow:hidden; background:var(--pn-bg);
+  }
+  .pn5 .pn5-cq{position:absolute; left:var(--pn5-cq-l); top:var(--pn5-cq-t);
+    width:var(--pn5-cq-w); height:auto; display:block; z-index:2;}
+  .pn5 .pn5-txt{position:absolute; left:var(--pn5-txt-l); top:var(--pn5-txt-t);
+    width:var(--pn5-txt-w); height:auto; display:block; z-index:2;}
+  .pn5 .pn5-logo{position:absolute; left:var(--pn5-logo-l); bottom:var(--pn5-logo-b);
+    width:var(--pn5-logo-w); height:auto; display:block; z-index:2;}
+  .pn5 .pn-noise{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-image:url(assets/img/pn-grain.jpg);
+    background-repeat:repeat;
+    background-size:var(--pn-noise-size) var(--pn-noise-size);
+    z-index:5; pointer-events:none; opacity:var(--pn-noise-op);
+    mix-blend-mode:multiply;
+  }
+
+  /* ========= PIAZZE NEGATE - SLIDE 6 — copia statica di OUR CAMPAIGN QUESTION ========= */
+  .pn6{
+    --pn-bg:#7F04FA;
+    --pn-noise-op:0.6;
+    --pn-noise-size:340px;
+    --pn6-cq-l:2.85vw;   --pn6-cq-t:12.8vw;   --pn6-cq-w:31vw;
+    --pn6-txt-l:calc(100% - clamp(22px,3vw,46px) - var(--pn6-txt-w));    --pn6-txt-t:12.8vw;  --pn6-txt-w:55vw;
+    --pn6-logo-l:2.3vw;  --pn6-logo-b:4vw;    --pn6-logo-w:22vw;
+    --pn6-sky-l:0vw;     --pn6-sky-b:-0.69vw;     --pn6-sky-w:110.9vw;
+    position:relative; width:100%; height:100svh; overflow:hidden; background:var(--pn-bg);
+  }
+  .pn6 .pn6-sky{position:absolute; left:var(--pn6-sky-l); bottom:var(--pn6-sky-b);
+    width:var(--pn6-sky-w); height:auto; display:block; z-index:1;}
+  .pn6 .pn6-cq{position:absolute; left:var(--pn6-cq-l); top:var(--pn6-cq-t);
+    width:var(--pn6-cq-w); height:auto; display:block; z-index:2;}
+  .pn6 .pn6-txt{position:absolute; left:var(--pn6-txt-l); top:var(--pn6-txt-t);
+    width:var(--pn6-txt-w); height:auto; display:block; z-index:2;}
+  .pn6 .pn6-logo{position:absolute; left:var(--pn6-logo-l); bottom:var(--pn6-logo-b);
+    width:var(--pn6-logo-w); height:auto; display:block; z-index:2;}
+  .pn6 .pn-noise{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-image:url(assets/img/pn-grain.jpg);
+    background-repeat:repeat;
+    background-size:var(--pn-noise-size) var(--pn-noise-size);
+    z-index:5; pointer-events:none; opacity:var(--pn-noise-op);
+    mix-blend-mode:multiply;
+  }
+
+  /* ========= PIAZZE NEGATE - SLIDE 7 — FLOOR GRAFFITI (Piazza Bausan): foto + titolo + annotazione + logo =========
+     Layout come da full_slide. Sfondo = FOTO pavimento (cover + zoom). NIENTE paragrafo.
+       - titolo "FLOOR GRAFFITI / 1 H BEFORE" (SVG, lime+bianco) in alto a sinistra
+       - annotazione "QUESTION ABOUT THE PIAZZA" + freccia (PNG, nero reso trasparente) al centro-basso, punta al graffito
+       - logo PIAZZE NEGATE in basso a sinistra
+     NB: il mockup full_slide e' 1.4:1, la slide live e' 16:9 -> a parita' di zoom il graffito risulta piu'
+         piccolo qui. Con 1.69 (=il tuo +30%) il graffito e' ~64% di larghezza; per matchare il mockup (~81%)
+         alza --pn7-bg-zoom verso ~2.1.
+     >>> KNOBS <<< (vw)
+       --pn7-bg-pos  = inquadratura foto (object-position). "50% 50%"=centro.
+       --pn7-bg-zoom = zoom foto (1=nessuno; 1.69=+30%). Alza per ingrandire ancora, abbassa per rimpicciolire.
+       --pn7-title-l/t/w = titolo: sinistra / alto / larghezza
+       --pn7-note-l/t/w  = annotazione: sinistra / alto / larghezza (spostala per allineare la freccia al graffito)
+       --pn7-logo-l/b/w  = logo: sinistra / fondo / larghezza */
+  .pn7{
+    --pn-noise-op:0.6;
+    --pn-noise-size:340px;
+    --pn7-bg-pos:50% 50%;
+    --pn7-bg-zoom:1.69;
+    --pn7-title-l:2.85vw;  --pn7-title-t:12.8vw;  --pn7-title-w:26vw;
+    --pn7-note-l:38.2vw;   --pn7-note-t:37.6vw;   --pn7-note-w:27.5vw;
+    --pn7-logo-l:2.3vw;    --pn7-logo-b:4vw;      --pn7-logo-w:22vw;
+    position:relative; width:100%; height:100svh; overflow:hidden; background:#000;
+  }
+  .pn7 .pn7-bg{position:absolute; inset:0; width:100%; height:100%;
+    object-fit:cover; object-position:var(--pn7-bg-pos);
+    transform:scale(var(--pn7-bg-zoom)); transform-origin:center; display:block; z-index:0;}
+  .pn7 .pn7-title{position:absolute; left:var(--pn7-title-l); top:var(--pn7-title-t);
+    width:var(--pn7-title-w); height:auto; display:block; z-index:2;}
+  .pn7 .pn7-note{position:absolute; left:var(--pn7-note-l); top:var(--pn7-note-t);
+    width:var(--pn7-note-w); height:auto; display:block; z-index:2;}
+  .pn7 .pn7-logo{position:absolute; left:var(--pn7-logo-l); bottom:var(--pn7-logo-b);
+    width:var(--pn7-logo-w); height:auto; display:block; z-index:2;}
+  .pn7 .pn-noise{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-image:url(assets/img/pn-grain.jpg);
+    background-repeat:repeat;
+    background-size:var(--pn-noise-size) var(--pn-noise-size);
+    z-index:5; pointer-events:none; opacity:var(--pn-noise-op);
+    mix-blend-mode:multiply;
+  }
+
+  /* ========= PIAZZE NEGATE - SLIDE 8 — TOTEM (artefatto). Layout come da full_slide TOTEM. =========
+     Sfondo viola. Titolo TOTEM (top-left), logo (bottom-left).
+     Al posto del paragrafo: GRIGLIA FOTO (jpg) a destra + 2 ETICHETTE manoscritte (svg) al centro-sx,
+     allineate alle righe della griglia (INFORMATIONS+INSTRUCTIONS ~ riga 1, PANELS FOR INTERACTION ~ riga 2).
+     NB: mockup 1.4:1 vs slide live 16:9 -> posizioni/misure sono un punto di partenza, ritoccabili coi KNOB.
+     >>> KNOBS <<< (vw)
+       --pn8-title-l/t/w = titolo TOTEM
+       --pn8-grid-l/t/w  = griglia foto: sinistra / alto / larghezza (altezza automatica, aspetto nativo ~1.066)
+       --pn8-info-l/t/w  = etichetta "INFORMATIONS + INSTRUCTIONS"
+       --pn8-pan-l/t/w   = etichetta "PANELS FOR INTERACTION"
+       --pn8-logo-l/b/w  = logo */
+  .pn8{
+    --pn-bg:#7F04FA;
+    --pn-noise-op:0.6;
+    --pn-noise-size:340px;
+    --pn8-title-l:2.85vw;  --pn8-title-t:12.8vw;  --pn8-title-w:11.2vw;
+    --pn8-grid-l:calc(100% - clamp(22px,3vw,46px) - var(--pn8-grid-w));   --pn8-grid-t:12.5vw;     --pn8-grid-w:41.8vw;
+    --pn8-info-l:calc(100% - clamp(22px,3vw,46px) - 61.3vw);   --pn8-info-t:14.7vw;   --pn8-info-w:15.9vw;
+    --pn8-pan-l:calc(100% - clamp(22px,3vw,46px) - 61.3vw);    --pn8-pan-t:30.1vw;    --pn8-pan-w:11.9vw;
+    --pn8-logo-l:2.3vw;  --pn8-logo-b:4vw;    --pn8-logo-w:22vw;
+    position:relative; width:100%; height:100svh; overflow:hidden; background:var(--pn-bg);
+  }
+  .pn8 .pn8-title{position:absolute; left:var(--pn8-title-l); top:var(--pn8-title-t);
+    width:var(--pn8-title-w); height:auto; display:block; z-index:2;}
+  .pn8 .pn8-grid{position:absolute; left:var(--pn8-grid-l); top:var(--pn8-grid-t);
+    width:var(--pn8-grid-w); height:auto; display:block; z-index:2;}
+  .pn8 .pn8-info{position:absolute; left:var(--pn8-info-l); top:var(--pn8-info-t);
+    width:var(--pn8-info-w); height:auto; display:block; z-index:2;}
+  .pn8 .pn8-pan{position:absolute; left:var(--pn8-pan-l); top:var(--pn8-pan-t);
+    width:var(--pn8-pan-w); height:auto; display:block; z-index:2;}
+  .pn8 .pn8-logo{position:absolute; left:var(--pn8-logo-l); bottom:var(--pn8-logo-b);
+    width:var(--pn8-logo-w); height:auto; display:block; z-index:2;}
+  .pn8 .pn-noise{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-image:url(assets/img/pn-grain.jpg);
+    background-repeat:repeat;
+    background-size:var(--pn-noise-size) var(--pn-noise-size);
+    z-index:5; pointer-events:none; opacity:var(--pn-noise-op);
+    mix-blend-mode:multiply;
+  }
+
+  /* >>> SLIDE 9: EXPLAINATORY POSTCARD + STICKERS (start of lab) <<<
+     Copia della pn8 ma: sfondo full-bleed (png cartoline) come pn7, niente griglia foto, niente etichette bianche.
+     KNOBS (vw): --pn9-bg-pos/zoom = inquadratura sfondo; --pn9-title-l/t/w = titolo; --pn9-logo-l/b/w = logo */
+  .pn9{
+    --pn-noise-op:0.6;
+    --pn-noise-size:340px;
+    --pn9-bg-pos:50% 50%;
+    --pn9-bg-zoom:1;
+    --pn9-title-l:2.85vw;  --pn9-title-t:12.8vw;  --pn9-title-w:24.6vw;
+    --pn9-logo-l:2.3vw;    --pn9-logo-b:4vw;      --pn9-logo-w:22vw;
+    position:relative; width:100%; height:100svh; overflow:hidden; background:#000;
+  }
+  .pn9 .pn9-bg{position:absolute; inset:0; width:100%; height:100%;
+    object-fit:cover; object-position:var(--pn9-bg-pos);
+    transform:scale(var(--pn9-bg-zoom)); transform-origin:center; display:block; z-index:0;}
+  .pn9 .pn9-title{position:absolute; left:var(--pn9-title-l); top:var(--pn9-title-t);
+    width:var(--pn9-title-w); height:auto; display:block; z-index:2;}
+  .pn9 .pn9-logo{position:absolute; left:var(--pn9-logo-l); bottom:var(--pn9-logo-b);
+    width:var(--pn9-logo-w); height:auto; display:block; z-index:2;}
+  .pn9 .pn-noise{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-image:url(assets/img/pn-grain.jpg);
+    background-repeat:repeat;
+    background-size:var(--pn-noise-size) var(--pn-noise-size);
+    z-index:5; pointer-events:none; opacity:var(--pn-noise-op);
+    mix-blend-mode:multiply;
+  }
+
+  /* ========= PIAZZE NEGATE - SLIDE 10 — copia di TERRITORIAL COLLABORATIVE LABORATORY, in fondo ========= */
+  .pn10{
+    --pn-bg:#7F04FA;
+    --pn-noise-op:0.6;
+    --pn-noise-size:340px;
+    --pn10-cq-l:2.85vw;   --pn10-cq-t:12.8vw;   --pn10-cq-w:15.8vw;
+    --pn10-txt-l:calc(100% - clamp(22px,3vw,46px) - 0.9158 * var(--pn10-txt-w));    --pn10-txt-t:calc(27.53vw - var(--pn10-txt-w) / 1.467 / 2);  --pn10-txt-w:56.54vw; /* ancora CENTRO-DX: bordo dx card AMO a E + centro verticale fisso a 27.53vw -> riduci --pn10-txt-w per rimpicciolire dal centro-destra */
+    --pn10-logo-l:2.3vw;  --pn10-logo-b:4vw;    --pn10-logo-w:22vw;
+    --pn10-leg-l:0.5vw;   --pn10-leg-t:22vw;    --pn10-leg-w:16.8vw;
+    --pn10-n1-l:66.5vw;   --pn10-n1-t:8vw;      --pn10-n1-w:17.5vw;
+    --pn10-n2-l:66.8vw;   --pn10-n2-t:43vw;     --pn10-n2-w:16.1vw;
+    position:relative; width:100%; height:100svh; overflow:hidden; background:var(--pn-bg);
+  }
+  .pn10 .pn10-cq{position:absolute; left:var(--pn10-cq-l); top:var(--pn10-cq-t);
+    width:var(--pn10-cq-w); height:auto; display:block; z-index:2;}
+  .pn10 .pn10-txt{position:absolute; left:var(--pn10-txt-l); top:var(--pn10-txt-t);
+    width:var(--pn10-txt-w); height:auto; display:block; z-index:2;}
+  .pn10 .pn10-logo{position:absolute; left:var(--pn10-logo-l); bottom:var(--pn10-logo-b);
+    width:var(--pn10-logo-w); height:auto; display:block; z-index:2;}
+  .pn10 .pn10-leg{position:absolute; left:var(--pn10-leg-l); top:var(--pn10-leg-t);
+    width:var(--pn10-leg-w); height:auto; display:block; z-index:2;}
+  .pn10 .pn10-n1{position:absolute; left:var(--pn10-n1-l); top:var(--pn10-n1-t);
+    width:var(--pn10-n1-w); height:auto; display:block; z-index:3;}
+  .pn10 .pn10-n2{position:absolute; left:var(--pn10-n2-l); top:var(--pn10-n2-t);
+    width:var(--pn10-n2-w); height:auto; display:block; z-index:3;}
+  .pn10 .pn-noise{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-image:url(assets/img/pn-grain.jpg);
+    background-repeat:repeat;
+    background-size:var(--pn-noise-size) var(--pn-noise-size);
+    z-index:5; pointer-events:none; opacity:var(--pn-noise-op);
+    mix-blend-mode:multiply;
+  }
+
+  /* ========= PIAZZE NEGATE - SLIDE 11 — copia di EXPLAINATORY POSTCARD, da personalizzare ========= */
+  .pn11{
+    --pn-noise-op:0.6;
+    --pn-noise-size:340px;
+    --pn11-bg-pos:50% 50%;
+    --pn11-bg-zoom:1;
+    --pn11-title-l:2.85vw;  --pn11-title-t:12.8vw;  --pn11-title-w:21.4vw;
+    --pn11-logo-l:2.3vw;    --pn11-logo-b:4vw;      --pn11-logo-w:22vw;
+    position:relative; width:100%; height:100svh; overflow:hidden; background:#000;
+  }
+  .pn11 .pn11-bg{position:absolute; inset:0; width:100%; height:100%;
+    object-fit:cover; object-position:var(--pn11-bg-pos);
+    transform:scale(var(--pn11-bg-zoom)); transform-origin:center; display:block; z-index:0;}
+  .pn11 .pn11-title{position:absolute; left:var(--pn11-title-l); top:var(--pn11-title-t);
+    width:var(--pn11-title-w); height:auto; display:block; z-index:2;}
+  .pn11 .pn11-logo{position:absolute; left:var(--pn11-logo-l); bottom:var(--pn11-logo-b);
+    width:var(--pn11-logo-w); height:auto; display:block; z-index:2;}
+  .pn11 .pn-noise{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-image:url(assets/img/pn-grain.jpg);
+    background-repeat:repeat;
+    background-size:var(--pn-noise-size) var(--pn-noise-size);
+    z-index:5; pointer-events:none; opacity:var(--pn-noise-op);
+    mix-blend-mode:multiply;
+  }
+
+  /* ========= PIAZZE NEGATE - SLIDE 12 — copia di STICKERS, da personalizzare ========= */
+  .pn12{
+    --pn-bg:#7F04FA;
+    --pn-noise-op:0.6;
+    --pn-noise-size:340px;
+    --pn12-cq-l:2.85vw;   --pn12-cq-t:12.8vw;   --pn12-cq-w:20.2vw;
+    --pn12-txt-l:calc(100% - clamp(22px,3vw,46px) - 0.9374 * var(--pn12-txt-w));    --pn12-txt-t:calc(29.33vw - var(--pn12-txt-w) / 1.430 / 2);  --pn12-txt-w:56.48vw; /* ancora CENTRO-DX: bordo dx card verde a E + centro verticale fisso a 29.33vw -> riduci --pn12-txt-w per rimpicciolire dal centro-destra */
+    --pn12-logo-l:2.3vw;  --pn12-logo-b:4vw;    --pn12-logo-w:22vw;
+    --pn12-leg-l:0.5vw;   --pn12-leg-t:22vw;    --pn12-leg-w:16.8vw;
+    --pn12-n1-l:66.5vw;   --pn12-n1-t:6.73vw;      --pn12-n1-w:14.64vw;
+    --pn12-n2-l:66.8vw;   --pn12-n2-t:44.6vw;     --pn12-n2-w:15.25vw;
+    position:relative; width:100%; height:100svh; overflow:hidden; background:var(--pn-bg);
+  }
+  .pn12 .pn12-cq{position:absolute; left:var(--pn12-cq-l); top:var(--pn12-cq-t);
+    width:var(--pn12-cq-w); height:auto; display:block; z-index:2;}
+  .pn12 .pn12-txt{position:absolute; left:var(--pn12-txt-l); top:var(--pn12-txt-t);
+    width:var(--pn12-txt-w); height:auto; display:block; z-index:2;}
+  .pn12 .pn12-logo{position:absolute; left:var(--pn12-logo-l); bottom:var(--pn12-logo-b);
+    width:var(--pn12-logo-w); height:auto; display:block; z-index:2;}
+  .pn12 .pn12-leg{position:absolute; left:var(--pn12-leg-l); top:var(--pn12-leg-t);
+    width:var(--pn12-leg-w); height:auto; display:block; z-index:2;}
+  .pn12 .pn12-n1{position:absolute; left:var(--pn12-n1-l); top:var(--pn12-n1-t);
+    width:var(--pn12-n1-w); height:auto; display:block; z-index:3;}
+  .pn12 .pn12-n2{position:absolute; left:var(--pn12-n2-l); top:var(--pn12-n2-t);
+    width:var(--pn12-n2-w); height:auto; display:block; z-index:3;}
+  .pn12 .pn-noise{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-image:url(assets/img/pn-grain.jpg);
+    background-repeat:repeat;
+    background-size:var(--pn-noise-size) var(--pn-noise-size);
+    z-index:5; pointer-events:none; opacity:var(--pn-noise-op);
+    mix-blend-mode:multiply;
+  }
+  .pn13{
+    --pn-bg:#7F04FA;
+    --pn-noise-op:0.6;
+    --pn-noise-size:340px;
+    --pn13-cq-l:2.85vw;   --pn13-cq-t:12.8vw;   --pn13-cq-w:20.2vw;
+    --pn13-photos-l:calc(100% - clamp(22px,3vw,46px) - var(--pn13-photos-w));    --pn13-photos-t:12.8vw;  --pn13-photos-w:49.06vw; /* 2 FOTO a destra: bordo dx a E, top al titolo, bottom allineato alle card. Riduci -w per rimpicciolire dal basso */
+    --pn13-logo-l:2.3vw;  --pn13-logo-b:4vw;    --pn13-logo-w:22vw;
+    --pn13-cards-l:2.85vw;   --pn13-cards-t:24.00vw;    --pn13-cards-w:23.98vw;   /* 2 CARD: ancora ALTO-SINISTRA (angolo alto-sx fisso a 2.85vw/24.00vw). Alzate del 10% (25.72->24.00). Riduci -w per rimpicciolire verso alto-sx */
+    position:relative; width:100%; height:100svh; overflow:hidden; background:var(--pn-bg);
+  }
+  .pn13 .pn13-cq{position:absolute; left:var(--pn13-cq-l); top:var(--pn13-cq-t);
+    width:var(--pn13-cq-w); height:auto; display:block; z-index:2;}
+  .pn13 .pn13-photos{position:absolute; left:var(--pn13-photos-l); top:var(--pn13-photos-t);
+    width:var(--pn13-photos-w); height:auto; display:block; z-index:2;}
+  .pn13 .pn13-logo{position:absolute; left:var(--pn13-logo-l); bottom:var(--pn13-logo-b);
+    width:var(--pn13-logo-w); height:auto; display:block; z-index:2;}
+  .pn13 .pn13-cards{position:absolute; left:var(--pn13-cards-l); top:var(--pn13-cards-t);
+    width:var(--pn13-cards-w); height:auto; display:block; z-index:2;}
+  .pn13 .pn-noise{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-image:url(assets/img/pn-grain.jpg);
+    background-repeat:repeat;
+    background-size:var(--pn-noise-size) var(--pn-noise-size);
+    z-index:5; pointer-events:none; opacity:var(--pn-noise-op);
+    mix-blend-mode:multiply;
+  }
+
+  /* ========= PIAZZE NEGATE - SLIDE 14 — copia di pn6 (TERRITORIAL COLLABORATIVE LABORATORY), dopo pn13 ========= */
+  .pn14{
+    --pn-bg:#7F04FA;
+    --pn-noise-op:0.6;
+    --pn-noise-size:340px;
+    --pn14-cq-l:2.85vw;   --pn14-cq-t:12.8vw;   --pn14-cq-w:23.8vw;
+    --pn14-txt-l:calc(100% - clamp(22px,3vw,46px) - var(--pn14-txt-w));    --pn14-txt-t:12.8vw;  --pn14-txt-w:52vw;   /* testo INSTAGRAM: right-anchored a E, allineato alle foto di pn13 sopra */
+    --pn14-logo-l:2.3vw;  --pn14-logo-b:4vw;    --pn14-logo-w:22vw;
+    --pn14-sky-l:0vw;     --pn14-sky-b:-0.69vw;     --pn14-sky-w:110.9vw;
+    position:relative; width:100%; height:100svh; overflow:hidden; background:var(--pn-bg);
+  }
+  .pn14 .pn14-sky{position:absolute; left:var(--pn14-sky-l); bottom:var(--pn14-sky-b);
+    width:var(--pn14-sky-w); height:auto; display:block; z-index:1;}
+  .pn14 .pn14-cq{position:absolute; left:var(--pn14-cq-l); top:var(--pn14-cq-t);
+    width:var(--pn14-cq-w); height:auto; display:block; z-index:2;}
+  .pn14 .pn14-txt{position:absolute; left:var(--pn14-txt-l); top:var(--pn14-txt-t);
+    width:var(--pn14-txt-w); height:auto; display:block; z-index:2;}
+  .pn14 .pn14-logo{position:absolute; left:var(--pn14-logo-l); bottom:var(--pn14-logo-b);
+    width:var(--pn14-logo-w); height:auto; display:block; z-index:2;}
+  .pn14 .pn-noise{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-image:url(assets/img/pn-grain.jpg);
+    background-repeat:repeat;
+    background-size:var(--pn-noise-size) var(--pn-noise-size);
+    z-index:5; pointer-events:none; opacity:var(--pn-noise-op);
+    mix-blend-mode:multiply;
+  }
+
+  /* ========= PIAZZE NEGATE - SLIDE 14 — copia di pn6 (TERRITORIAL COLLABORATIVE LABORATORY), dopo pn13 ========= */
+  .pn15{
+    --pn-bg:#7F04FA;
+    --pn-noise-op:0.6;
+    --pn-noise-size:340px;
+    --pn15-cq-l:2.85vw;   --pn15-cq-t:12.8vw;   --pn15-cq-w:23.8vw;
+    --pn15-logo-l:2.3vw;  --pn15-logo-b:4vw;    --pn15-logo-w:22vw;
+    --pn15-vid-w:12.665vw;   --pn15-vid-gap:3.315vw;   --pn15-vid-t:12.8vw;   --pn15-vid-r:clamp(22px,3vw,46px);   --pn15-vid-radius:0.595vw;   /* gruppo video -15% dal punto alto-destro (top+E fissi) */
+    --pn15-icons-w:59.2vw;   --pn15-icons-shift:1.51vw;   --pn15-icons-t:35.58vw;   /* striscia: width=span video (cerchi spaziati come i video), shift 1.51vw a sx per allineare */
+    position:relative; width:100%; height:100svh; overflow:hidden; background:var(--pn-bg);
+  }
+  .pn15 .pn15-bg{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; z-index:0;}
+  .pn15 .pn15-vid{position:absolute; top:var(--pn15-vid-t); width:var(--pn15-vid-w); aspect-ratio:1638/2852; object-fit:cover; display:block; z-index:2; border-radius:var(--pn15-vid-radius); background:#000;}
+  .pn15 .pn15-v1{left:calc(100% - var(--pn15-vid-r) - 4*var(--pn15-vid-w) - 3*var(--pn15-vid-gap));}
+  .pn15 .pn15-v2{left:calc(100% - var(--pn15-vid-r) - 3*var(--pn15-vid-w) - 2*var(--pn15-vid-gap));}
+  .pn15 .pn15-v3{left:calc(100% - var(--pn15-vid-r) - 2*var(--pn15-vid-w) - var(--pn15-vid-gap));}
+  .pn15 .pn15-v4{left:calc(100% - var(--pn15-vid-r) - var(--pn15-vid-w));}
+  .pn15 .pn15-icons{position:absolute; top:var(--pn15-icons-t); left:calc(100% - var(--pn15-vid-r) - var(--pn15-icons-w) - var(--pn15-icons-shift)); width:var(--pn15-icons-w); height:auto; display:block; z-index:2;}
+  .pn15 .pn15-cq{position:absolute; left:var(--pn15-cq-l); top:var(--pn15-cq-t);
+    width:var(--pn15-cq-w); height:auto; display:block; z-index:2;}
+  .pn15 .pn15-logo{position:absolute; left:var(--pn15-logo-l); bottom:var(--pn15-logo-b);
+    width:var(--pn15-logo-w); height:auto; display:block; z-index:2;}
+  .pn15 .pn-noise{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-image:url(assets/img/pn-grain.jpg);
+    background-repeat:repeat;
+    background-size:var(--pn-noise-size) var(--pn-noise-size);
+    z-index:5; pointer-events:none; opacity:var(--pn-noise-op);
+    mix-blend-mode:multiply;
+  }
+
+  /* ========= PIAZZE NEGATE - SLIDE 16 — copia di pn15 (INSTAGRAM HIGHLIGHTS) SENZA video/png, dopo pn15 ========= */
+  .pn16{
+    --pn-bg:#7F04FA;
+    --pn-noise-op:0.6;
+    --pn-noise-size:340px;
+    --pn16-cq-l:2.85vw;   --pn16-cq-t:12.8vw;   --pn16-cq-w:23.8vw;
+    --pn16-logo-l:2.3vw;  --pn16-logo-b:4vw;    --pn16-logo-w:22vw;
+    --pn16-post-w:20.59vw;   --pn16-post-gap:2.62vw;   --pn16-post-t:12.8vw;   --pn16-post-r:clamp(22px,3vw,46px);   --pn16-post-radius:0.64vw;   /* 2 post IG dal punto alto-destro (top+E fissi) */
+    position:relative; width:100%; height:100svh; overflow:hidden; background:var(--pn-bg);
+  }
+  .pn16 .pn16-bg{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; z-index:0;}
+  .pn16 .pn16-post{position:absolute; top:var(--pn16-post-t); width:var(--pn16-post-w); aspect-ratio:2052/3195; object-fit:cover; display:block; z-index:2; border-radius:var(--pn16-post-radius); background:#fff;}
+  .pn16 .pn16-p1{left:calc(100% - var(--pn16-post-r) - 2*var(--pn16-post-w) - var(--pn16-post-gap));}
+  .pn16 .pn16-p2{left:calc(100% - var(--pn16-post-r) - var(--pn16-post-w));}
+  .pn16 .pn16-cq{position:absolute; left:var(--pn16-cq-l); top:var(--pn16-cq-t);
+    width:var(--pn16-cq-w); height:auto; display:block; z-index:2;}
+  .pn16 .pn16-logo{position:absolute; left:var(--pn16-logo-l); bottom:var(--pn16-logo-b);
+    width:var(--pn16-logo-w); height:auto; display:block; z-index:2;}
+  .pn16 .pn-noise{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-image:url(assets/img/pn-grain.jpg);
+    background-repeat:repeat;
+    background-size:var(--pn-noise-size) var(--pn-noise-size);
+    z-index:5; pointer-events:none; opacity:var(--pn-noise-op);
+    mix-blend-mode:multiply;
+  }
+
+  /* ========= PIAZZE NEGATE - SLIDE 17 — copia di pn16 (PINNED POSTS) con titolo LAB PROMOTION, dopo pn16 ========= */
+  .pn17{
+    --pn-bg:#7F04FA;
+    --pn-noise-op:0.6;
+    --pn-noise-size:340px;
+    --pn17-cq-l:2.85vw;   --pn17-cq-t:12.8vw;   --pn17-cq-w:23.8vw;
+    --pn17-logo-l:2.3vw;  --pn17-logo-b:4vw;    --pn17-logo-w:22vw;
+    --pn17-post-w:20.59vw;   --pn17-post-gap:2.62vw;   --pn17-post-t:12.8vw;   --pn17-post-r:clamp(22px,3vw,46px);   --pn17-post-radius:0.64vw;   /* post video = stessa largh E stesso gap dei post pn16 */
+    --pn17-phone-w:14.82vw;   --pn17-phone-radius:0.96vw;   /* telefono scalato x0.80, dx=E */
+    position:relative; width:100%; height:100svh; overflow:hidden; background:var(--pn-bg);
+  }
+  .pn17 .pn17-bg{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; z-index:0;}
+  .pn17 .pn17-post{position:absolute; top:var(--pn17-post-t); width:var(--pn17-post-w); aspect-ratio:2052/3195; object-fit:cover; display:block; z-index:2; border-radius:var(--pn17-post-radius); background:#fff;}
+  .pn17 .pn17-p1{left:calc(100% - var(--pn17-post-r) - var(--pn17-phone-w) - var(--pn17-post-gap) - var(--pn17-post-w));}
+  .pn17 .pn17-phone{position:absolute; top:var(--pn17-post-t); left:calc(100% - var(--pn17-post-r) - var(--pn17-phone-w)); width:var(--pn17-phone-w); aspect-ratio:1658/3581; object-fit:cover; display:block; z-index:2; border-radius:var(--pn17-phone-radius); background:#000;}
+  .pn17 .pn17-cq{position:absolute; left:var(--pn17-cq-l); top:var(--pn17-cq-t);
+    width:var(--pn17-cq-w); height:auto; display:block; z-index:2;}
+  .pn17 .pn17-logo{position:absolute; left:var(--pn17-logo-l); bottom:var(--pn17-logo-b);
+    width:var(--pn17-logo-w); height:auto; display:block; z-index:2;}
+  .pn17 .pn-noise{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-image:url(assets/img/pn-grain.jpg);
+    background-repeat:repeat;
+    background-size:var(--pn-noise-size) var(--pn-noise-size);
+    z-index:5; pointer-events:none; opacity:var(--pn-noise-op);
+    mix-blend-mode:multiply;
+  }
+
+  /* ========= PIAZZE NEGATE - SLIDE 18 — copia di pn16 (2 video post) con titolo VISITING THE PIAZZA, ultima ========= */
+  .pn18{
+    --pn-bg:#7F04FA;
+    --pn-noise-op:0.6;
+    --pn-noise-size:340px;
+    --pn18-cq-l:2.85vw;   --pn18-cq-t:12.8vw;   --pn18-cq-w:23.8vw;
+    --pn18-logo-l:2.3vw;  --pn18-logo-b:4vw;    --pn18-logo-w:22vw;
+    --pn18-post-w:20.59vw;   --pn18-post-gap:2.62vw;   --pn18-post-t:12.8vw;   --pn18-post-r:clamp(22px,3vw,46px);   --pn18-post-radius:0.64vw;   /* 2 post IG dal punto alto-destro (top+E fissi) */
+    position:relative; width:100%; height:100svh; overflow:hidden; background:var(--pn-bg);
+  }
+  .pn18 .pn18-bg{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; z-index:0;}
+  .pn18 .pn18-post{position:absolute; top:var(--pn18-post-t); width:var(--pn18-post-w); aspect-ratio:2052/3195; object-fit:cover; display:block; z-index:2; border-radius:var(--pn18-post-radius); background:#fff;}
+  .pn18 .pn18-p1{left:calc(100% - var(--pn18-post-r) - 2*var(--pn18-post-w) - var(--pn18-post-gap));}
+  .pn18 .pn18-p2{left:calc(100% - var(--pn18-post-r) - var(--pn18-post-w));}
+  .pn18 .pn18-cq{position:absolute; left:var(--pn18-cq-l); top:var(--pn18-cq-t);
+    width:var(--pn18-cq-w); height:auto; display:block; z-index:2;}
+  .pn18 .pn18-logo{position:absolute; left:var(--pn18-logo-l); bottom:var(--pn18-logo-b);
+    width:var(--pn18-logo-w); height:auto; display:block; z-index:2;}
+  .pn18 .pn-noise{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-image:url(assets/img/pn-grain.jpg);
+    background-repeat:repeat;
+    background-size:var(--pn-noise-size) var(--pn-noise-size);
+    z-index:5; pointer-events:none; opacity:var(--pn-noise-op);
+    mix-blend-mode:multiply;
+  }
+
+  /* ========= PIAZZE NEGATE - SLIDE 19 — copia di pn18 con titolo STORIES DURING LAB, ultima ========= */
+  .pn19{
+    --pn-bg:#7F04FA;
+    --pn-noise-op:0.6;
+    --pn-noise-size:340px;
+    --pn19-cq-l:2.85vw;   --pn19-cq-t:12.8vw;   --pn19-cq-w:23.8vw;
+    --pn19-logo-l:2.3vw;  --pn19-logo-b:4vw;    --pn19-logo-w:22vw;
+    --pn19-phone-w:14.82vw;   --pn19-phone-gap:2.62vw;   --pn19-phone-t:12.8vw;   --pn19-phone-r:clamp(22px,3vw,46px);   --pn19-phone-radius:0.72vw;   /* 2 stories formato telefono (come pn17), dal punto alto-destro (top+E fissi) */
+    position:relative; width:100%; height:100svh; overflow:hidden; background:var(--pn-bg);
+  }
+  .pn19 .pn19-bg{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; z-index:0;}
+  .pn19 .pn19-post{position:absolute; top:var(--pn19-phone-t); width:var(--pn19-phone-w); aspect-ratio:2616/5650; object-fit:cover; display:block; z-index:2; border-radius:var(--pn19-phone-radius); background:#000;}
+  .pn19 .pn19-p1{left:calc(100% - var(--pn19-phone-r) - 2*var(--pn19-phone-w) - var(--pn19-phone-gap));}
+  .pn19 .pn19-p2{left:calc(100% - var(--pn19-phone-r) - var(--pn19-phone-w));}
+  .pn19 .pn19-cq{position:absolute; left:var(--pn19-cq-l); top:var(--pn19-cq-t);
+    width:var(--pn19-cq-w); height:auto; display:block; z-index:2;}
+  .pn19 .pn19-logo{position:absolute; left:var(--pn19-logo-l); bottom:var(--pn19-logo-b);
+    width:var(--pn19-logo-w); height:auto; display:block; z-index:2;}
+  .pn19 .pn-noise{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-image:url(assets/img/pn-grain.jpg);
+    background-repeat:repeat;
+    background-size:var(--pn-noise-size) var(--pn-noise-size);
+    z-index:5; pointer-events:none; opacity:var(--pn-noise-op);
+    mix-blend-mode:multiply;
+  }
+
+  /* ========= PIAZZE NEGATE - SLIDE 20 — copia di pn19 con titolo LAB RESULTS, ultima ========= */
+  .pn20{
+    --pn-bg:#7F04FA;
+    --pn-noise-op:0.6;
+    --pn-noise-size:340px;
+    --pn20-cq-l:2.85vw;   --pn20-cq-t:12.8vw;   --pn20-cq-w:23.8vw;
+    --pn20-logo-l:2.3vw;  --pn20-logo-b:4vw;    --pn20-logo-w:22vw;
+    --pn20-post-w:20.59vw;   --pn20-post-t:12.8vw;   --pn20-post-r:clamp(22px,3vw,46px);   --pn20-post-radius:0.64vw;   /* 1 post IG formato standard (come pn18), bordo destro a E */
+    position:relative; width:100%; height:100svh; overflow:hidden; background:var(--pn-bg);
+  }
+  .pn20 .pn20-bg{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; z-index:0;}
+  .pn20 .pn20-post{position:absolute; top:var(--pn20-post-t); width:var(--pn20-post-w); aspect-ratio:2052/3195; object-fit:cover; display:block; z-index:2; border-radius:var(--pn20-post-radius); background:#fff;}
+  .pn20 .pn20-p2{left:calc(100% - var(--pn20-post-r) - var(--pn20-post-w));}
+  .pn20 .pn20-cq{position:absolute; left:var(--pn20-cq-l); top:var(--pn20-cq-t);
+    width:var(--pn20-cq-w); height:auto; display:block; z-index:2;}
+  .pn20 .pn20-logo{position:absolute; left:var(--pn20-logo-l); bottom:var(--pn20-logo-b);
+    width:var(--pn20-logo-w); height:auto; display:block; z-index:2;}
+  .pn20 .pn-noise{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-image:url(assets/img/pn-grain.jpg);
+    background-repeat:repeat;
+    background-size:var(--pn-noise-size) var(--pn-noise-size);
+    z-index:5; pointer-events:none; opacity:var(--pn-noise-op);
+    mix-blend-mode:multiply;
+  }
+
+  /* ========= PIAZZE NEGATE - SLIDE 21 — WEBSITE / SECONDARY ARTIFACT, copia di pn14, ultima ========= */
+  .pn21{
+    --pn-bg:#7F04FA;
+    --pn-noise-op:0.6;
+    --pn-noise-size:340px;
+    --pn21-cq-l:2.85vw;   --pn21-cq-t:12.8vw;   --pn21-cq-w:23.03vw;   /* cap-height match con pn14 */
+    --pn21-txt-l:calc(100% - clamp(22px,3vw,46px) - var(--pn21-txt-w));    --pn21-txt-t:12.8vw;  --pn21-txt-w:55.51vw;   /* testo WEBSITE: right-anchored a E, x-height match con pn14 */
+    --pn21-logo-l:2.3vw;  --pn21-logo-b:4vw;    --pn21-logo-w:22vw;
+    --pn21-sky-l:0vw;     --pn21-sky-b:-6.71vw;     --pn21-sky-w:99.81vw;
+    position:relative; width:100%; height:100svh; overflow:hidden; background:var(--pn-bg);
+  }
+  .pn21 .pn21-sky{position:absolute; left:var(--pn21-sky-l); bottom:var(--pn21-sky-b);
+    width:var(--pn21-sky-w); height:auto; display:block; z-index:1;}
+  .pn21 .pn21-cq{position:absolute; left:var(--pn21-cq-l); top:var(--pn21-cq-t);
+    width:var(--pn21-cq-w); height:auto; display:block; z-index:2;}
+  .pn21 .pn21-txt{position:absolute; left:var(--pn21-txt-l); top:var(--pn21-txt-t);
+    width:var(--pn21-txt-w); height:auto; display:block; z-index:2;}
+  .pn21 .pn21-logo{position:absolute; left:var(--pn21-logo-l); bottom:var(--pn21-logo-b);
+    width:var(--pn21-logo-w); height:auto; display:block; z-index:2;}
+  .pn21 .pn-noise{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-image:url(assets/img/pn-grain.jpg);
+    background-repeat:repeat;
+    background-size:var(--pn-noise-size) var(--pn-noise-size);
+    z-index:5; pointer-events:none; opacity:var(--pn-noise-op);
+    mix-blend-mode:multiply;
+  }
+
+  /* ========= PIAZZE NEGATE - SLIDE 22 — WEBSITE / NAVIGATION, copia di pn20, ultima ========= */
+  .pn22{
+    --pn-bg:#7F04FA;
+    --pn-noise-op:0.6;
+    --pn-noise-size:340px;
+    --pn22-cq-l:2.85vw;   --pn22-cq-t:12.8vw;   --pn22-cq-w:17.92vw;   /* cap-height match con pn20 */
+    --pn22-logo-l:2.3vw;  --pn22-logo-b:4vw;    --pn22-logo-w:22vw;
+    --pn22-post-w:49.24vw;   --pn22-post-t:12.8vw;   --pn22-post-r:clamp(22px,3vw,46px);   --pn22-post-radius:0;   /* video sito landscape: top/bottom/right allineati al post di pn20 */
+    position:relative; width:100%; height:100svh; overflow:hidden; background:var(--pn-bg);
+  }
+  .pn22 .pn22-bg{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; z-index:0;}
+  .pn22 .pn22-post{position:absolute; top:var(--pn22-post-t); width:var(--pn22-post-w); aspect-ratio:2556/1664; object-fit:cover; display:block; z-index:2; border-radius:var(--pn22-post-radius); background:#fff;}
+  .pn22 .pn22-p2{left:calc(100% - var(--pn22-post-r) - var(--pn22-post-w));}
+  .pn22 .pn22-cq{position:absolute; left:var(--pn22-cq-l); top:var(--pn22-cq-t);
+    width:var(--pn22-cq-w); height:auto; display:block; z-index:2;}
+  .pn22 .pn22-logo{position:absolute; left:var(--pn22-logo-l); bottom:var(--pn22-logo-b);
+    width:var(--pn22-logo-w); height:auto; display:block; z-index:2;}
+  .pn22 .pn-noise{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-image:url(assets/img/pn-grain.jpg);
+    background-repeat:repeat;
+    background-size:var(--pn-noise-size) var(--pn-noise-size);
+    z-index:5; pointer-events:none; opacity:var(--pn-noise-op);
+    mix-blend-mode:multiply;
+  }
+
+  /* ========= PIAZZE NEGATE - SLIDE 23 — copia di pn21, ultima ========= */
+  .pn23{
+    --pn-bg:#7F04FA;
+    --pn-noise-op:0.6;
+    --pn-noise-size:340px;
+    --pn23-cq-l:2.85vw;   --pn23-cq-t:12.8vw;   --pn23-cq-w:24.90vw;   /* cap-height match con pn21 */
+    --pn23-txt-l:calc(100% - clamp(22px,3vw,46px) - var(--pn23-txt-w));    --pn23-txt-t:12.8vw;  --pn23-txt-w:54.04vw;   /* testo WEBSITE: right-anchored a E, x-height match con pn14 */
+    --pn23-logo-l:2.3vw;  --pn23-logo-b:4vw;    --pn23-logo-w:22vw;
+    --pn23-sky-l:0.01vw;     --pn23-sky-b:-0.25vw;     --pn23-sky-w:99.81vw;
+    position:relative; width:100%; height:100svh; overflow:hidden; background:var(--pn-bg);
+  }
+  .pn23 .pn23-sky{position:absolute; left:var(--pn23-sky-l); bottom:var(--pn23-sky-b);
+    width:var(--pn23-sky-w); height:auto; display:block; z-index:1;}
+  .pn23 .pn23-cq{position:absolute; left:var(--pn23-cq-l); top:var(--pn23-cq-t);
+    width:var(--pn23-cq-w); height:auto; display:block; z-index:2;}
+  .pn23 .pn23-txt{position:absolute; left:var(--pn23-txt-l); top:var(--pn23-txt-t);
+    width:var(--pn23-txt-w); height:auto; display:block; z-index:2;}
+  .pn23 .pn23-logo{position:absolute; left:var(--pn23-logo-l); bottom:var(--pn23-logo-b);
+    width:var(--pn23-logo-w); height:auto; display:block; z-index:2;}
+  .pn23 .pn-noise{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-image:url(assets/img/pn-grain.jpg);
+    background-repeat:repeat;
+    background-size:var(--pn-noise-size) var(--pn-noise-size);
+    z-index:5; pointer-events:none; opacity:var(--pn-noise-op);
+    mix-blend-mode:multiply;
+  }
+
+  /* ========= PIAZZE NEGATE - SLIDE 24 — copia di pn11 (TOTEM INTERACTION), ultima ========= */
+  .pn24{
+    --pn-noise-op:0.6;
+    --pn-noise-size:340px;
+    --pn24-bg-pos:50% 50%;
+    --pn24-bg-zoom:1.12;
+    --pn24-bg-shift-x:1.60vw;   --pn24-bg-shift-y:-2.02vw;   /* immagine un filo più bassa e a destra */
+    --pn24-title-l:2.85vw;  --pn24-title-t:12.8vw;  --pn24-title-w:19.66vw;   /* cap-height match con pn11 */
+    --pn24-logo-l:2.3vw;    --pn24-logo-b:4vw;      --pn24-logo-w:22vw;
+    position:relative; width:100%; height:100svh; overflow:hidden; background:#000;
+  }
+  .pn24 .pn24-bg{position:absolute; inset:0; width:100%; height:100%;
+    object-fit:cover; object-position:var(--pn24-bg-pos);
+    transform:translate(var(--pn24-bg-shift-x), var(--pn24-bg-shift-y)) scale(var(--pn24-bg-zoom)); transform-origin:center; display:block; z-index:0;}
+  .pn24 .pn24-title{position:absolute; left:var(--pn24-title-l); top:var(--pn24-title-t);
+    width:var(--pn24-title-w); height:auto; display:block; z-index:2;}
+  .pn24 .pn24-logo{position:absolute; left:var(--pn24-logo-l); bottom:var(--pn24-logo-b);
+    width:var(--pn24-logo-w); height:auto; display:block; z-index:2;}
+  .pn24 .pn-noise{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-image:url(assets/img/pn-grain.jpg);
+    background-repeat:repeat;
+    background-size:var(--pn-noise-size) var(--pn-noise-size);
+    z-index:5; pointer-events:none; opacity:var(--pn-noise-op);
+    mix-blend-mode:multiply;
+  }
+
+  /* ========= PIAZZE NEGATE - SLIDE 25 — copia di pn24 (OFFLINE PROMOTION / POSTERS), ultima ========= */
+  .pn25{
+    --pn-noise-op:0.6;
+    --pn-noise-size:340px;
+    --pn25-bg-pos:50% 50%;
+    --pn25-bg-zoom:1;
+    --pn25-bg-shift-x:0vw;   --pn25-bg-shift-y:0vw;   /* immagine un filo più bassa e a destra */
+    --pn25-title-l:2.85vw;  --pn25-title-t:12.8vw;  --pn25-title-w:19.66vw;   /* cap-height match con pn11 */
+    --pn25-logo-l:2.3vw;    --pn25-logo-b:4vw;      --pn25-logo-w:22vw;
+    position:relative; width:100%; height:100svh; overflow:hidden; background:#000;
+  }
+  .pn25 .pn25-bg{position:absolute; inset:0; width:100%; height:100%;
+    object-fit:cover; object-position:var(--pn25-bg-pos);
+    transform:translate(var(--pn25-bg-shift-x), var(--pn25-bg-shift-y)) scale(var(--pn25-bg-zoom)); transform-origin:center; display:block; z-index:0;}
+  .pn25 .pn25-title{position:absolute; left:var(--pn25-title-l); top:var(--pn25-title-t);
+    width:var(--pn25-title-w); height:auto; display:block; z-index:2;}
+  .pn25 .pn25-logo{position:absolute; left:var(--pn25-logo-l); bottom:var(--pn25-logo-b);
+    width:var(--pn25-logo-w); height:auto; display:block; z-index:2;}
+  .pn25 .pn-noise{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-image:url(assets/img/pn-grain.jpg);
+    background-repeat:repeat;
+    background-size:var(--pn-noise-size) var(--pn-noise-size);
+    z-index:5; pointer-events:none; opacity:var(--pn-noise-op);
+    mix-blend-mode:multiply;
+  }</style>
+</head>
+<body>
+  <main class="project">
+    <div class="p-head">
+      <div class="p-head-left">
+        <img class="ast" src="assets/img/intro.png" alt="">
+        <span class="num">01.</span>
+      </div>
+      <span class="name">Visual Identity</span>
+    </div>
+
+    <div class="p-title">Fantacycling</div>
+
+    <div class="p-foot">
+      <div class="programs">Programs used:<br>Figma<br>Procreate<br>Illustrator</div>
+      <div class="year">2025</div>
+    </div>
+  </main>
+
+  <section class="fc-board">
+    <div class="fc-col">
+      <div class="fc-panel marks"><img src="assets/img/board.png" alt="FantaCycling logo mark construction"></div>
+      <div class="fc-panel sagace"><img src="assets/img/board-2.png" alt="Sagace typeface"></div>
+    </div>
+    <div class="fc-col">
+      <div class="fc-panel logos-w"><img src="assets/img/board-3.png" alt="FantaCycling logo lockups (light)"></div>
+      <div class="fc-panel logos-k"><img src="assets/img/board-4.png" alt="FantaCycling logo lockups (dark)"></div>
+      <div class="fc-colors">
+        <div class="fc-c-yellow"></div><div class="fc-c-navy"></div><div class="fc-c-peri"></div>
+        <div class="fc-c-red"></div><div class="fc-c-lav"></div>
+        <div class="fc-c-pattern"><svg viewBox="306 256 1238 1238" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" fill="none"><path d="M923.724 1402.19H309.298C206.938 1147.42 104.578 892.619 2.21851 637.85C206.9 637.708 411.62 637.601 616.302 637.458C718.776 892.37 821.25 1147.28 923.724 1402.19Z" stroke="#FAB418" stroke-width="12" stroke-miterlimit="10"/><path d="M2095.22 1266.86H1480.79C1378.43 1012.09 1276.07 757.288 1173.71 502.519C1378.4 502.377 1583.11 502.27 1787.8 502.127C1890.27 757.039 1992.74 1011.95 2095.22 1266.86Z" stroke="#FAB418" stroke-width="12" stroke-miterlimit="10"/><path d="M1551.19 1973.3H891.606C781.721 1699.79 671.835 1426.28 561.949 1152.81C781.683 1152.66 1001.42 1152.52 1221.19 1152.38C1331.19 1426.03 1441.19 1699.69 1551.19 1973.3Z" stroke="#FAB418" stroke-width="12" stroke-miterlimit="10"/><path d="M1235.21 796.663H596.347C489.92 531.74 383.493 266.816 277.066 1.92807C489.92 1.78554 702.736 1.64302 915.59 1.50049C1022.13 266.567 1128.67 531.597 1235.21 796.663Z" stroke="#FAB418" stroke-width="12" stroke-miterlimit="10"/><path d="M1910.8 1096.65H1296.37C1194.01 841.885 1091.65 587.08 989.292 332.312C1193.97 332.169 1398.69 332.062 1603.38 331.92C1705.85 586.831 1808.32 841.742 1910.8 1096.65Z" stroke="#FAB418" stroke-width="12" stroke-miterlimit="10"/></svg></div>
+      </div>
+    </div>
+  </section>
+
+
+<section class="fc-riders"><img src="assets/img/riders.png" alt="Fantacycling — two cyclists illustration" decoding="async"></section>
+
+<section class="fc-ads">
+  <div class="fc-ad top"><img src="assets/img/ad1.jpg" alt="Fantacycling — affissione pensilina" decoding="async"></div>
+  <div class="fc-ad bot"><img src="assets/img/ad1-2.jpg" alt="Fantacycling — cartellone / billboard" decoding="async"></div>
+</section>
+
+<section class="fc-ads2">
+  <div class="fc-ad2 top"><img src="assets/img/ad2.jpg" alt="Fantacycling — biglietti da visita" decoding="async"></div>
+  <div class="fc-ad2 bot"><img src="assets/img/ad2-2.jpg" alt="Fantacycling — striscione / billboard" decoding="async"></div>
+</section>
+
+<section class="fc-prod">
+  <div class="col-l"><img src="assets/img/prod1.jpg" alt="Fantacycling — borraccia" decoding="async"></div>
+  <div class="col-r">
+    <div class="cell top"><img src="assets/img/prod1-2.jpg" alt="Fantacycling — guanti" decoding="async"></div>
+    <div class="cell bot"><img src="assets/img/prod1-3.jpg" alt="Fantacycling — calzini" decoding="async"></div>
+  </div>
+</section>
+
+<section class="fc-prod2">
+  <div class="col-l"><img src="assets/img/prod2.jpg" alt="Fantacycling — sacca" decoding="async"></div>
+  <div class="col-r"><img src="assets/img/prod2-2.jpg" alt="Fantacycling — taccuino e penna" decoding="async"></div>
+</section>
+
+<section class="fc-kit">
+  <img src="assets/img/kit.jpg" alt="Fantacycling — divisa (maglia e pantaloncini), fronte e retro" decoding="async">
+</section>
+
+<section class="fc-social">
+  <img src="assets/img/social.jpg" alt="Fantacycling — social media: profilo Instagram, post, caroselli, icona" decoding="async">
+</section>
+
+<section class="fc-app">
+  <img src="assets/img/app.jpg" alt="Fantacycling — app UI: home, racers, racer sheet, my team, app icon" decoding="async">
+</section>
+
+<section class="fc-video">
+  <!-- VIDEO: metti il file in assets/video/video.mp4 (o cambia il path qui sotto). Parte in autoplay muted loop. -->
+  <div class="vwrap"><video autoplay muted loop playsinline poster="assets/img/video-poster.jpg">
+    <source src="assets/video/video.mp4" type="video/mp4">
+  </video></div>
+</section>
+
+<section class="vi-next">
+    <h3 class="task-h">.TASK</h3>
+    <p class="task-p">Recreate a full visual identity for a FantaCycling team: logo design, app and website UI, social media content, advertising, merchandise, and business cards. The previous F logo becomes a cyclist mid-sprint. The Pantani palette borrows from race routes and jersey traditions. The illustrations give the same feeling as the sport: being always in motion.</p>
+    <hr class="dash">
+    <div class="meet">MEET Archive</div>
+    <div class="vi-foot">
+      <div>Programs used:<br>Processing<br>After effects</div>
+      <div>2025</div>
+    </div>
+  </section>
+
+<section class="ma-slide" id="meet-archive">
+    <div class="ma-left">
+      <img class="ma-text" src="assets/img/meet-text.svg" alt="MEET ARCHIVE — The archive narrates the fundamental evolutionary steps of digital culture. It's a meeting point between the past and the present, a timeline of the research and experimentation process from the birth of the digital technologies.">
+    </div>
+    <div class="ma-right">
+      <img class="ma-photo" src="assets/img/meet-photo.jpg" alt="MEET Archive exhibition - Le Radici del Nuovo">
+    </div>
+  </section>
+
+<section class="mb-slide">
+    <div class="mb-stage">
+      <img class="mb-img" src="assets/img/moodboard.png" alt="Moodboard composition - eroded concrete, dust, flip phone">
+      <img class="mb-labels" src="assets/img/moodboard-labels.svg" alt="sedimention, erosion, time, memory of past technology">
+    </div>
+    <img class="mb-title" src="assets/img/moodboard-title.svg" alt="MOODBOARD">
+  </section>
+<section class="tl-slide">
+    <div class="tl-sticky">
+      <img class="tl-img tl-base" src="assets/img/timeline.png" alt="Timeline of obsolete technology (photographs): Floppy Disk 1971, Bandai Tamagotchi 1996, BlackBerry Bold 9000 2008">
+      <img class="tl-img tl-over" src="assets/img/timeline2.jpg" alt="The same timeline rendered as colored particle point-clouds">
+    </div>
+  </section>
+<section class="fin-slide">
+    <video src="assets/video/floppy.mp4" autoplay muted loop playsinline preload="auto"></video>
+    <video src="assets/video/tamagotchi.mp4" autoplay muted loop playsinline preload="auto"></video>
+    <video src="assets/video/blackberry.mp4" autoplay muted loop playsinline preload="auto"></video>
+  </section>
+<section class="vi-next">
+    <h3 class="task-h">.TASK</h3>
+    <p class="task-p">Create a visual identity for the Meet Archive, a collection of tech objects spanning from different decades each one a small piece of cultural memory. The central concept is the technological fossil. Every object is presented through an animated poster: buried under dense, sand-like particles that accumulate with time.</p>
+    <hr class="dash">
+    <div class="meet">Piazze negate</div>
+    <div class="vi-foot">
+      <div>Programs used:<br>Figma<br>After effects<br>Illustrator<br>Photoshop</div>
+      <div>2026</div>
+    </div>
+  </section>
+<section class="pn-hero" id="piazze-negate">
+    <!-- STEP 3: sfondo + foto + titolo -->
+    <img class="pn-photo" src="assets/img/pn-photo.png" alt="Piazza pubblica affollata — bambini che giocano, ping pong, tavolini (collage a blocchi)" decoding="async">
+    <img class="pn-title" src="assets/img/pn-title.svg" alt="PIAZZE NEGATE" decoding="async">
+    <img class="pn-sub" src="assets/img/pn-subtitle.svg" alt="What is a city without a place to meet?" decoding="async">
+    <div class="pn-noise" aria-hidden="true"></div>
+  </section>
+<section class="pn2">
+    <!-- SLIDE 2: skyline (basso sx) + campaign question + paragrafo + logo. Tutto sotto il noise. -->
+    <img class="pn2-sky" src="assets/img/pn2-skyline.png" alt="" aria-hidden="true" decoding="async">
+    <img class="pn2-cq" src="assets/img/pn2-campaign.svg" alt="Our campaign question" decoding="async">
+    <img class="pn2-txt" src="assets/img/pn2-text.svg" alt="How can communication design act as a critical practice to expose the ways Milan's public squares fail their citizens?" decoding="async">
+    <img class="pn2-logo" src="assets/img/pn2-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <div class="pn-noise" aria-hidden="true"></div>
+  </section>
+<div class="pn34-stack">
+   <div class="pn34-sticky">
+    <section class="pn3">
+    <!-- SLIDE 3 (base): resta visibile sotto -->
+    <img class="pn3-cq" src="assets/img/pn3-campaign.png" alt="Our campaign system" decoding="async">
+    <img class="pn3-txt" src="assets/img/pn3-text.png" alt="Territorial collaborative lab — primary artefact: annotation through stickers, interactive information totem, floor graffiti" decoding="async">
+    <img class="pn3-logo" src="assets/img/pn2-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <div class="pn-noise" aria-hidden="true"></div>
+  </section>
+    <section class="pn4">
+    <!-- SLIDE 4 (overlay): fade-in sopra la slide 3 mentre si scrolla, copre tutto -->
+    <img class="pn4-cq" src="assets/img/pn3-campaign.png" alt="Our campaign system" decoding="async">
+    <img class="pn4-txt" src="assets/img/pn4-text.png" alt="Pubblic communication — secondary artefact: Instagram page, website about piazzas" decoding="async">
+    <img class="pn4-logo" src="assets/img/pn2-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <div class="pn-noise" aria-hidden="true"></div>
+  </section>
+    <section class="pn5">
+    <!-- SLIDE 5 (overlay): fade-in sopra PUBBLIC COMMUNICATION mentre si scrolla -->
+    <img class="pn5-cq" src="assets/img/pn3-campaign.png" alt="Our campaign system" decoding="async">
+    <img class="pn5-txt" src="assets/img/pn5-text.png" alt="Local advertisement — tertiary artefact: informative poster, floor graffiti" decoding="async">
+    <img class="pn5-logo" src="assets/img/pn2-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <div class="pn-noise" aria-hidden="true"></div>
+  </section>
+   </div>
+</div>
+<section class="pn6">
+    <!-- SLIDE 6: TERRITORIAL COLLABORATIVE LABORATORY (titolo) + paragrafo + skyline + logo. Statica. -->
+    <img class="pn6-sky" src="assets/img/pn6-skyline.png" alt="" aria-hidden="true" decoding="async">
+    <img class="pn6-cq" src="assets/img/pn6-campaign.svg" alt="Territorial collaborative laboratory — artefatto primario" decoding="async">
+    <img class="pn6-txt" src="assets/img/pn6-text.svg" alt="The lab runs every three weeks, from 2 to 6 pm, moving through Milan's municipal districts with the goal of covering the entire city by year's end." decoding="async">
+    <img class="pn6-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <div class="pn-noise" aria-hidden="true"></div>
+  </section>
+<section class="pn7">
+    <!-- SLIDE 7: FLOOR GRAFFITI (Piazza Bausan). Foto + titolo(svg) + annotazione(png trasp.) + logo. Layout = full_slide. -->
+    <img class="pn7-bg" src="assets/img/sfondo.jpg" alt="Floor graffiti in Piazza Bausan: 'Questo e' il cuore di Piazza Bausan. Lo senti pulsare?' con QR code, dipinto sul pavimento in porfido" decoding="async">
+    <img class="pn7-title" src="assets/img/pn7-title.svg" alt="FLOOR GRAFFITI — 1 H BEFORE" decoding="async">
+    <img class="pn7-note" src="assets/img/pn7-annotation.png" alt="Question about the piazza" decoding="async">
+    <img class="pn7-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <div class="pn-noise" aria-hidden="true"></div>
+  </section>
+<section class="pn8">
+    <!-- SLIDE 8: TOTEM (artefatto). Layout = full_slide: titolo + griglia foto + 2 etichette + logo. -->
+    <img class="pn8-title" src="assets/img/pn8-title.svg" alt="TOTEM — 1 H BEFORE" decoding="async">
+    <img class="pn8-grid" src="assets/img/pn8-grid.jpg" alt="Totem in Piazza Bausan: pannello informazioni, istruzioni passo-passo, pannelli interattivi 'IO HO PARTECIPATO!' e 'COME VIVI PIAZZA BAUSAN?', persone che partecipano" decoding="async">
+    <img class="pn8-info" src="assets/img/pn8-info.svg" alt="Informations + instructions" decoding="async">
+    <img class="pn8-pan" src="assets/img/pn8-panels.svg" alt="Panels for interaction" decoding="async">
+    <img class="pn8-logo" src="assets/img/pn-logo-bg.svg" alt="PIAZZE NEGATE" decoding="async">
+    <div class="pn-noise" aria-hidden="true"></div>
+  </section>
+<section class="pn9">
+    <!-- SLIDE 9: EXPLAINATORY POSTCARD + STICKERS (start of lab). Sfondo full-bleed (cartoline) + titolo(svg) + logo. -->
+    <img class="pn9-bg" src="assets/img/pn9-bg.jpg" alt="Cartolina 'GRAZIE per aver preso parte al nostro laboratorio' e sticker 'AMO QUESTA PIAZZA PERCHE' / LA CHIAMEREI PIAZZA SE' di Piazze Negate su sfondo viola" decoding="async">
+    <img class="pn9-title" src="assets/img/pn9-title.svg" alt="EXPLAINATORY POSTCARD + STICKERS — START OF LAB" decoding="async">
+    <img class="pn9-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <div class="pn-noise" aria-hidden="true"></div>
+  </section>
+<section class="pn10">
+    <!-- SLIDE 10: STICKERS (start of lab) — titolo(svg) + immagine card + logo. In fondo. -->
+    <img class="pn10-cq" src="assets/img/pn10-title.svg" alt="STICKERS — START OF LAB" decoding="async">
+    <img class="pn10-txt" src="assets/img/pn10-cards.png" alt="Sticker da compilare di Piazze Negate: 'AMO QUESTA PIAZZA PERCHE' (verde) e 'LA CHIAMEREI PIAZZA SE' (viola), con icone cuore e lampadina" decoding="async">
+    <img class="pn10-leg" src="assets/img/pn10-legend.svg" alt="Legenda: appreciation = cuore, suggestion = lampadina" decoding="async">
+    <img class="pn10-n1" src="assets/img/pn10-note1.svg" alt="I love this piazza because" decoding="async">
+    <img class="pn10-n2" src="assets/img/pn10-note2.svg" alt="I would call it piazza if" decoding="async">
+    <img class="pn10-logo" src="assets/img/pn-logo-bg.svg" alt="PIAZZE NEGATE" decoding="async">
+    <div class="pn-noise" aria-hidden="true"></div>
+  </section>
+<section class="pn11">
+    <!-- SLIDE 11: copia di EXPLAINATORY POSTCARD (start of lab) — da personalizzare. -->
+    <img class="pn11-bg" src="assets/img/pn11-bg.jpg" alt="Cartolina 'GRAZIE per aver preso parte al nostro laboratorio' e sticker di Piazze Negate su sfondo viola" decoding="async">
+    <img class="pn11-title" src="assets/img/pn11-title.svg" alt="EXPLAINATORY POSTCARD + STICKERS — START OF LAB" decoding="async">
+    <img class="pn11-logo" src="assets/img/pn11-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <div class="pn-noise" aria-hidden="true"></div>
+  </section>
+<section class="pn12">
+    <!-- SLIDE 12 (copia di pn10): STICKERS (start of lab) — titolo(svg) + immagine card + logo. In fondo. -->
+    <img class="pn12-cq" src="assets/img/pn12-title.svg" alt="STICKERS — START OF LAB" decoding="async">
+    <img class="pn12-txt" src="assets/img/pn12-cards.png" alt="Sticker da compilare di Piazze Negate: 'AMO QUESTA PIAZZA PERCHE' (verde) e 'LA CHIAMEREI PIAZZA SE' (viola), con icone cuore e lampadina" decoding="async">
+    <img class="pn12-leg" src="assets/img/pn12-legend.svg" alt="Legenda: appreciation = cuore, suggestion = lampadina" decoding="async">
+    <img class="pn12-n1" src="assets/img/pn12-note1.svg" alt="I love this piazza because" decoding="async">
+    <img class="pn12-n2" src="assets/img/pn12-note2.svg" alt="I would call it piazza if" decoding="async">
+    <img class="pn12-logo" src="assets/img/pn-logo-bg.svg" alt="PIAZZE NEGATE" decoding="async">
+    <div class="pn-noise" aria-hidden="true"></div>
+  </section>
+<section class="pn13">
+    <!-- SLIDE 13: SECONDARY STICKERS — titolo (1.svg) + 2 card a sx + 2 foto a dx (allineate titolo/logo) + logo -->
+    <img class="pn13-cq" src="assets/img/pn13-title.svg" alt="SECONDARY STICKERS — SUBJECTIVE PERSONAL OPINIONS" decoding="async">
+    <img class="pn13-photos" src="assets/img/pn13-photos.png" alt="Due foto in esterna: sticker verde compilato su un cordolo coi fiori, e sticker viola compilato a mano" decoding="async">
+    <img class="pn13-cards" src="assets/img/pn13-cards.png" alt="Due sticker: QUESTO SPAZIO VERDE MI PIACE PERCHE (verde) e VORREI CHE QUESTO SPAZIO VERDE (viola)" decoding="async">
+    <img class="pn13-logo" src="assets/img/pn-logo-bg.svg" alt="PIAZZE NEGATE" decoding="async">
+    <div class="pn-noise" aria-hidden="true"></div>
+  </section>
+<section class="pn14">
+    <!-- SLIDE 14: INSTAGRAM PAGE / SECONDARY ARTIFACT — titolo + paragrafo + skyline(svg) + logo. Statica. -->
+    <img class="pn14-sky" src="assets/img/pn14-skyline.svg" alt="" aria-hidden="true" decoding="async">
+    <img class="pn14-cq" src="assets/img/pn14-title.svg" alt="INSTAGRAM PAGE — SECONDARY ARTIFACT" decoding="async">
+    <img class="pn14-txt" src="assets/img/pn14-text.svg" alt="Instagram is the project's most immediate channel, where the lab's visual identity takes shape and the story of Milan's piazze stays alive, continuous, and open to participation and dialogue." decoding="async">
+    <img class="pn14-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <div class="pn-noise" aria-hidden="true"></div>
+  </section>
+<section class="pn15">
+    <!-- SLIDE 15: INSTAGRAM PAGE / HIGHLIGHTS — sfondo grigio + titolo + 4 video IG (highlights) + striscia icone/label + logo. -->
+    <img class="pn15-bg" src="assets/img/pn15-bg.png" alt="" aria-hidden="true" decoding="async">
+    <img class="pn15-cq" src="assets/img/pn15-title.svg" alt="INSTAGRAM PAGE — HIGHLIGHTS" decoding="async">
+    <video class="pn15-vid pn15-v1" src="assets/video/pn15-v1.mp4" autoplay loop muted playsinline></video>
+    <video class="pn15-vid pn15-v2" src="assets/video/pn15-v2.mp4" autoplay loop muted playsinline></video>
+    <video class="pn15-vid pn15-v3" src="assets/video/pn15-v3.mp4" autoplay loop muted playsinline></video>
+    <video class="pn15-vid pn15-v4" src="assets/video/pn15-v4.mp4" autoplay loop muted playsinline></video>
+    <img class="pn15-icons" src="assets/img/pn15-icons.png" alt="Perché Piazze Negate? · Il nostro laboratorio · Come partecipare · Voce dei cittadini" decoding="async">
+    <img class="pn15-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <div class="pn-noise" aria-hidden="true"></div>
+  </section>
+<section class="pn16">
+    <!-- SLIDE 16: INSTAGRAM PAGE / PINNED POSTS — sfondo grigio + titolo + 2 post IG + logo. -->
+    <img class="pn16-bg" src="assets/img/pn15-bg.png" alt="" aria-hidden="true" decoding="async">
+    <img class="pn16-cq" src="assets/img/pn16-title.svg" alt="INSTAGRAM PAGE — PINNED POSTS" decoding="async">
+    <video class="pn16-post pn16-p1" src="assets/video/pn16-v1.mp4" autoplay loop muted playsinline></video>
+    <video class="pn16-post pn16-p2" src="assets/video/pn16-v2.mp4" autoplay loop muted playsinline></video>
+    <img class="pn16-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <div class="pn-noise" aria-hidden="true"></div>
+  </section>
+<section class="pn17">
+    <!-- SLIDE 17: INSTAGRAM PAGE / LAB PROMOTION (copia di pn16 con nuovo titolo) — sfondo + titolo + 2 post + logo. -->
+    <img class="pn17-bg" src="assets/img/pn15-bg.png" alt="" aria-hidden="true" decoding="async">
+    <img class="pn17-cq" src="assets/img/pn17-title.svg" alt="INSTAGRAM PAGE — LAB PROMOTION" decoding="async">
+    <video class="pn17-post pn17-p1" src="assets/video/pn17-v1.mp4" autoplay loop muted playsinline></video>
+    <img class="pn17-phone" src="assets/img/pn17-phone.png" alt="Story Instagram: Laboratorio Piazza Bausan 20/01/26" decoding="async">
+    <img class="pn17-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <div class="pn-noise" aria-hidden="true"></div>
+  </section>
+<section class="pn18">
+    <!-- SLIDE 18: INSTAGRAM PAGE / VISITING THE PIAZZA — INFORMATIVE POSTS (copia di pn16 con nuovo titolo). -->
+    <img class="pn18-bg" src="assets/img/pn15-bg.png" alt="" aria-hidden="true" decoding="async">
+    <img class="pn18-cq" src="assets/img/pn18-title.svg" alt="INSTAGRAM PAGE — VISITING THE PIAZZA, INFORMATIVE POSTS" decoding="async">
+    <video class="pn18-post pn18-p1" src="assets/video/pn18-v1.mp4" autoplay loop muted playsinline></video>
+    <video class="pn18-post pn18-p2" src="assets/video/pn18-v2.mp4" autoplay loop muted playsinline></video>
+    <img class="pn18-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <div class="pn-noise" aria-hidden="true"></div>
+  </section>
+<section class="pn19">
+    <!-- SLIDE 19: INSTAGRAM PAGE / STORIES DURING LAB (copia di pn18 con nuovo titolo). -->
+    <img class="pn19-bg" src="assets/img/pn15-bg.png" alt="" aria-hidden="true" decoding="async">
+    <img class="pn19-cq" src="assets/img/pn19-title.svg" alt="INSTAGRAM PAGE — STORIES DURING LAB" decoding="async">
+    <video class="pn19-post pn19-p1" src="assets/video/pn19-v1.mp4" autoplay loop muted playsinline></video>
+    <video class="pn19-post pn19-p2" src="assets/video/pn19-v2.mp4" autoplay loop muted playsinline></video>
+    <img class="pn19-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <div class="pn-noise" aria-hidden="true"></div>
+  </section>
+
+<section class="pn20">
+    <!-- SLIDE 20: INSTAGRAM PAGE / LAB RESULTS (copia di pn19 con nuovo titolo LAB RESULTS). -->
+    <img class="pn20-bg" src="assets/img/pn15-bg.png" alt="" aria-hidden="true" decoding="async">
+    <img class="pn20-cq" src="assets/img/pn20-title.svg" alt="INSTAGRAM PAGE — LAB RESULTS" decoding="async">
+    <video class="pn20-post pn20-p2" src="assets/video/pn20-v1.mp4" autoplay loop muted playsinline></video>
+    <img class="pn20-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <div class="pn-noise" aria-hidden="true"></div>
+  </section>
+
+<section class="pn21">
+    <!-- SLIDE 21: WEBSITE / SECONDARY ARTIFACT — titolo + paragrafo + skyline(svg) + logo. Statica. -->
+    <img class="pn21-sky" src="assets/img/pn21-skyline.svg" alt="" aria-hidden="true" decoding="async">
+    <img class="pn21-cq" src="assets/img/pn21-title.svg" alt="WEBSITE — SECONDARY ARTIFACT" decoding="async">
+    <img class="pn21-txt" src="assets/img/pn21-text.svg" alt="The website is an open archive where annotations, testimonies and reflections collected in the field come together into a living map of Milan's piazze, to be read slowly, revisited, and put in relation with each other." decoding="async">
+    <img class="pn21-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <div class="pn-noise" aria-hidden="true"></div>
+  </section>
+
+<section class="pn22">
+    <!-- SLIDE 22: WEBSITE / NAVIGATION (copia di pn20 con nuovo titolo). -->
+    <img class="pn22-bg" src="assets/img/pn15-bg.png" alt="" aria-hidden="true" decoding="async">
+    <img class="pn22-cq" src="assets/img/pn22-title.svg" alt="WEBSITE — NAVIGATION" decoding="async">
+    <video class="pn22-post pn22-p2" src="assets/video/pn22-v1.mp4" autoplay loop muted playsinline></video>
+    <img class="pn22-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <div class="pn-noise" aria-hidden="true"></div>
+  </section>
+
+<section class="pn23">
+    <!-- SLIDE 23: copia di pn21 — titolo + paragrafo + skyline(svg) + logo. Statica. -->
+    <img class="pn23-sky" src="assets/img/pn23-skyline.svg" alt="" aria-hidden="true" decoding="async">
+    <img class="pn23-cq" src="assets/img/pn23-title.svg" alt="OFFLINE PROMOTION — TERTIARY ARTIFACT" decoding="async">
+    <img class="pn23-txt" src="assets/img/pn23-text.svg" alt="Posters and floor graffiti bring the project into the urban space itself, meeting people in their daily routines before the lab even begins, sparking curiosity and inviting them to participate." decoding="async">
+    <img class="pn23-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <div class="pn-noise" aria-hidden="true"></div>
+  </section>
+
+<section class="pn24">
+    <!-- SLIDE 24: copia di pn11 (TOTEM INTERACTION), ultima. -->
+    <img class="pn24-bg" src="assets/img/pn24-bg.png" alt="Poster Piazze Negate 'UN LABORATORIO PARTECIPATIVO PER TORNARE A VIVERE LE PIAZZE INSIEME' affisso su un muro" decoding="async">
+    <img class="pn24-title" src="assets/img/pn24-title.svg" alt="OFFLINE PROMOTION — POSTERS" decoding="async">
+    <img class="pn24-logo" src="assets/img/pn11-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <div class="pn-noise" aria-hidden="true"></div>
+  </section>
+
+<section class="pn25">
+    <!-- SLIDE 25: copia di pn24 (OFFLINE PROMOTION / POSTERS), ultima. -->
+    <img class="pn25-bg" src="assets/img/pn25-bg.png" alt="Floor graffiti Piazze Negate '20/01 POST LEZIONE IN PIAZZA BAUSAN. PENSIAMOLA INSIEME.' con QR code sulla pavimentazione, skater di passaggio" decoding="async">
+    <img class="pn25-title" src="assets/img/pn24-title.svg" alt="OFFLINE PROMOTION — POSTERS" decoding="async">
+    <img class="pn25-logo" src="assets/img/pn11-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <div class="pn-noise" aria-hidden="true"></div>
+  </section>
+
+<section class="vi-next vi-next2">
+    <!-- SLIDE TRANSIZIONE 2: .TASK di Piazze Negate + bottone Back to content. -->
+    <h3 class="task-h">.TASK</h3>
+    <p class="task-p">Design a communication campaign system for a participatory urban research project investigating why Milan's public piazze fail to function as genuine spaces of encounter and collective life, where design choices, management decisions, and control systems quietly push people away instead of inviting them to stay.</p>
+    <hr class="dash">
+    <a class="back-btn" href="index.html#contents">Back to content</a>
+  </section>
+<script>/* tl-crossfade */
+(function(){
+  var slide=document.querySelector('.tl-slide');
+  if(!slide) return;
+  var over=slide.querySelector('.tl-over');
+  var ticking=false;
+  function upd(){
+    var vh=window.innerHeight||document.documentElement.clientHeight;
+    var total=slide.offsetHeight-vh;
+    var p= total>0 ? (-slide.getBoundingClientRect().top)/total : 0;
+    p= p<0?0:(p>1?1:p);
+    over.style.opacity=p;
+    ticking=false;
+  }
+  function onScroll(){ if(!ticking){ ticking=true; requestAnimationFrame(upd); } }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',onScroll);
+  upd();
+})();
+</script>
+<script>/* pn4-fadein */
+(function(){
+  var stack=document.querySelector('.pn34-stack');
+  if(!stack) return;
+  var over=stack.querySelector('.pn4');
+  var over2=stack.querySelector('.pn5');
+  if(!over) return;
+  var ticking=false;
+  function upd(){
+    var vh=window.innerHeight||document.documentElement.clientHeight;
+    var total=stack.offsetHeight-vh;
+    var p= total>0 ? (-stack.getBoundingClientRect().top)/total : 0;
+    p= p<0?0:(p>1?1:p);
+    // two equal phases: 0->0.5 fades in pn4, 0.5->1 fades in pn5
+    var p4 = p/0.5; p4 = p4<0?0:(p4>1?1:p4);
+    over.style.opacity = p4;
+    if(over2){
+      var p5 = (p-0.5)/0.5; p5 = p5<0?0:(p5>1?1:p5);
+      over2.style.opacity = p5;
+    }
+    ticking=false;
+  }
+  function onScroll(){ if(!ticking){ ticking=true; requestAnimationFrame(upd); } }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',onScroll);
+  upd();
+})();
+</script>
+</body>
+</html>

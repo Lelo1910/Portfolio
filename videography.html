@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eleonora Benso — 04. Videography / L'ultima cena</title>
+<style>
+  @font-face{font-family:"HelveticaNeueMedium"; src:url(assets/fonts/HelveticaNeueMedium.otf) format("opentype"); font-weight:400 700; font-display:swap;}
+  :root{--bg:#f0efec; --ink:#0b0b0c; --gray:#a3a3a3;}
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{background:var(--bg); color:var(--ink);
+    font-family:"HelveticaNeueMedium","Helvetica Neue",Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased; min-height:100svh; overflow-x:hidden;}
+
+  .project{
+    /* >>> KNOBS <<<  (numbers only) */
+    --pad:clamp(22px,3vw,46px);
+    --ast-h:clamp(34px,4vw,64px);  --ast-y:0px;
+    --head-sz:clamp(34px,6.5vw,104px);       /* size of 03. + PHOTOGRAPHY */
+    --num-gap:clamp(20px,2.4vw,44px);         /* gap between asterisk and "03." */
+    --head-top:18vh;                          /* vertical position of the heading */
+    --title-sz:clamp(22px,2.4vw,38px);        /* "Concert" */
+    --foot-sz:clamp(15px,1.5vw,23px);  --foot-lh:1.3;
+    --year-y:0.4em;      /* offset colonna anni in EM: scala col font -> identico a ogni larghezza.  + = piu giu, 0 = baseline */
+
+    position:relative; min-height:100svh; padding:var(--pad);
+    display:flex; flex-direction:column;
+  }
+  /* asterisk + 03. on the left, PHOTOGRAPHY pushed to the right margin */
+  .p-head{display:flex; align-items:center; justify-content:space-between;
+    margin-top:var(--head-top); font-weight:700; line-height:1;}
+  .p-head-left{display:flex; align-items:center; gap:var(--num-gap);}
+  .p-head .ast{height:var(--ast-h); width:auto; transform:translateY(var(--ast-y)); flex:none;}
+  .p-head .num{font-size:var(--head-sz);}
+  .p-head .name{font-size:var(--head-sz); text-transform:uppercase; letter-spacing:-.01em; margin-right:-.01em;}
+
+  .p-title{font-size:var(--title-sz); font-weight:700; margin-top:auto;}
+
+  /* footer: programmi a sinistra, anni a destra allineati in ALTO (2024 sulla riga "Programs used:") */
+  .p-foot{display:flex; justify-content:space-between; align-items:flex-end;
+    margin-top:clamp(28px,5vh,70px); color:var(--gray);
+    font-size:var(--foot-sz); line-height:var(--foot-lh);}
+  .p-foot .year{text-align:right;}
+
+  /* ===================== PHOTOGRAPHY — galleria a scroll orizzontale GUIDATO dallo scroll verticale =====================
+     La sezione e' alta: mentre scrolli giu, .pin resta bloccata (sticky) e la striscia foto trasla
+     in orizzontale attraverso tutti i frame. Scorre solo la foto, la didascalia resta ferma.
+     L'altezza della sezione la calcola lo script in base al numero di frame (--scroll-speed regola la velocita).
+     >>> KNOBS <<<
+     --img-h        : altezza foto (verticali 2:3, orizzontali 3:2 -> niente crop)
+     --pair-gap     : spazio tra le due foto in un frame "duo"
+     --scroll-speed : px verticali per px orizzontali (piu alto = scroll piu lungo/lento) */
+  .ph-pair{
+    --pad:clamp(22px,3vw,46px);
+    --img-h:clamp(320px,72vh,800px);
+    --pair-gap:clamp(28px,8vw,150px);
+    --foot-sz:clamp(15px,1.5vw,23px); --foot-lh:1.3;
+    --scroll-speed:1.6;
+    position:relative; min-height:100svh;
+  }
+  .ph-pair .pin{position:sticky; top:0; height:100svh; box-sizing:border-box; padding:var(--pad);
+    display:flex; flex-direction:column; overflow:hidden;}
+  .ph-pair .track-wrap{flex:1; overflow:hidden;}
+  .ph-pair .track{display:flex; height:100%; will-change:transform;}
+  .ph-pair .frame{flex:0 0 100%; display:flex; justify-content:center; align-items:center; gap:var(--pair-gap);}
+  .ph-pair .frame img{height:var(--img-h); width:auto; max-width:100%; object-fit:contain; display:block;}
+  .ph-pair .frame iframe{height:var(--img-h); aspect-ratio:16/9; max-width:100%; width:auto; border:0; display:block; background:#000;}
+  .ph-pair .frame video{height:var(--img-h); width:auto; max-width:100%; object-fit:contain; display:block; background:#000;}
+  .ph-pair .frame .ph-vid{height:var(--img-h); aspect-ratio:16/9; max-width:100%; background:#1c1c1c;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+    color:var(--gray); font-size:var(--foot-sz); line-height:1.3; text-align:center;}
+  .ph-pair .frame .ph-vid span{opacity:.55; font-size:.8em;}
+  .ph-pair .frame.full img{height:100%; width:100%; max-width:100%; object-fit:cover; display:block;}
+  .ph-pair .frame iframe{height:var(--img-h); aspect-ratio:16/9; max-width:100%; width:auto; border:0; background:#000; display:block;}
+  /* click-to-play facade: shows YouTube thumbnail, loads iframe only on click */
+  .ph-pair .frame .yt{position:relative; height:var(--img-h); aspect-ratio:16/9; max-width:100%; width:auto; background:#000; cursor:pointer; overflow:hidden;}
+  .ph-pair .frame .yt img{width:100%; height:100%; object-fit:cover; display:block;}
+  .ph-pair .frame .yt .yt-play{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:68px; height:48px; padding:0; border:0; border-radius:14px; background:rgba(20,20,20,.72); cursor:pointer; transition:background .15s;}
+  .ph-pair .frame .yt .yt-play::before{content:""; position:absolute; top:50%; left:50%; transform:translate(-40%,-50%); border-style:solid; border-width:10px 0 10px 17px; border-color:transparent transparent transparent #fff;}
+  .ph-pair .frame .yt:hover .yt-play{background:#ff0000;}
+  .ph-pair .frame .yt iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
+  .ph-pair .frame.duo img{max-width:calc((100% - var(--pair-gap)) / 2);}
+  .ph-pair .cap{color:var(--gray); font-size:var(--foot-sz); line-height:var(--foot-lh); flex:none;}
+
+  /* ===================== slide .TASK (testo) — stessa logica delle altre pagine =====================
+     .task-h = ".TASK" (rientrato), .task-p = paragrafo, .dash = linea tratteggiata a tutta larghezza,
+     .meet = nome sezione, .vi-foot = programmi (sx) + anno (dx). */
+  .vi-next{
+    --pad:clamp(22px,3vw,46px);
+    --task-sz:clamp(18px,2.1vw,32px); --task-lh:1.25;
+    --task-indent:30%;  --task-width:56%;
+    --gap-task-dash:clamp(54px,10vh,140px);
+    --gap-dash-meet:clamp(54px,10vh,140px);
+    --gap-meet-foot:clamp(24px,4.5vh,60px);
+    --meet-sz:clamp(22px,2.6vw,40px);
+    --foot-sz:clamp(15px,1.5vw,23px); --foot-lh:1.3;
+    --dash-len:12px; --dash-gap:9px; --dash-thick:2.6px;
+    --year-y:0.4em;
+    min-height:100svh; box-sizing:border-box; padding:var(--pad);
+    display:flex; flex-direction:column; justify-content:center;
+  }
+  .vi-next .task-h{margin:0 0 clamp(18px,2.5vh,30px) var(--task-indent);
+    font-size:var(--meet-sz); font-weight:700;}
+  .vi-next .task-p{max-width:var(--task-width);
+    font-size:var(--task-sz); line-height:var(--task-lh); font-weight:400;}
+  .vi-next .dash{height:var(--dash-thick); border:0;
+    margin:var(--gap-task-dash) calc(-1 * var(--pad)) 0;
+    background:repeating-linear-gradient(to right,
+      var(--ink) 0 var(--dash-len),
+      transparent var(--dash-len) calc(var(--dash-len) + var(--dash-gap)));}
+  .vi-next .meet{margin-top:var(--gap-dash-meet); font-size:var(--meet-sz); font-weight:700;}
+  .vi-next .vi-foot{display:flex; justify-content:space-between; align-items:flex-end;
+    margin-top:var(--gap-meet-foot); color:var(--gray);
+    font-size:var(--foot-sz); line-height:var(--foot-lh);}
+
+  /* ========= vi-next2 — .TASK finale + bottone Back to content ========= */
+  .vi-next2{--back-gap:clamp(120px,28vh,300px); --back-pad-y:0.55em; --back-pad-x:0.9em;}
+  .vi-next2 .back-btn{align-self:flex-start; margin-top:var(--back-gap);
+    font-size:var(--foot-sz); font-weight:600; color:var(--ink); text-decoration:none;
+    border:1.6px dashed var(--ink); padding:var(--back-pad-y) var(--back-pad-x);
+    background:transparent; cursor:pointer;}
+  .vi-next2 .back-btn:hover{background:var(--ink); color:var(--bg); border-style:solid;}
+
+  /* spread di "A day in the rattery" in scroll orizzontale: stessa meccanica di .ph-pair.
+     Lo spread riempie l'altezza disponibile (senza sforare) e galleggia con margini come nel mockup.
+     >>> KNOBS <<<  --pad = margine intorno allo spread ; --rat-gap = stacco tra spread e didascalia */
+  .rat-spreads{--pair-gap:0px; --pad:clamp(26px,4vw,60px); --rat-gap:clamp(26px,4.5vh,64px);}
+  .rat-spreads .pin{gap:var(--rat-gap);}
+  .rat-spreads .frame img{height:auto; max-height:100%; max-width:100%; width:auto; object-fit:contain;}
+  .rat-spreads .cap{font-size:clamp(16px,1.7vw,26px);}
+
+  /* ===================== slide "Area 51" — video centrato sulla pagina (scroll verticale) =====================
+     >>> KNOBS <<<  --vid-h = altezza del video (piu basso = piu margini intorno) */
+  .area51{
+    --pad:clamp(22px,3vw,46px);
+    --vid-h:clamp(300px,74vh,860px);
+    --label-sz:clamp(16px,1.7vw,26px); --foot-lh:1.3;
+    min-height:100svh; box-sizing:border-box; padding:var(--pad);
+    display:flex; flex-direction:column;
+  }
+  .area51 .vid{flex:1; min-height:0; display:flex; align-items:center; justify-content:center;}
+  .area51 .vid video{height:var(--vid-h); max-width:100%; width:auto; object-fit:contain; display:block; background:#000;}
+  .area51 .vid iframe{height:var(--vid-h); aspect-ratio:16/9; max-width:100%; width:auto; border:0; display:block; background:#000;}
+  .area51 .cap{color:var(--gray); font-size:var(--label-sz); line-height:var(--foot-lh); flex:none;}
+</style>
+</head>
+<body>
+  <main class="project" id="lultima-cena">
+    <div class="p-head">
+      <div class="p-head-left">
+        <img class="ast" src="assets/img/ast-blue.png" alt="">
+        <span class="num">04.</span>
+      </div>
+      <span class="name">Videography</span>
+    </div>
+
+    <div class="p-title">L'ultima cena</div>
+
+    <div class="p-foot">
+      <div class="programs">Programs used:<br>DaVinci Resolve</div>
+      <div class="year">2024</div>
+    </div>
+  </main>
+
+  <section class="ph-pair" id="videos">
+    <div class="pin">
+      <div class="track-wrap">
+        <div class="track">
+          <div class="frame"><div class="yt" data-id="0iG4BUAMVrw" data-params="start=4&amp;rel=0"><img src="https://i.ytimg.com/vi/0iG4BUAMVrw/maxresdefault.jpg" alt="L'ultima cena" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/0iG4BUAMVrw/hqdefault.jpg'"><button class="yt-play" aria-label="Play L'ultima cena"></button></div></div>
+          <div class="frame"><div class="yt" data-id="rMsjZHHwJFs" data-params="rel=0"><img src="https://i.ytimg.com/vi/rMsjZHHwJFs/maxresdefault.jpg" alt="Video 2" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/rMsjZHHwJFs/hqdefault.jpg'"><button class="yt-play" aria-label="Play video"></button></div></div>
+          <div class="frame full"><img src="assets/img/lultima-street.jpg" width="2048" height="1448" alt="L'ultima cena — poster in context"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="vi-next street-doc" id="laboratori-polimi">
+    <h3 class="task-h">.TASK</h3>
+    <p class="task-p">Direct and produce a short film inspired by Martin Scorsese's psychological thrillers as part of a group of eight, handling every aspect from screenplay to casting, set design, costumes, and cinematography, exploring paranoia and through a fragmented perspective that blurs the line between the protagonist's inner world and reality.</p>
+    <hr class="dash">
+    <div class="meet">Laboratori Polimi</div>
+    <div class="vi-foot">
+      <div>Programs used:<br>After effects<br>Premiere</div>
+      <div>2024</div>
+    </div>
+  </section>
+
+  <section class="ph-pair" id="laboratori-videos">
+    <div class="pin">
+      <div class="track-wrap">
+        <div class="track">
+          <div class="frame"><div class="yt" data-id="QOS0Dr3q23k" data-params="rel=0"><img src="https://i.ytimg.com/vi/QOS0Dr3q23k/maxresdefault.jpg" alt="Laboratori Polimi 1" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/QOS0Dr3q23k/hqdefault.jpg'"><button class="yt-play" aria-label="Play Laboratori Polimi 1"></button></div></div>
+          <div class="frame"><div class="yt" data-id="Y-MMKiSMQh4" data-params="rel=0"><img src="https://i.ytimg.com/vi/Y-MMKiSMQh4/maxresdefault.jpg" alt="Laboratori Polimi 2" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/Y-MMKiSMQh4/hqdefault.jpg'"><button class="yt-play" aria-label="Play Laboratori Polimi 2"></button></div></div>
+          <div class="frame"><div class="yt" data-id="ij8l_Tcabuo" data-params="rel=0"><img src="https://i.ytimg.com/vi/ij8l_Tcabuo/maxresdefault.jpg" alt="Laboratori Polimi 3" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/ij8l_Tcabuo/hqdefault.jpg'"><button class="yt-play" aria-label="Play Laboratori Polimi 3"></button></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="vi-next street-doc" id="interviews">
+    <h3 class="task-h">.TASK</h3>
+    <p class="task-p">Produce three interview and workshop videos for a Politecnico di Milano graduate program, coordinating set design, lighting, and multi-camera shooting across Sony, Canon, and Nikon, achieving visual consistency through color grading with Dehancer's Agfa Chrome preset, bloom effects, and white balance correction.</p>
+    <hr class="dash">
+    <div class="meet">Interviews</div>
+    <div class="vi-foot">
+      <div>Programs used:<br>Premiere</div>
+      <div>2025</div>
+    </div>
+  </section>
+
+  <section class="ph-pair" id="interviews-videos">
+    <div class="pin">
+      <div class="track-wrap">
+        <div class="track">
+          <div class="frame"><div class="yt" data-id="LW63hF9o7HQ" data-params="rel=0"><img src="https://i.ytimg.com/vi/LW63hF9o7HQ/maxresdefault.jpg" alt="Interview 1" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/LW63hF9o7HQ/hqdefault.jpg'"><button class="yt-play" aria-label="Play Interview 1"></button></div></div>
+          <div class="frame"><div class="yt" data-id="vJMA1lewSog" data-params="rel=0"><img src="https://i.ytimg.com/vi/vJMA1lewSog/maxresdefault.jpg" alt="Interview 2" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/vJMA1lewSog/hqdefault.jpg'"><button class="yt-play" aria-label="Play Interview 2"></button></div></div>
+          <div class="frame"><div class="yt" data-id="F9yIFmGEVJ8" data-params="rel=0"><img src="https://i.ytimg.com/vi/F9yIFmGEVJ8/maxresdefault.jpg" alt="Interview 3" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/F9yIFmGEVJ8/hqdefault.jpg'"><button class="yt-play" aria-label="Play Interview 3"></button></div></div>
+          <div class="frame"><div class="yt" data-id="eSA_kyz8tT8" data-params="rel=0"><img src="https://i.ytimg.com/vi/eSA_kyz8tT8/maxresdefault.jpg" alt="Interview 4" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/eSA_kyz8tT8/hqdefault.jpg'"><button class="yt-play" aria-label="Play Interview 4"></button></div></div>
+          <div class="frame"><div class="yt" data-id="5fgu6jSA1cQ" data-params="start=70&amp;rel=0"><img src="https://i.ytimg.com/vi/5fgu6jSA1cQ/maxresdefault.jpg" alt="Interview 5" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/5fgu6jSA1cQ/hqdefault.jpg'"><button class="yt-play" aria-label="Play Interview 5"></button></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="vi-next street-doc" id="a-part-of-us">
+    <h3 class="task-h">.TASK</h3>
+    <p class="task-p">Produce anniversary interview videos for two non-profit associations, ACLI, supporting people with financial and bureaucratic needs, and Lavorare Insieme, dedicated to people with severe disabilities, documenting individual stories, daily activities with the people they help, and the impact of their work on the community.</p>
+    <hr class="dash">
+    <div class="meet">A part of us</div>
+    <div class="vi-foot">
+      <div>Programs used:<br>DaVinci Resolve</div>
+      <div>2026</div>
+    </div>
+  </section>
+
+  <section class="area51" id="a-part-of-us-video">
+    <div class="vid">
+      <video controls preload="metadata" playsinline poster="assets/img/a-part-of-us-poster.jpg" src="assets/video/a-part-of-us.mp4"></video>
+    </div>
+  </section>
+
+  <section class="vi-next vi-next2">
+    <h3 class="task-h">.TASK</h3>
+    <p class="task-p">Write and direct a short horror film with a professional cast and crew, handling the full screenplay, sourcing props and costumes, managing outdoor shooting conditions, and operating professional cameras. The full edit, from raw footage to final cut, was handled independently by me.</p>
+    <hr class="dash">
+    <a class="back-btn" href="index.html#contents">Back to content</a>
+  </section>
+
+  <script>
+    /* scroll orizzontale guidato dallo scroll verticale, per OGNI sezione .ph-pair in sequenza:
+       ognuna si blocca (sticky) a turno e fa scorrere la sua striscia foto. L'altezza di ciascuna
+       sezione e' calcolata in base alla larghezza dei suoi frame e a --scroll-speed. */
+    (function(){
+      var secs=Array.prototype.slice.call(document.querySelectorAll('.ph-pair'));
+      if(!secs.length) return;
+      var items=secs.map(function(sec){
+        return {sec:sec, track:sec.querySelector('.track'), wrap:sec.querySelector('.track-wrap'), maxX:0};
+      });
+      var ticking=false;
+      function applyAll(){
+        ticking=false;
+        var vh=window.innerHeight;
+        items.forEach(function(it){
+          var total=it.sec.offsetHeight - vh;
+          var passed=Math.min(Math.max(-it.sec.getBoundingClientRect().top,0), total);
+          var p = total>0 ? passed/total : 0;
+          it.track.style.transform='translate3d('+(-p*it.maxX)+'px,0,0)';
+        });
+      }
+      function measureAll(){
+        var vh=window.innerHeight;
+        items.forEach(function(it){
+          var speed=parseFloat(getComputedStyle(it.sec).getPropertyValue('--scroll-speed'))||1.5;
+          it.maxX=Math.max(it.track.scrollWidth - it.wrap.clientWidth, 0);
+          it.sec.style.height=(vh + it.maxX*speed)+'px';
+        });
+        applyAll();
+      }
+      function onScroll(){ if(!ticking){ ticking=true; requestAnimationFrame(applyAll); } }
+      window.addEventListener('scroll', onScroll, {passive:true});
+      window.addEventListener('resize', measureAll);
+      window.addEventListener('load', measureAll);
+      document.querySelectorAll('.ph-pair img').forEach(function(im){ im.addEventListener('load', measureAll); });
+      measureAll();
+    })();
+  </script>
+
+  <script>
+    document.querySelectorAll('.ph-pair .frame .yt').forEach(function(el){
+      el.addEventListener('click', function(){
+        var id = el.getAttribute('data-id');
+        var p  = el.getAttribute('data-params') || '';
+        var f  = document.createElement('iframe');
+        f.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1' + (p ? '&' + p : '');
+        f.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+        f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+        f.allowFullscreen = true;
+        var img = el.querySelector('img'); if (img) f.title = img.alt;
+        el.innerHTML = '';
+        el.appendChild(f);
+      });
+    });
+  </script>
+</body>
+</html>

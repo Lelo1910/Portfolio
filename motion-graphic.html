@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eleonora Benso — 02. Motion Graphic / We say stop</title>
+<style>
+  @font-face{font-family:"HelveticaNeueMedium"; src:url(assets/fonts/HelveticaNeueMedium.otf) format("opentype"); font-weight:400 700; font-display:swap;}
+  :root{--bg:#f0efec; --ink:#0b0b0c; --gray:#a3a3a3; --year-y:0.4em;}
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{background:var(--bg); color:var(--ink);
+    font-family:"HelveticaNeueMedium","Helvetica Neue",Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased; min-height:100svh; overflow-x:hidden;}
+
+  .project{
+    /* >>> KNOBS <<<  (numbers only) */
+    --pad:clamp(22px,3vw,46px);
+    --ast-h:clamp(34px,4vw,64px);  --ast-y:0px;
+    --head-sz:clamp(34px,6.5vw,104px);       /* size of 02. + MOTION GRAPHIC */
+    --num-gap:clamp(20px,2.4vw,44px);         /* gap between asterisk and "02." */
+    --head-top:18vh;                          /* vertical position of the heading */
+    --title-sz:clamp(22px,2.4vw,38px);        /* "We say stop" */
+    --foot-sz:clamp(15px,1.5vw,23px);  --foot-lh:1.3;
+
+    position:relative; min-height:100svh; padding:var(--pad);
+    display:flex; flex-direction:column;
+  }
+  /* asterisk + 02. on the left, MOTION GRAPHIC pushed to the right margin */
+  .p-head{display:flex; align-items:center; justify-content:space-between;
+    margin-top:var(--head-top); font-weight:700; line-height:1;}
+  .p-head-left{display:flex; align-items:center; gap:var(--num-gap);}
+  .p-head .ast{height:var(--ast-h); width:auto; transform:translateY(var(--ast-y)); flex:none;}
+  .p-head .num{font-size:var(--head-sz);}
+  .p-head .name{font-size:var(--head-sz); text-transform:uppercase; letter-spacing:-.01em; margin-right:-.01em;}
+
+  .p-title{font-size:var(--title-sz); font-weight:700; margin-top:auto;}
+
+  .p-foot{display:flex; justify-content:space-between; align-items:flex-end;
+    margin-top:clamp(28px,5vh,70px); color:var(--gray);
+    font-size:var(--foot-sz); line-height:var(--foot-lh);}
+
+  /* ===================== WE SAY STOP — 5 VIDEO ROW =====================
+     >>> KNOBS <<<
+     --wsv-gap : gap between the videos (all equal)
+     Row spans full content width: left edge = "We say stop", right edge = "2024". */
+  .ws-videos{
+    --pad:clamp(22px,3vw,46px);
+    --wsv-gap:2vw;
+    min-height:100svh; box-sizing:border-box; padding:var(--pad);
+    background:var(--bg);
+    display:flex; align-items:center;
+  }
+  .ws-videos .wsv-row{width:100%;
+    display:grid; grid-template-columns:repeat(5,1fr); gap:var(--wsv-gap);}
+  .ws-videos video{width:100%; height:auto; aspect-ratio:1984/2832; display:block; background:var(--bg);}
+
+  /* ===================== OLTRE L'ASCOLTO — FULL-WIDTH VIDEO =====================
+     >>> KNOBS <<<
+     Same --pad as .ws-videos: left edge aligns with ws-v1, right edge with ws-v5. */
+  /* ===================== OLTRE L'ASCOLTO — FULL-WIDTH VIDEO =====================
+     >>> KNOBS <<<
+     Same --pad as .ws-videos on ALL four sides: left/right align with ws-v1/ws-v5,
+     top/bottom space identical to the side margins. */
+  .ol-video{
+    --pad:clamp(22px,3vw,46px);
+    box-sizing:border-box; padding:var(--pad);
+    background:var(--bg);
+    scroll-margin-top:clamp(22px,3vw,46px);
+  }
+  .ol-video video{width:100%; height:auto; aspect-ratio:1920/1080; display:block; background:#000;}
+  .ol-video .video-placeholder{width:100%; aspect-ratio:1920/1080; background:#000;}
+  /* Oltre l'ascolto + Design Philology: video centrato + piu piccolo (come "L'ultima cena" in videography) */
+  #oltre-lascolto, #design-philology{display:flex; flex-direction:column; align-items:center; justify-content:center;}
+  #oltre-lascolto video, #design-philology video{width:auto; height:clamp(300px,74vh,860px); max-width:100%; object-fit:contain;}
+
+  /* ===================== .TASK / NEXT (We say stop -> Oltre l'ascolto) ===================== */
+  .vi-next{
+    --pad:clamp(22px,3vw,46px);
+    --task-sz:clamp(18px,2.1vw,32px); --task-lh:1.25;
+    --task-indent:30%;  --task-width:56%;
+    --gap-task-dash:clamp(54px,10vh,140px);
+    --gap-dash-meet:clamp(54px,10vh,140px);
+    --gap-meet-foot:clamp(24px,4.5vh,60px);
+    --meet-sz:clamp(22px,2.6vw,40px);
+    --foot-sz:clamp(15px,1.5vw,23px); --foot-lh:1.3;
+    --dash-len:12px; --dash-gap:9px; --dash-thick:2.6px;
+    min-height:100svh; box-sizing:border-box; padding:var(--pad);
+    display:flex; flex-direction:column; justify-content:center;
+  }
+  .vi-next .task-h{margin:0 0 clamp(18px,2.5vh,30px) var(--task-indent);
+    font-size:var(--meet-sz); font-weight:700;}
+  .vi-next .task-p{max-width:var(--task-width);
+    font-size:var(--task-sz); line-height:var(--task-lh); font-weight:400;}
+  .vi-next .dash{height:var(--dash-thick); border:0;
+    margin:var(--gap-task-dash) calc(-1 * var(--pad)) 0;
+    background:repeating-linear-gradient(to right,
+      var(--ink) 0 var(--dash-len),
+      transparent var(--dash-len) calc(var(--dash-len) + var(--dash-gap)));}
+  .vi-next .meet{margin-top:var(--gap-dash-meet); font-size:var(--meet-sz); font-weight:700;}
+  .vi-next .vi-foot{display:flex; justify-content:space-between; align-items:flex-end;
+    margin-top:var(--gap-meet-foot); color:var(--gray);
+    font-size:var(--foot-sz); line-height:var(--foot-lh);}
+
+  /* ========= vi-next2 — .TASK finale + bottone Back to content (come Piazze Negate) ========= */
+  .vi-next2{--back-gap:clamp(120px,28vh,300px); --back-pad-y:0.55em; --back-pad-x:0.9em;}
+  .vi-next2 .back-btn{align-self:flex-start; margin-top:var(--back-gap);
+    font-size:var(--foot-sz); font-weight:600; color:var(--ink); text-decoration:none;
+    border:1.6px dashed var(--ink); padding:var(--back-pad-y) var(--back-pad-x);
+    background:transparent; cursor:pointer;}
+  .vi-next2 .back-btn:hover{background:var(--ink); color:var(--bg); border-style:solid;}
+
+  /* ========= Motion school — horizontal scroll ========= */
+  /* >>> KNOBS <<< (numbers only) */
+  .ms-scroll{
+    --scroll-speed:1.4;       /* higher = more vertical scroll to move through the pages */
+    --ms-sq:30vw;             /* the two square videos (current size) */
+    --ms-sq-gap:2vw;          /* gap between the two squares */
+    --ms-wide:60vw;           /* "Click here" video + new video (wider) */
+  }
+  .ph-pair{position:relative; min-height:100svh;}
+  .ph-pair .pin{position:sticky; top:0; height:100svh; box-sizing:border-box;
+    padding:clamp(22px,3vw,46px); display:flex; flex-direction:column; overflow:hidden;}
+  .ph-pair .track-wrap{flex:1; overflow:hidden;}
+  .ph-pair .track{display:flex; height:100%; will-change:transform; backface-visibility:hidden; -webkit-backface-visibility:hidden;}
+  .ph-pair .frame{flex:0 0 100%; display:flex; justify-content:center; align-items:center;}
+  /* contenitore .vwrap: clippa ~2px ai lati per nascondere il "seam" di rendering sul bordo del video durante lo scroll */
+  .ph-pair .frame .vwrap{overflow:hidden; line-height:0; font-size:0; max-width:100%; background:var(--bg);}
+  .ph-pair .frame .vwrap video{display:block; width:calc(100% + 4px); height:auto; margin-left:-2px; background:var(--bg);}
+  .ms-duo{gap:var(--ms-sq-gap);}
+  .ms-duo .vwrap{width:var(--ms-sq);}
+  .ms-wide .vwrap{width:var(--ms-wide);}
+</style>
+</head>
+<body>
+  <main class="project" id="we-say-stop">
+    <div class="p-head">
+      <div class="p-head-left">
+        <img class="ast" src="assets/img/ast-pink.png" alt="">
+        <span class="num">02.</span>
+      </div>
+      <span class="name">Motion Graphic</span>
+    </div>
+
+    <div class="p-title">We say stop</div>
+
+    <div class="p-foot">
+      <div class="programs">Programs used:<br>After effects</div>
+      <div class="year">2024</div>
+    </div>
+  </main>
+
+  <section class="ws-videos">
+    <div class="wsv-row">
+      <video src="assets/video/ws-v1.mp4" autoplay muted loop playsinline></video>
+      <video src="assets/video/ws-v2.mp4" autoplay muted loop playsinline></video>
+      <video src="assets/video/ws-v3.mp4" autoplay muted loop playsinline></video>
+      <video src="assets/video/ws-v4.mp4" autoplay muted loop playsinline></video>
+      <video src="assets/video/ws-v5.mp4" autoplay muted loop playsinline></video>
+    </div>
+  </section>
+
+  <section class="vi-next">
+    <h3 class="task-h">.TASK</h3>
+    <p class="task-p">Animate static posters into looping videos for a university campaign against pick-up artists, Bringing variable text, illustrations, and textures to life in After Effects, with characters animated through the puppet tool and code expressions controlling font variability. The plugin Overlord was used for the transfer between Ai and Ae.</p>
+    <hr class="dash">
+    <div class="meet">Oltre l’ascolto</div>
+    <div class="vi-foot">
+      <div>Programs used:<br>After effects<br>Illustrator</div>
+      <div>2025</div>
+    </div>
+  </section>
+
+  <section class="ol-video" id="oltre-lascolto">
+    <video src="assets/video/GRUPPO_5_1.mp4" poster="assets/img/oltre-lascolto-poster.png" controls playsinline preload="metadata"></video>
+  </section>
+
+  <section class="vi-next">
+    <h3 class="task-h">.TASK</h3>
+    <p class="task-p">Create an animation for RAI exploring the legacy of Milan's Studio di Fonologia. Telling the stories of its most iconic instruments through sound and visuals, where every frame of the animations reflects the ways these machines transformed sound. This was a celebratory video commissioned for the Studio’s 70 years.</p>
+    <hr class="dash">
+    <div class="meet">Design philology</div>
+    <div class="vi-foot">
+      <div>Programs used:<br>After effects</div>
+      <div>2024</div>
+    </div>
+  </section>
+
+  <!-- DESIGN PHILOLOGY — video -->
+  <section class="ol-video" id="design-philology">
+    <video src="assets/video/design-philology.mp4" poster="assets/img/design-philology-poster.png" controls playsinline preload="metadata"></video>
+  </section>
+
+  <section class="vi-next">
+    <h3 class="task-h">.TASK</h3>
+    <p class="task-p">Create an introductory video for Design Philology, an archive dedicated to the history of design education and research at Politecnico di Milano. The video follows an established visual identity and a specific professional aesthetic, weaving together illustrations, typography, through 3D camera in After Effects.</p>
+    <hr class="dash">
+    <div class="meet">Motion school</div>
+    <div class="vi-foot">
+      <div>Programs used:<br>After effects<br>Animate</div>
+      <div>2024<br>2025</div>
+    </div>
+  </section>
+
+  <!-- MOTION SCHOOL — 3 video -->
+  <section class="ph-pair ms-scroll" id="motion-school">
+    <div class="pin">
+      <div class="track-wrap">
+        <div class="track">
+          <div class="frame ms-duo">
+            <div class="vwrap"><video src="assets/video/ms-v2.mp4" autoplay muted loop playsinline></video></div>
+            <div class="vwrap"><video src="assets/video/ms-v3.mp4" autoplay muted loop playsinline></video></div>
+          </div>
+          <div class="frame ms-wide">
+            <div class="vwrap"><video src="assets/video/ms-v1.mp4" autoplay muted loop playsinline></video></div>
+          </div>
+          <div class="frame ms-wide">
+            <div class="vwrap"><video src="assets/video/ms-v4.mp4" autoplay muted loop playsinline></video></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="vi-next vi-next2">
+    <h3 class="task-h">.TASK</h3>
+    <p class="task-p">Complete 3 animations to get the certification from the course Motion Secrets, an advanced After Effects course by motion designer Emanuele Colombo: mastering fluid movement, anticipation, follow-through, and morphing across three animation formats: one commercial, one shape based, and one being a full character animation.</p>
+    <hr class="dash">
+    <a class="back-btn" href="index.html#contents">Back to content</a>
+  </section>
+
+  <script>
+    /* scroll orizzontale guidato dallo scroll verticale, per OGNI sezione .ph-pair:
+       la sezione si blocca (sticky) e fa scorrere la sua striscia di frame.
+       L'altezza e' calcolata in base alla larghezza dei frame e a --scroll-speed. */
+    (function(){
+      var secs=Array.prototype.slice.call(document.querySelectorAll('.ph-pair'));
+      if(!secs.length) return;
+      var items=secs.map(function(sec){
+        return {sec:sec, track:sec.querySelector('.track'), wrap:sec.querySelector('.track-wrap'), maxX:0};
+      });
+      var ticking=false;
+      function applyAll(){
+        ticking=false;
+        var vh=window.innerHeight;
+        items.forEach(function(it){
+          var total=it.sec.offsetHeight - vh;
+          var passed=Math.min(Math.max(-it.sec.getBoundingClientRect().top,0), total);
+          var p = total>0 ? passed/total : 0;
+          it.track.style.transform='translate3d('+Math.round(-p*it.maxX)+'px,0,0)';
+        });
+      }
+      function measureAll(){
+        var vh=window.innerHeight;
+        items.forEach(function(it){
+          var speed=parseFloat(getComputedStyle(it.sec).getPropertyValue('--scroll-speed'))||1.5;
+          it.maxX=Math.max(it.track.scrollWidth - it.wrap.clientWidth, 0);
+          it.sec.style.height=(vh + it.maxX*speed)+'px';
+        });
+        applyAll();
+      }
+      function onScroll(){ if(!ticking){ ticking=true; requestAnimationFrame(applyAll); } }
+      window.addEventListener('scroll', onScroll, {passive:true});
+      window.addEventListener('resize', measureAll);
+      window.addEventListener('load', measureAll);
+      document.querySelectorAll('.ph-pair img, .ph-pair video').forEach(function(m){
+        m.addEventListener('loadedmetadata', measureAll); m.addEventListener('load', measureAll);
+      });
+      measureAll();
+    })();
+  </script>
+
+</body>
+</html>
