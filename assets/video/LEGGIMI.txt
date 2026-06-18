@@ -1,3 +1,0 @@
-video.mp4 = la registrazione del sito fantacycling.com (ottimizzata per il web, ~4.3 MB).
-Parte in autoplay, muto, in loop nella pagina visual-identity.html.
-Per sostituirlo basta rimpiazzare questo file mantenendo il nome video.mp4.
