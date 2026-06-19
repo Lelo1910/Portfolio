@@ -4,9 +4,35 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script>
-  /* MOBILE DECK MODE (shared): iframe@1440 scaled to width; vh/svh->vw; top-level nav; anchor goto */
+  /* MOBILE DECK MODE (shared): iframe@1440 scaled to width; vh/svh->vw; top-level nav; anchor goto; lazy videos */
   (function(){
     var DW=1440, R=0.5625;
+
+    /* shared lazy-video manager: play only videos in the visible band, pause the rest.
+       runs INSIDE the iframe (band fed by shell) and on plain DESKTOP (own scroll). */
+    function initVideoMgr(mode){
+      var CAP=6, MARGIN=600;
+      var vids=[].slice.call(document.querySelectorAll('video[data-auto]'));
+      if(!vids.length) return null;
+      vids.forEach(function(v){ try{v.pause();}catch(e){} v.preload='none'; });
+      var band=null;
+      function within(v){ var r=v.getBoundingClientRect(); var o=window.pageYOffset||0; var t=r.top+o, b=r.bottom+o; return b>band.t-MARGIN && t<band.b+MARGIN; }
+      function apply(){ if(!band) return; var n=0;
+        vids.forEach(function(v){
+          if(within(v) && n<CAP){ n++; if(v.paused){ v.preload='auto'; var p=v.play(); if(p&&p.catch)p.catch(function(){}); } }
+          else if(!v.paused){ try{v.pause();}catch(e){} }
+        }); }
+      if(mode==='self'){
+        var raf=false;
+        function rb(){ band={t:(window.pageYOffset||0), b:(window.pageYOffset||0)+window.innerHeight}; apply(); raf=false; }
+        function os(){ if(!raf){ raf=true; requestAnimationFrame(rb); } }
+        window.addEventListener('scroll',os,{passive:true});
+        window.addEventListener('resize',os,{passive:true});
+        rb();
+      }
+      return { setBand:function(t,b){ band={t:t,b:b}; apply(); }, refresh:function(){ apply(); } };
+    }
+
     if (window.self!==window.top){
       /* ---- INNER (real content inside the iframe) ---- */
       document.documentElement.classList.add('deck-inner');
@@ -17,9 +43,11 @@
         if(r.cssRules) walk(r.cssRules); } }
       function conv(){ for(var i=0;i<document.styleSheets.length;i++){ var rr; try{rr=document.styleSheets[i].cssRules;}catch(e){continue;} walk(rr);} }
       var rep=function(){ try{ parent.postMessage({__deckH:document.documentElement.scrollHeight},'*'); }catch(e){} };
-      document.addEventListener('DOMContentLoaded',function(){ conv(); rep(); });
-      window.addEventListener('load',function(){ conv(); rep(); [400,1200,2500].forEach(function(t){setTimeout(rep,t);});
-        if(window.ResizeObserver){ try{ new ResizeObserver(rep).observe(document.body); }catch(e){} } });
+      var VM=null;
+      document.addEventListener('DOMContentLoaded',function(){ conv(); rep(); VM=initVideoMgr('shell'); });
+      window.addEventListener('load',function(){ conv(); rep(); if(VM)VM.refresh();
+        [400,1200,2500].forEach(function(t){setTimeout(function(){rep(); if(VM)VM.refresh();},t);});
+        if(window.ResizeObserver){ try{ new ResizeObserver(function(){rep(); if(VM)VM.refresh();}).observe(document.body); }catch(e){} } });
       window.addEventListener('resize',rep);
       /* internal page links must navigate the REAL top window (fresh load -> own shell + hash + scroll reset) */
       document.addEventListener('click',function(e){
@@ -27,18 +55,27 @@
         if(a.target==='_blank') return; var href=a.getAttribute('href')||'';
         if(/^[^#?]*\.html(\?[^#]*)?(#.*)?$/.test(href)){ e.preventDefault(); try{ top.location.href=a.href; }catch(err){ location.href=a.href; } }
       }, true);
-      /* shell asks: where is #id ? inner never scrolls, so rect.top == offset from doc top */
       window.addEventListener('message',function(e){
-        if(e.data && e.data.__deckGoto!=null){
+        if(!e.data) return;
+        if(e.data.__deckGoto!=null){
           var id=e.data.__deckGoto, el=id?document.getElementById(id):null;
           var y= el ? Math.round(el.getBoundingClientRect().top + (window.pageYOffset||0)) : 0;
           try{ parent.postMessage({__deckGotoY:y},'*'); }catch(err){}
         }
+        if(e.data.__deckVis && VM){ VM.setBand(e.data.__deckVis.t, e.data.__deckVis.b); }
       });
       return;
     }
+
+    /* ---- TOP WINDOW ---- */
+    var isDeck = !!(window.matchMedia && window.matchMedia('(max-width:820px)').matches);
+    if(!isDeck){
+      /* plain desktop: no deck shell, just lazy-manage videos in place */
+      var go=function(){ initVideoMgr('self'); };
+      if(document.readyState!=='loading') go(); else document.addEventListener('DOMContentLoaded',go);
+      return;
+    }
     /* ---- SHELL (top window on small screens) ---- */
-    if(!(window.matchMedia && window.matchMedia('(max-width:820px)').matches)) return;
     document.documentElement.classList.add('deck-shell');
     if('scrollRestoration' in history){ try{ history.scrollRestoration='manual'; }catch(e){} }
     var GOTO=(location.hash && location.hash.length>1)? location.hash.slice(1) : null;
@@ -51,13 +88,18 @@
       var f=document.createElement('iframe'); f.src=location.pathname+location.search;
       f.setAttribute('scrolling','no'); f.setAttribute('title','portfolio'); h.appendChild(f); document.body.appendChild(h);
       var lastH=0, scale=1;
+      function postVis(){ if(!lastH) return; try{ f.contentWindow.postMessage({__deckVis:{t:(window.pageYOffset||0)/scale, b:((window.pageYOffset||0)+window.innerHeight)/scale}},'*'); }catch(e){} }
       function ap(hh){ scale=window.innerWidth/DW; f.style.width=DW+'px'; if(hh){lastH=hh; f.style.height=hh+'px';}
         f.style.transformOrigin='top left'; f.style.transform='scale('+scale+')'; h.style.height=(lastH*scale)+'px';
-        if(GOTO && !lockGoto && lastH){ try{ f.contentWindow.postMessage({__deckGoto:GOTO},'*'); }catch(e){} } }
+        if(GOTO && !lockGoto && lastH){ try{ f.contentWindow.postMessage({__deckGoto:GOTO},'*'); }catch(e){} }
+        postVis(); }
+      var vraf=false;
+      function onScroll(){ if(!vraf){ vraf=true; requestAnimationFrame(function(){ postVis(); vraf=false; }); } }
+      window.addEventListener('scroll',onScroll,{passive:true});
       window.addEventListener('message',function(e){
         if(!e.data) return;
         if(e.data.__deckH){ ap(e.data.__deckH); }
-        if(e.data.__deckGotoY!=null && !lockGoto){ window.scrollTo(0, Math.max(0, Math.round(e.data.__deckGotoY*scale))); }
+        if(e.data.__deckGotoY!=null && !lockGoto){ window.scrollTo(0, Math.max(0, Math.round(e.data.__deckGotoY*scale))); postVis(); }
       });
       window.addEventListener('resize',function(){ ap(0); });
       f.addEventListener('load',function(){ ap(lastH||window.innerHeight); });
@@ -233,11 +275,11 @@
 
   <section class="ws-videos">
     <div class="wsv-row">
-      <video src="assets/video/ws-v1.mp4" autoplay muted loop playsinline></video>
-      <video src="assets/video/ws-v2.mp4" autoplay muted loop playsinline></video>
-      <video src="assets/video/ws-v3.mp4" autoplay muted loop playsinline></video>
-      <video src="assets/video/ws-v4.mp4" autoplay muted loop playsinline></video>
-      <video src="assets/video/ws-v5.mp4" autoplay muted loop playsinline></video>
+      <video src="assets/video/ws-v1.mp4" muted loop playsinline preload="none" data-auto="1"></video>
+      <video src="assets/video/ws-v2.mp4" muted loop playsinline preload="none" data-auto="1"></video>
+      <video src="assets/video/ws-v3.mp4" muted loop playsinline preload="none" data-auto="1"></video>
+      <video src="assets/video/ws-v4.mp4" muted loop playsinline preload="none" data-auto="1"></video>
+      <video src="assets/video/ws-v5.mp4" muted loop playsinline preload="none" data-auto="1"></video>
     </div>
   </section>
 
@@ -253,7 +295,7 @@
   </section>
 
   <section class="ol-video" id="oltre-lascolto">
-    <video src="assets/video/GRUPPO_5_1.mp4" poster="assets/img/oltre-lascolto-poster.png" controls playsinline preload="metadata"></video>
+    <video src="assets/video/GRUPPO_5_1.mp4" poster="assets/img/oltre-lascolto-poster.png" controls playsinline preload="none"></video>
   </section>
 
   <section class="vi-next">
@@ -269,7 +311,7 @@
 
   <!-- DESIGN PHILOLOGY — video -->
   <section class="ol-video" id="design-philology">
-    <video src="assets/video/design-philology.mp4" poster="assets/img/design-philology-poster.png" controls playsinline preload="metadata"></video>
+    <video src="assets/video/design-philology.mp4" poster="assets/img/design-philology-poster.png" controls playsinline preload="none"></video>
   </section>
 
   <section class="vi-next">
@@ -289,14 +331,14 @@
       <div class="track-wrap">
         <div class="track">
           <div class="frame ms-duo">
-            <div class="vwrap"><video src="assets/video/ms-v2.mp4" autoplay muted loop playsinline></video></div>
-            <div class="vwrap"><video src="assets/video/ms-v3.mp4" autoplay muted loop playsinline></video></div>
+            <div class="vwrap"><video src="assets/video/ms-v2.mp4" muted loop playsinline preload="none" data-auto="1"></video></div>
+            <div class="vwrap"><video src="assets/video/ms-v3.mp4" muted loop playsinline preload="none" data-auto="1"></video></div>
           </div>
           <div class="frame ms-wide">
-            <div class="vwrap"><video src="assets/video/ms-v1.mp4" autoplay muted loop playsinline></video></div>
+            <div class="vwrap"><video src="assets/video/ms-v1.mp4" muted loop playsinline preload="none" data-auto="1"></video></div>
           </div>
           <div class="frame ms-wide">
-            <div class="vwrap"><video src="assets/video/ms-v4.mp4" autoplay muted loop playsinline></video></div>
+            <div class="vwrap"><video src="assets/video/ms-v4.mp4" muted loop playsinline preload="none" data-auto="1"></video></div>
           </div>
         </div>
       </div>
