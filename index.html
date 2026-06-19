@@ -4,47 +4,66 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script>
-  /* ===== MOBILE DECK MODE (iframe + transform + runtime vh->vw fix) =====
-     Small viewport -> top window becomes a shell that loads THIS page in a
-     1440px iframe and scales it to fit the screen width. INSIDE the iframe,
-     CSS vh would resolve against the iframe's full content height (thousands of
-     px), blowing up every vh-based margin -> so we convert vh -> vw-equivalent
-     (16:9 => 1vh = 0.5625vw) at runtime, which keeps vertical spacing exactly
-     proportional to the desktop. Detection uses the real viewport width. */
+  /* MOBILE DECK MODE (shared): iframe@1440 scaled to width; vh/svh->vw; top-level nav; anchor goto */
   (function(){
-    var DW = 1440, R = 0.5625;   /* 16:9 frame: 1vh == 0.5625vw */
-    if (window.self !== window.top){
-      var html = document.documentElement; html.classList.add('deck-inner');
-      function vh2vw(s){ return s.replace(/(-?[\d.]+)(svh|dvh|lvh|vh)\b/g, function(_,n){ return (parseFloat(n)*R)+'vw'; }); }
-      function walk(rules){
-        for (var j=0;j<rules.length;j++){ var r=rules[j];
-          if (r.type === 5) continue;                 /* skip @font-face (base64 src) */
-          if (r.style){ for (var k=0;k<r.style.length;k++){ var p=r.style[k], v=r.style.getPropertyValue(p);
-            if (v.length < 200 && /[\d.]+vh\b/.test(v)) r.style.setProperty(p, vh2vw(v), r.style.getPropertyPriority(p)); } }
-          if (r.cssRules) walk(r.cssRules); }
-      }
-      function convert(){ for (var i=0;i<document.styleSheets.length;i++){ var rr; try{ rr=document.styleSheets[i].cssRules; }catch(e){ continue; } walk(rr); } }
-      var report=function(){ try{ parent.postMessage({__deckH: document.documentElement.scrollHeight}, '*'); }catch(e){} };
-      document.addEventListener('DOMContentLoaded', function(){ convert(); report(); });
-      window.addEventListener('load', function(){ convert(); report(); setTimeout(report,300); setTimeout(report,1200); });
-      window.addEventListener('resize', report);
+    var DW=1440, R=0.5625;
+    if (window.self!==window.top){
+      /* ---- INNER (real content inside the iframe) ---- */
+      document.documentElement.classList.add('deck-inner');
+      function u(s){ return s.replace(/(-?[\d.]+)(svh|dvh|lvh|vh)\b/g,function(_,n){return (parseFloat(n)*R)+'vw';}); }
+      function walk(rs){ for(var j=0;j<rs.length;j++){ var r=rs[j]; if(r.type===5) continue;
+        if(r.style){ for(var k=0;k<r.style.length;k++){ var p=r.style[k],v=r.style.getPropertyValue(p);
+          if(v.length<200 && /[\d.]+(svh|dvh|lvh|vh)\b/.test(v)) r.style.setProperty(p,u(v),r.style.getPropertyPriority(p)); } }
+        if(r.cssRules) walk(r.cssRules); } }
+      function conv(){ for(var i=0;i<document.styleSheets.length;i++){ var rr; try{rr=document.styleSheets[i].cssRules;}catch(e){continue;} walk(rr);} }
+      var rep=function(){ try{ parent.postMessage({__deckH:document.documentElement.scrollHeight},'*'); }catch(e){} };
+      document.addEventListener('DOMContentLoaded',function(){ conv(); rep(); });
+      window.addEventListener('load',function(){ conv(); rep(); [400,1200,2500].forEach(function(t){setTimeout(rep,t);});
+        if(window.ResizeObserver){ try{ new ResizeObserver(rep).observe(document.body); }catch(e){} } });
+      window.addEventListener('resize',rep);
+      /* internal page links must navigate the REAL top window (fresh load -> own shell + hash + scroll reset) */
+      document.addEventListener('click',function(e){
+        var a=e.target&&e.target.closest?e.target.closest('a[href]'):null; if(!a) return;
+        if(a.target==='_blank') return; var href=a.getAttribute('href')||'';
+        if(/^[^#?]*\.html(\?[^#]*)?(#.*)?$/.test(href)){ e.preventDefault(); try{ top.location.href=a.href; }catch(err){ location.href=a.href; } }
+      }, true);
+      /* shell asks: where is #id ? inner never scrolls, so rect.top == offset from doc top */
+      window.addEventListener('message',function(e){
+        if(e.data && e.data.__deckGoto!=null){
+          var id=e.data.__deckGoto, el=id?document.getElementById(id):null;
+          var y= el ? Math.round(el.getBoundingClientRect().top + (window.pageYOffset||0)) : 0;
+          try{ parent.postMessage({__deckGotoY:y},'*'); }catch(err){}
+        }
+      });
       return;
     }
-    if (!(window.matchMedia && window.matchMedia('(max-width:820px)').matches)) return;
+    /* ---- SHELL (top window on small screens) ---- */
+    if(!(window.matchMedia && window.matchMedia('(max-width:820px)').matches)) return;
     document.documentElement.classList.add('deck-shell');
-    document.addEventListener('DOMContentLoaded', function(){
-      var holder=document.createElement('div'); holder.className='deck-frame';
-      var f=document.createElement('iframe');
-      f.src=location.pathname+location.search+'#deckframe';
-      f.setAttribute('scrolling','no'); f.setAttribute('title','portfolio');
-      holder.appendChild(f); document.body.appendChild(holder);
-      var lastH=0;
-      function apply(h){ var s=window.innerWidth/DW; f.style.width=DW+'px';
-        if(h){ lastH=h; f.style.height=h+'px'; } f.style.transformOrigin='top left';
-        f.style.transform='scale('+s+')'; holder.style.height=(lastH*s)+'px'; }
-      window.addEventListener('message', function(e){ if(e.data&&e.data.__deckH) apply(e.data.__deckH); });
-      window.addEventListener('resize', function(){ apply(0); });
-      f.addEventListener('load', function(){ apply(lastH||window.innerHeight); });
+    if('scrollRestoration' in history){ try{ history.scrollRestoration='manual'; }catch(e){} }
+    var GOTO=(location.hash && location.hash.length>1)? location.hash.slice(1) : null;
+    if(location.hash){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} }
+    var lockGoto=false;
+    ['touchstart','wheel','keydown'].forEach(function(ev){ window.addEventListener(ev,function(){lockGoto=true;},{passive:true}); });
+    document.addEventListener('DOMContentLoaded',function(){
+      window.scrollTo(0,0);
+      var h=document.createElement('div'); h.className='deck-frame';
+      var f=document.createElement('iframe'); f.src=location.pathname+location.search;
+      f.setAttribute('scrolling','no'); f.setAttribute('title','portfolio'); h.appendChild(f); document.body.appendChild(h);
+      var lastH=0, scale=1;
+      function ap(hh){ scale=window.innerWidth/DW; f.style.width=DW+'px'; if(hh){lastH=hh; f.style.height=hh+'px';}
+        f.style.transformOrigin='top left'; f.style.transform='scale('+scale+')'; h.style.height=(lastH*scale)+'px';
+        if(GOTO && !lockGoto && lastH){ try{ f.contentWindow.postMessage({__deckGoto:GOTO},'*'); }catch(e){} } }
+      window.addEventListener('message',function(e){
+        if(!e.data) return;
+        if(e.data.__deckH){ ap(e.data.__deckH); }
+        if(e.data.__deckGotoY!=null && !lockGoto){ window.scrollTo(0, Math.max(0, Math.round(e.data.__deckGotoY*scale))); }
+      });
+      window.addEventListener('resize',function(){ ap(0); });
+      f.addEventListener('load',function(){ ap(lastH||window.innerHeight); });
+      if(GOTO){ var tries=0, iv=setInterval(function(){ tries++;
+        if(lockGoto||tries>30){ clearInterval(iv); return; }
+        if(lastH){ try{ f.contentWindow.postMessage({__deckGoto:GOTO},'*'); }catch(e){} } }, 200); }
     });
   })();
 </script>
@@ -338,7 +357,7 @@
   }
 
 
-  /* ===== MOBILE DECK MODE — slides scaled to phone width, continuous cream ===== */
+  /* ===== MOBILE DECK MODE ===== */
   html.deck-shell, html.deck-shell body{ background:var(--bg); }
   html.deck-shell body{ min-height:0; overflow-x:hidden; }
   html.deck-shell body > *:not(.deck-frame){ display:none !important; }
@@ -346,7 +365,9 @@
   html.deck-shell .deck-frame iframe{ display:block; border:0; background:var(--bg); }
   html.deck-inner, html.deck-inner body{ min-height:0 !important; height:auto !important; overflow-x:hidden; }
   html.deck-inner body{ background:var(--bg); }
-  /* safety net: frame each section landscape even before the JS unit-fix runs */
+  /* kill subpixel seams between scaled stacked frames (cream bleeds through on colored slides) */
+  html.deck-inner body > main, html.deck-inner body > section, html.deck-inner body > div{ margin-bottom:-1px !important; }
+  /* safety net: frame each section landscape */
   html.deck-inner .wrap, html.deck-inner .about, html.deck-inner .skills,
   html.deck-inner .exp, html.deck-inner .contents, html.deck-inner .thanks{ min-height:56.25vw; }
 </style>
