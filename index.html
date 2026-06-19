@@ -35,6 +35,43 @@
           try{ parent.postMessage({__deckGotoY:y},'*'); }catch(err){}
         }
       });
+      /* per-slide reveal: the inner doc is rendered at 1440 in a scaled iframe and never
+         scrolls itself, so we read the REAL scroll from the parent + the iframe's on-screen
+         rect, and reveal each section as its top crosses ~82% of the device viewport. */
+      (function(){
+        function allSecs(){ try{ return [].slice.call(document.querySelectorAll('.about,.skills,.exp,.contents,.thanks')); }catch(e){ return []; } }
+        function showAll(){ var s=allSecs(); for(var i=0;i<s.length;i++){ s[i].classList.add('deck-seen'); } }
+        setTimeout(showAll,4000);            /* safety: never leave a slide hidden if anything fails */
+        var SET=false;
+        function setup(){
+          if(SET) return;
+          var secs=allSecs(); if(!secs.length) return;   /* not in DOM yet -> retry later */
+          SET=true;
+          var fe=null, pv=null; try{ fe=window.frameElement; pv=window.parent; }catch(e){}
+          if(!fe || !pv){ showAll(); return; }            /* can't read parent -> just show */
+          function tick(){
+            if(!secs.length) return;
+            try{
+              var fr=fe.getBoundingClientRect();
+              var scale=(fr.width/DW)||1;
+              var vh=pv.innerHeight||document.documentElement.clientHeight;
+              for(var i=secs.length-1;i>=0;i--){
+                var top=fr.top + secs[i].getBoundingClientRect().top*scale;
+                if(top < vh*0.82){ secs[i].classList.add('deck-seen'); secs.splice(i,1); }
+              }
+            }catch(err){ showAll(); secs=[]; }
+          }
+          var raf=false;
+          function onScroll(){ if(raf) return; raf=true;
+            (window.requestAnimationFrame||function(cb){return setTimeout(cb,16);})(function(){ raf=false; tick(); }); }
+          try{ pv.addEventListener('scroll',onScroll,{passive:true}); pv.addEventListener('resize',onScroll,{passive:true}); }
+          catch(e){ showAll(); return; }
+          tick(); setTimeout(tick,250); setTimeout(tick,1000);
+        }
+        document.addEventListener('DOMContentLoaded',setup);
+        window.addEventListener('load',setup);
+        setTimeout(setup,800); setTimeout(setup,1600);
+      })();
       return;
     }
     /* ---- SHELL (top window on small screens) ---- */
@@ -104,7 +141,7 @@
 
   /* ---- TEXT NUDGE KNOBS — edit left/top to move each label (px) ---- */
   header .l   { position:relative; left:0px;  top:0px; }   /* ELEONORA BENSO   */
-  header .r   { position:relative; left:0x;  top:0px; }   /* DESIGN PORTFOLIO */
+  header .r   { position:relative; left:0px;  top:0px; }   /* DESIGN PORTFOLIO */
   footer .roles{ position:relative; left:0px; top:0px; }   /* MOTION/VIDEO/GRAPHIC */
   footer .year { position:relative; left:0px; top:0px; }   /* 2026 */
 
@@ -370,6 +407,22 @@
   /* safety net: frame each section landscape */
   html.deck-inner .wrap, html.deck-inner .about, html.deck-inner .skills,
   html.deck-inner .exp, html.deck-inner .contents, html.deck-inner .thanks{ min-height:56.25vw; }
+
+  /* >>> PER-SLIDE ENTRANCE (deck/mobile only) <<<
+     each section fades+rises in as it scrolls into view; hero keeps its own native animation.
+     --deck-rise = how far each slide travels up while appearing */
+  html.deck-inner{ --deck-rise:34px; }
+  html.deck-inner .about, html.deck-inner .skills, html.deck-inner .exp,
+  html.deck-inner .contents, html.deck-inner .thanks{
+    opacity:0; transform:translateY(var(--deck-rise));
+    transition:opacity .7s cubic-bezier(.2,.8,.2,1), transform .85s cubic-bezier(.18,.8,.2,1);
+    will-change:opacity, transform;
+  }
+  html.deck-inner .deck-seen{ opacity:1; transform:none; }
+  @media (prefers-reduced-motion:reduce){
+    html.deck-inner .about, html.deck-inner .skills, html.deck-inner .exp,
+    html.deck-inner .contents, html.deck-inner .thanks{ opacity:1 !important; transform:none !important; transition:none; }
+  }
 </style>
 </head>
 <body>
