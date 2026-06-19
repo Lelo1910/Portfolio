@@ -39,7 +39,18 @@
       var all=[].slice.call(document.querySelectorAll('video'));
       if(!all.length) return null;
       var managed=all.filter(function(v){ return v.hasAttribute('data-auto'); });
-      managed.forEach(function(v){ try{v.pause();}catch(e){} v.preload='none'; v.style.cursor='pointer'; });
+      var ovs=[];
+      managed.forEach(function(v){ try{v.pause();}catch(e){} v.preload='none'; v.style.cursor='pointer';
+        /* floating play-icon hint over each tappable video (pure visual; taps pass through to the video) */
+        var ov=document.createElement('div'); ov.setAttribute('aria-hidden','true');
+        ov.style.cssText='position:absolute;pointer-events:none;z-index:2147483000;display:flex;align-items:center;justify-content:center;transition:opacity .18s ease;';
+        ov.innerHTML='<span style="display:flex;align-items:center;justify-content:center;width:120px;height:120px;border-radius:50%;background:rgba(11,11,12,.5);box-shadow:0 6px 26px rgba(0,0,0,.28);"><svg width="52" height="52" viewBox="0 0 24 24" fill="#ffffff" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.29-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14z"/></svg></span>';
+        document.body.appendChild(ov); ovs.push({v:v,ov:ov});
+        v.addEventListener('play',function(){ ov.style.opacity='0'; });
+        v.addEventListener('pause',function(){ ov.style.opacity='1'; });
+      });
+      function place(){ ovs.forEach(function(o){ var r=o.v.getBoundingClientRect(); var x=window.pageXOffset||0,y=window.pageYOffset||0;
+        o.ov.style.left=(r.left+x)+'px'; o.ov.style.top=(r.top+y)+'px'; o.ov.style.width=r.width+'px'; o.ov.style.height=r.height+'px'; }); }
       /* single active: whenever any video starts, pause every other video */
       all.forEach(function(v){ v.addEventListener('play',function(){
         all.forEach(function(o){ if(o!==v && !o.paused){ try{o.pause();}catch(e){} } }); }); });
@@ -48,11 +59,12 @@
         if(v.paused){ v.preload='auto'; var p=v.play(); if(p&&p.catch)p.catch(function(){}); } else { try{v.pause();}catch(e){} } }); });
       var band=null;
       function within(v){ var r=v.getBoundingClientRect(); var o=window.pageYOffset||0; var t=r.top+o,b=r.bottom+o; return b>band.t-300 && t<band.b+300; }
-      function apply(){ if(!band) return;
+      function apply(){ place(); if(!band) return;
         managed.forEach(function(v){
           if(within(v)){ if(v.preload!=='metadata' && v.preload!=='auto'){ v.preload='metadata'; try{v.load();}catch(e){} } }
           else { if(!v.paused){ try{v.pause();}catch(e){} } }
         }); }
+      window.addEventListener('resize',place); place();
       return { setBand:function(t,b){ band={t:t,b:b}; apply(); }, refresh:function(){ apply(); } };
     }
 
@@ -1295,6 +1307,10 @@
   html.deck-inner .pn34-stack .pn3,
   html.deck-inner .pn34-stack .pn4,
   html.deck-inner .pn34-stack .pn5{ position:relative !important; inset:auto !important; opacity:1 !important; margin-bottom:-1px !important; }
+  /* kill the 1px purple edge where a full-cover bg image doesn't reach the scaled section box (overscan, clipped by overflow:hidden) */
+  html.deck-inner section[class^="pn"] > img[class$="-bg"]{
+    top:-2px !important; left:-2px !important; right:auto !important; bottom:auto !important;
+    width:calc(100% + 4px) !important; height:calc(100% + 4px) !important; }
 </style>
 </head>
 <body>
