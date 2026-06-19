@@ -3,6 +3,38 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+  (function(){
+    var DW=1440, R=0.5625;
+    if (window.self!==window.top){
+      document.documentElement.classList.add('deck-inner');
+      function u(s){ return s.replace(/(-?[\d.]+)(svh|dvh|lvh|vh)\b/g,function(_,n){return (parseFloat(n)*R)+'vw';}); }
+      function walk(rs){ for(var j=0;j<rs.length;j++){ var r=rs[j]; if(r.type===5) continue;
+        if(r.style){ for(var k=0;k<r.style.length;k++){ var p=r.style[k],v=r.style.getPropertyValue(p);
+          if(v.length<200 && /[\d.]+(svh|dvh|lvh|vh)\b/.test(v)) r.style.setProperty(p,u(v),r.style.getPropertyPriority(p)); } }
+        if(r.cssRules) walk(r.cssRules); } }
+      function conv(){ for(var i=0;i<document.styleSheets.length;i++){ var rr; try{rr=document.styleSheets[i].cssRules;}catch(e){continue;} walk(rr);} }
+      var rep=function(){ try{ parent.postMessage({__deckH:document.documentElement.scrollHeight},'*'); }catch(e){} };
+      document.addEventListener('DOMContentLoaded',function(){ conv(); rep(); });
+      window.addEventListener('load',function(){ conv(); rep(); setTimeout(rep,300); setTimeout(rep,1200); });
+      window.addEventListener('resize',rep);
+      return;
+    }
+    if(!(window.matchMedia && window.matchMedia('(max-width:820px)').matches)) return;
+    document.documentElement.classList.add('deck-shell');
+    document.addEventListener('DOMContentLoaded',function(){
+      var h=document.createElement('div'); h.className='deck-frame';
+      var f=document.createElement('iframe'); f.src=location.pathname+location.search+'#deckframe';
+      f.setAttribute('scrolling','no'); f.setAttribute('title','portfolio'); h.appendChild(f); document.body.appendChild(h);
+      var lastH=0;
+      function ap(hh){ var s=window.innerWidth/DW; f.style.width=DW+'px'; if(hh){lastH=hh; f.style.height=hh+'px';}
+        f.style.transformOrigin='top left'; f.style.transform='scale('+s+')'; h.style.height=(lastH*s)+'px'; }
+      window.addEventListener('message',function(e){ if(e.data&&e.data.__deckH) ap(e.data.__deckH); });
+      window.addEventListener('resize',function(){ ap(0); });
+      f.addEventListener('load',function(){ ap(lastH||window.innerHeight); });
+    });
+  })();
+</script>
 <title>Eleonora Benso — 02. Motion Graphic / We say stop</title>
 <style>
   @font-face{font-family:"HelveticaNeueMedium"; src:url(assets/fonts/HelveticaNeueMedium.otf) format("opentype"); font-weight:400 700; font-display:swap;}
@@ -130,48 +162,25 @@
   .ms-duo{gap:var(--ms-sq-gap);}
   .ms-duo .vwrap{width:var(--ms-sq);}
   .ms-wide .vwrap{width:var(--ms-wide);}
+
+  /* ===== MOBILE DECK MODE ===== */
+  html.deck-shell, html.deck-shell body{ background:var(--bg); }
+  html.deck-shell body{ min-height:0; overflow-x:hidden; }
+  html.deck-shell body > *:not(.deck-frame){ display:none !important; }
+  html.deck-shell .deck-frame{ position:relative; width:100%; overflow:hidden; background:var(--bg); }
+  html.deck-shell .deck-frame iframe{ display:block; border:0; background:var(--bg); }
+  html.deck-inner, html.deck-inner body{ min-height:0 !important; height:auto !important; overflow-x:hidden; }
+  html.deck-inner body{ background:var(--bg); }
+  /* horizontal-scroll gallery -> stacked frames */
+  html.deck-inner .ph-pair{ height:auto !important; min-height:0 !important; }
+  html.deck-inner .ph-pair .pin{ position:static !important; height:auto !important; }
+  html.deck-inner .ph-pair .track-wrap{ overflow:visible !important; flex:none !important; }
+  html.deck-inner .ph-pair .track{ display:block !important; height:auto !important; transform:none !important; }
+  html.deck-inner .ph-pair .frame{ min-height:56.25vw !important; }
+  html.deck-inner .ph-pair .frame + .frame{ margin-top:clamp(22px,3vw,46px); }
 </style>
 </head>
 <body>
-  <!-- ===== Rotate-to-landscape overlay (narrow portrait only) — self-contained ===== -->
-  <style>
-    #rotate-cue{display:none;}
-    @media (max-width:820px) and (orientation:portrait){
-      html,body{overflow:hidden !important;}
-      #rotate-cue{
-        display:flex; position:fixed; inset:0; z-index:2147483647;
-        flex-direction:column; align-items:center; justify-content:center; gap:7vw;
-        text-align:center; padding:12vw; box-sizing:border-box;
-        background:#f0efec; color:#0b0b0c;
-        font-family:"HelveticaNeueMedium","Helvetica Neue",Helvetica,Arial,sans-serif;
-      }
-      #rotate-cue .rc-arrow{width:42vw; max-width:230px; height:auto;
-        transform-origin:50% 50%; animation:rc-wiggle 2.4s ease-in-out infinite;}
-      #rotate-cue .rc-title{margin:0; font-size:7vw; font-weight:700; line-height:1.05; letter-spacing:-.01em;}
-      #rotate-cue .rc-sub{margin:.6em 0 0; font-size:3.9vw; line-height:1.35; opacity:.5;}
-      @keyframes rc-wiggle{0%,100%{transform:rotate(-7deg);} 50%{transform:rotate(9deg);}}
-      @media (prefers-reduced-motion:reduce){ #rotate-cue .rc-arrow{animation:none;} }
-    }
-  </style>
-  <div id="rotate-cue">
-    <svg class="rc-arrow" viewBox="20 20 180 140" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <defs>
-        <filter id="rcRough" x="-25%" y="-25%" width="150%" height="150%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.022" numOctaves="2" seed="5" result="n"/>
-          <feDisplacementMap in="SourceGraphic" in2="n" scale="5.5" xChannelSelector="R" yChannelSelector="G"/>
-        </filter>
-      </defs>
-      <g filter="url(#rcRough)" stroke="#0b0b0c" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
-        <path d="M46 142 C 36 80, 92 42, 168 60"/>
-        <path d="M148 44 L172 62 L150 84"/>
-      </g>
-    </svg>
-    <div>
-      <p class="rc-title">Rotate your phone</p>
-      <p class="rc-sub">this portfolio is best viewed in landscape</p>
-    </div>
-  </div>
-
   <main class="project" id="we-say-stop">
     <div class="p-head">
       <div class="p-head-left">
