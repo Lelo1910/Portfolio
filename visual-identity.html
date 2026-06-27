@@ -33,43 +33,59 @@
       return { setBand:function(t,b){ band={t:t,b:b}; apply(); }, refresh:function(){ apply(); } };
     }
 
-    /* MOBILE tap-to-play: no autoplay; tap a video to play it; starting one pauses all others;
-       only the visible band loads its first frame (preload metadata), off-screen ones pause. */
-    function initTapMode(){
-      var all=[].slice.call(document.querySelectorAll('video'));
-      if(!all.length) return null;
-      var managed=all.filter(function(v){ return v.hasAttribute('data-auto'); });
-      var ovs=[];
-      managed.forEach(function(v){ try{v.pause();}catch(e){} v.preload='none'; v.style.cursor='pointer';
-        /* floating play-icon hint over each tappable video (pure visual; taps pass through to the video) */
+    /* MOBILE tap-to-play: videos do NOT autoplay. Each gets a play-icon overlay appended INSIDE the
+       video's container (all already position:relative) and positioned over the video via its
+       offsetLeft/Top -> the icon rides along on scroll with NO per-scroll repositioning, so it can't
+       drift on iOS momentum. Tap a video to play/pause; starting one pauses the others; videos more
+       than a screen off-viewport pause to spare iOS memory. */
+    function initTapToPlay(){
+      var vids=[].slice.call(document.querySelectorAll('video[data-auto]'));
+      if(!vids.length) return;
+      var items=[];
+      vids.forEach(function(v){
+        try{v.pause();}catch(e){}
+        v.preload='none'; v.removeAttribute('autoplay'); v.style.cursor='pointer';
+        var par=v.parentElement;
+        if(getComputedStyle(par).position==='static'){ par.style.position='relative'; }
         var ov=document.createElement('div'); ov.setAttribute('aria-hidden','true');
-        ov.style.cssText='position:absolute;pointer-events:none;z-index:2147483000;display:flex;align-items:center;justify-content:center;transition:opacity .18s ease;';
-        ov.innerHTML='<span style="display:flex;align-items:center;justify-content:center;width:120px;height:120px;border-radius:50%;background:rgba(11,11,12,.5);box-shadow:0 6px 26px rgba(0,0,0,.28);"><svg width="52" height="52" viewBox="0 0 24 24" fill="#ffffff" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.29-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14z"/></svg></span>';
-        document.body.appendChild(ov); ovs.push({v:v,ov:ov});
-        v.addEventListener('play',function(){ ov.style.opacity='0'; });
+        ov.style.cssText='position:absolute;pointer-events:none;z-index:20;display:flex;align-items:center;justify-content:center;transition:opacity .2s ease;';
+        var btn=document.createElement('span');
+        btn.style.cssText='display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(11,11,12,.55);box-shadow:0 6px 26px rgba(0,0,0,.3);';
+        btn.innerHTML='<svg viewBox="0 0 24 24" fill="#ffffff" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.29-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14z"/></svg>';
+        ov.appendChild(btn); par.appendChild(ov);
+        var it={v:v,ov:ov,btn:btn,svg:btn.firstChild};
+        items.push(it);
+        v.addEventListener('click',function(){
+          if(v.paused){ v.preload='auto'; try{v.load();}catch(e){} var pr=v.play(); if(pr&&pr.catch)pr.catch(function(){}); }
+          else{ try{v.pause();}catch(e){} }
+        });
+        v.addEventListener('play',function(){ ov.style.opacity='0';
+          items.forEach(function(o){ if(o.v!==v && !o.v.paused){ try{o.v.pause();}catch(e){} } }); });
         v.addEventListener('pause',function(){ ov.style.opacity='1'; });
       });
-      function place(){ ovs.forEach(function(o){ var r=o.v.getBoundingClientRect(); var x=window.pageXOffset||0,y=window.pageYOffset||0;
-        o.ov.style.left=(r.left+x)+'px'; o.ov.style.top=(r.top+y)+'px'; o.ov.style.width=r.width+'px'; o.ov.style.height=r.height+'px'; }); }
-      /* single active: whenever any video starts, pause every other video */
-      all.forEach(function(v){ v.addEventListener('play',function(){
-        all.forEach(function(o){ if(o!==v && !o.paused){ try{o.pause();}catch(e){} } }); }); });
-      /* tap a managed (control-less) video to toggle play/pause */
-      managed.forEach(function(v){ v.addEventListener('click',function(){
-        if(v.paused){ v.preload='auto'; var p=v.play(); if(p&&p.catch)p.catch(function(){}); } else { try{v.pause();}catch(e){} } }); });
-      var band=null;
-      function within(v){ var r=v.getBoundingClientRect(); var o=window.pageYOffset||0; var t=r.top+o,b=r.bottom+o; return b>band.t-300 && t<band.b+300; }
-      function apply(){ place(); if(!band) return;
-        managed.forEach(function(v){
-          if(within(v)){ if(v.preload!=='metadata' && v.preload!=='auto'){ v.preload='metadata'; try{v.load();}catch(e){} } }
-          else { if(!v.paused){ try{v.pause();}catch(e){} } }
-        }); }
-      window.addEventListener('resize',place); place();
-      return { setBand:function(t,b){ band={t:t,b:b}; apply(); }, refresh:function(){ apply(); } };
+      function position(){
+        items.forEach(function(it){
+          var v=it.v, w=v.offsetWidth, h=v.offsetHeight;
+          it.ov.style.left=v.offsetLeft+'px'; it.ov.style.top=v.offsetTop+'px';
+          it.ov.style.width=w+'px'; it.ov.style.height=h+'px';
+          var d=Math.max(40,Math.min(96,Math.round(Math.min(w,h)*0.4)));
+          it.btn.style.width=d+'px'; it.btn.style.height=d+'px';
+          var sz=Math.round(d*0.46); it.svg.setAttribute('width',sz); it.svg.setAttribute('height',sz);
+        });
+      }
+      position();
+      window.addEventListener('resize',position,{passive:true});
+      [250,800,2000].forEach(function(t){ setTimeout(position,t); });
+      function cull(){ var vh=window.innerHeight;
+        items.forEach(function(it){ var r=it.v.getBoundingClientRect();
+          if((r.bottom<-vh || r.top>vh+vh) && !it.v.paused){ try{it.v.pause();}catch(e){} } }); }
+      var raf=false;
+      window.addEventListener('scroll',function(){ if(!raf){ raf=true; requestAnimationFrame(function(){ cull(); raf=false; }); } },{passive:true});
     }
 
-    /* ---- No iframe anywhere now. Desktop AND mobile both autoplay visible muted videos;
-       the tap-to-play overlays are gone (they hijacked scroll + drifted on iOS). ---- */
+    /* ---- No iframe anywhere. DESKTOP autoplays visible muted videos. MOBILE uses tap-to-play:
+       no autoplay; a play-icon sits over each video; overlays are anchored to the video's container
+       so they don't drift on iOS, and touch-action:pan-y keeps a tap from hijacking scroll. ---- */
     var isDeck = !!(window.matchMedia && window.matchMedia('(max-width:820px)').matches);
     if(!isDeck){
       var go=function(){ initVideoMgr('self'); };
@@ -77,8 +93,8 @@
       return;
     }
     /* ---- MOBILE DECK (NO IFRAME): browser renders the desktop layout at a fixed 1440px viewport
-       and zooms it to fit -> native scroll. Muted videos autoplay as they scroll into view, capped
-       to a few at a time so memory stays safe on iOS. No overlays, nothing steals the scroll. */
+       and zooms it to fit -> native scroll. Videos do NOT autoplay here: each shows a play-icon and
+       loads/plays only when tapped (great for the heavy particle clips); off-screen ones pause. */
     document.documentElement.classList.add('deck');
     var vp=document.querySelector('meta[name=viewport]');
     if(!vp){ vp=document.createElement('meta'); vp.setAttribute('name','viewport'); (document.head||document.documentElement).appendChild(vp); }
@@ -96,16 +112,10 @@
       requestAnimationFrame(function(){
         try{ window.dispatchEvent(new Event('resize')); }catch(e){}
         if((window.pageYOffset||0)===0){ window.scrollTo(0,1); window.scrollTo(0,0); }
+        /* tap-to-play does NO autoplay decoding at load (videos stay preload=none until tapped),
+           so nothing heavy contends with the first scroll; build the play-icons now (layout is ready). */
+        initTapToPlay();
       });
-      /* Defer ALL video work until the page is loaded & scrollable, so video decoding/
-         compositing can't contend with that first scroll (the "tap once, then scroll" bug). */
-      function startVideos(){
-        var VM=initVideoMgr('self',3);   /* keep few playing at once on mobile */
-        if(VM){ [700,1800,3200].forEach(function(t){ setTimeout(VM.refresh,t); }); }
-      }
-      var started=false; function go2(){ if(started)return; started=true; setTimeout(startVideos,250); }
-      if(document.readyState==='complete'){ go2(); }
-      else { window.addEventListener('load',go2); setTimeout(go2,2500); }
     }
     if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',setup); } else { setup(); }
   })();
@@ -1258,7 +1268,8 @@
      (pan-y also disables pinch-zoom; deliberate trade for guaranteed scrolling on a scaled layout.) */
   html.deck, html.deck body, html.deck *{ touch-action:pan-y; -webkit-touch-callout:none;
     -webkit-user-select:none; user-select:none; }
-  html.deck img, html.deck video{ pointer-events:none; }
+  html.deck img{ pointer-events:none; }          /* images stay inert */
+  html.deck video{ cursor:pointer; }              /* videos are tappable (tap-to-play) */
   html.deck body > main, html.deck body > section, html.deck body > div{ margin-bottom:-1px !important; }
   html.deck .tl-slide{ height:auto !important; background:#000 !important; }
   html.deck .tl-slide .tl-sticky{ position:static !important; height:auto !important; overflow:visible !important;
