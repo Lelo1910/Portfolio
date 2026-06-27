@@ -91,8 +91,21 @@
     function conv(){ try{ for(var i=0;i<document.styleSheets.length;i++){ var rr; try{rr=document.styleSheets[i].cssRules;}catch(e){continue;} walk(rr);} }catch(e){} }
     function setup(){
       conv();
-      var VM=initVideoMgr('self',4);   /* at most 4 videos playing at once on mobile */
-      if(VM){ [400,1200,2500].forEach(function(t){ setTimeout(VM.refresh,t); }); }
+      /* iOS: after the dynamic viewport + svh->vw conversion, nudge Safari to engage
+         scrolling so the page doesn't sit waiting for a first tap. Invisible + harmless. */
+      requestAnimationFrame(function(){
+        try{ window.dispatchEvent(new Event('resize')); }catch(e){}
+        if((window.pageYOffset||0)===0){ window.scrollTo(0,1); window.scrollTo(0,0); }
+      });
+      /* Defer ALL video work until the page is loaded & scrollable, so video decoding/
+         compositing can't contend with that first scroll (the "tap once, then scroll" bug). */
+      function startVideos(){
+        var VM=initVideoMgr('self',3);   /* keep few playing at once on mobile */
+        if(VM){ [700,1800,3200].forEach(function(t){ setTimeout(VM.refresh,t); }); }
+      }
+      var started=false; function go2(){ if(started)return; started=true; setTimeout(startVideos,250); }
+      if(document.readyState==='complete'){ go2(); }
+      else { window.addEventListener('load',go2); setTimeout(go2,2500); }
     }
     if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',setup); } else { setup(); }
   })();
