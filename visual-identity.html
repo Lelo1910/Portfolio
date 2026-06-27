@@ -1252,6 +1252,14 @@
   }
   /* ===== MOBILE DECK (no iframe — browser zooms the 1440 layout, native scroll) ===== */
   html.deck, html.deck body{ height:auto !important; min-height:0 !important; overflow-x:hidden; background:var(--bg); }
+  /* iOS: a tap/double-tap on an image was triggering double-tap-to-zoom (page is scaled-to-fit),
+     which froze scrolling until you tapped out of the zoom. 'manipulation' keeps pan-scroll AND
+     pinch-zoom but kills double-tap-zoom. Media here are decorative (no links/controls), so make
+     them non-interactive too, so a tap behaves exactly like a tap on empty space. */
+  html.deck{ touch-action:manipulation; }
+  html.deck body{ touch-action:manipulation; }
+  html.deck img, html.deck video{ touch-action:manipulation; pointer-events:none;
+    -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
   html.deck body > main, html.deck body > section, html.deck body > div{ margin-bottom:-1px !important; }
   html.deck .tl-slide{ height:auto !important; background:#000 !important; }
   html.deck .tl-slide .tl-sticky{ position:static !important; height:auto !important; overflow:visible !important;
