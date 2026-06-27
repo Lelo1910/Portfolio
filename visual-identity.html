@@ -82,7 +82,7 @@
     document.documentElement.classList.add('deck');
     var vp=document.querySelector('meta[name=viewport]');
     if(!vp){ vp=document.createElement('meta'); vp.setAttribute('name','viewport'); (document.head||document.documentElement).appendChild(vp); }
-    vp.setAttribute('content','width='+DW);
+    vp.setAttribute('content','width='+DW+', user-scalable=no');
     function u(s){ return s.replace(/(-?[\d.]+)(svh|dvh|lvh|vh)\b/g,function(_,n){return (parseFloat(n)*R)+'vw';}); }
     function walk(rs){ for(var j=0;j<rs.length;j++){ var r=rs[j]; if(r.type===5) continue;
       if(r.style){ for(var k=0;k<r.style.length;k++){ var prop=r.style[k],v=r.style.getPropertyValue(prop);
@@ -1252,14 +1252,13 @@
   }
   /* ===== MOBILE DECK (no iframe — browser zooms the 1440 layout, native scroll) ===== */
   html.deck, html.deck body{ height:auto !important; min-height:0 !important; overflow-x:hidden; background:var(--bg); }
-  /* iOS: a tap/double-tap on an image was triggering double-tap-to-zoom (page is scaled-to-fit),
-     which froze scrolling until you tapped out of the zoom. 'manipulation' keeps pan-scroll AND
-     pinch-zoom but kills double-tap-zoom. Media here are decorative (no links/controls), so make
-     them non-interactive too, so a tap behaves exactly like a tap on empty space. */
-  html.deck{ touch-action:manipulation; }
-  html.deck body{ touch-action:manipulation; }
-  html.deck img, html.deck video{ touch-action:manipulation; pointer-events:none;
-    -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
+  /* iOS + Android: tapping an image triggered double-tap / smart zoom (the page is scaled-to-fit),
+     after which the finger pans the zoomed view instead of scrolling -> "stuck" until you exit zoom.
+     Lock zoom gestures on EVERY element so a tap can never hijack scroll; only vertical scroll stays.
+     (pan-y also disables pinch-zoom; deliberate trade for guaranteed scrolling on a scaled layout.) */
+  html.deck, html.deck body, html.deck *{ touch-action:pan-y; -webkit-touch-callout:none;
+    -webkit-user-select:none; user-select:none; }
+  html.deck img, html.deck video{ pointer-events:none; }
   html.deck body > main, html.deck body > section, html.deck body > div{ margin-bottom:-1px !important; }
   html.deck .tl-slide{ height:auto !important; background:#000 !important; }
   html.deck .tl-slide .tl-sticky{ position:static !important; height:auto !important; overflow:visible !important;
