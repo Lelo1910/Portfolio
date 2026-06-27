@@ -101,6 +101,16 @@
       if(GOTO){ var tries=0, iv=setInterval(function(){ tries++;
         if(lockGoto||tries>30){ clearInterval(iv); return; }
         if(lastH){ try{ f.contentWindow.postMessage({__deckGoto:GOTO},'*'); }catch(e){} } }, 200); }
+      /* robust height sync: read the inner doc directly (same-origin) so the outer scroll
+         area always matches the real content height, independent of postMessage timing */
+      function innerH(){ try{ var d=f.contentDocument||(f.contentWindow&&f.contentWindow.document); if(!d) return 0;
+        var de=d.documentElement, b=d.body;
+        return Math.max(de?de.scrollHeight:0, b?b.scrollHeight:0, de?de.offsetHeight:0, b?b.offsetHeight:0); }catch(e){ return 0; } }
+      function syncH(){ var hh=innerH(); if(hh && Math.abs(hh-lastH)>1) ap(hh); }
+      var _t0=Date.now(), _si=setInterval(function(){ syncH(); if(Date.now()-_t0>6000) clearInterval(_si); }, 200);
+      window.addEventListener('scroll', syncH, {passive:true});
+      window.addEventListener('resize', syncH, {passive:true});
+      window.addEventListener('load', function(){ syncH(); setTimeout(syncH,500); setTimeout(syncH,1500); });
     });
   })();
 </script>
@@ -396,7 +406,10 @@
 
   /* ===== MOBILE DECK MODE ===== */
   html.deck-shell, html.deck-shell body{ background:var(--bg); }
-  html.deck-shell body{ min-height:0; overflow-x:hidden; }
+  /* kill the global html,body{height:100%} cap on the shell: otherwise the document is
+     locked to one viewport tall and iOS Safari refuses to scroll past the first screen */
+  html.deck-shell{ height:auto !important; min-height:0 !important; }
+  html.deck-shell body{ height:auto !important; min-height:0 !important; overflow-x:hidden; }
   html.deck-shell body > *:not(.deck-frame){ display:none !important; }
   html.deck-shell .deck-frame{ position:relative; width:100%; overflow:hidden; background:var(--bg); }
   html.deck-shell .deck-frame iframe{ display:block; border:0; background:var(--bg); }
