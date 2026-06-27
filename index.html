@@ -4,144 +4,35 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script>
-  /* MOBILE DECK MODE (shared): iframe@1440 scaled to width; vh/svh->vw; top-level nav; anchor goto; lazy videos */
+  /* MOBILE DECK (NO IFRAME): on small screens the browser renders the desktop layout at a
+     fixed 1440px-wide viewport and zooms it to fit the phone -> the page scrolls NATIVELY
+     (no iframe, no postMessage height sync). vh/svh are rewritten to vw so each full-screen
+     section becomes a small landscape frame, stacked vertically. */
   (function(){
     var DW=1440, R=0.5625;
+    if(!(window.matchMedia && window.matchMedia('(max-width:820px)').matches)) return;
+    document.documentElement.classList.add('deck');
+    var vp=document.querySelector('meta[name=viewport]');
+    if(!vp){ vp=document.createElement('meta'); vp.setAttribute('name','viewport'); (document.head||document.documentElement).appendChild(vp); }
+    vp.setAttribute('content','width='+DW);
 
-    /* shared lazy-video manager: play only videos in the visible band, pause the rest.
-       runs INSIDE the iframe (band fed by shell) and on plain DESKTOP (own scroll). */
-    function initVideoMgr(mode){
-      var CAP=6, MARGIN=600;
-      var vids=[].slice.call(document.querySelectorAll('video[data-auto]'));
-      if(!vids.length) return null;
-      vids.forEach(function(v){ try{v.pause();}catch(e){} v.preload='none'; });
-      var band=null;
-      function within(v){ var r=v.getBoundingClientRect(); var o=window.pageYOffset||0; var t=r.top+o, b=r.bottom+o; return b>band.t-MARGIN && t<band.b+MARGIN; }
-      function apply(){ if(!band) return; var n=0;
-        vids.forEach(function(v){
-          if(within(v) && n<CAP){ n++; if(v.paused){ v.preload='auto'; var p=v.play(); if(p&&p.catch)p.catch(function(){}); } }
-          else if(!v.paused){ try{v.pause();}catch(e){} }
-        }); }
-      if(mode==='self'){
-        var raf=false;
-        function rb(){ band={t:(window.pageYOffset||0), b:(window.pageYOffset||0)+window.innerHeight}; apply(); raf=false; }
-        function os(){ if(!raf){ raf=true; requestAnimationFrame(rb); } }
-        window.addEventListener('scroll',os,{passive:true});
-        window.addEventListener('resize',os,{passive:true});
-        rb();
-      }
-      return { setBand:function(t,b){ band={t:t,b:b}; apply(); }, refresh:function(){ apply(); } };
-    }
+    function u(s){ return s.replace(/(-?[\d.]+)(svh|dvh|lvh|vh)\b/g,function(_,n){return (parseFloat(n)*R)+'vw';}); }
+    function walk(rs){ for(var j=0;j<rs.length;j++){ var r=rs[j]; if(r.type===5) continue;
+      if(r.style){ for(var k=0;k<r.style.length;k++){ var prop=r.style[k],v=r.style.getPropertyValue(prop);
+        if(v.length<200 && /[\d.]+(svh|dvh|lvh|vh)\b/.test(v)) r.style.setProperty(prop,u(v),r.style.getPropertyPriority(prop)); } }
+      if(r.cssRules) walk(r.cssRules); } }
+    function conv(){ try{ for(var i=0;i<document.styleSheets.length;i++){ var rr; try{rr=document.styleSheets[i].cssRules;}catch(e){continue;} walk(rr);} }catch(e){} }
 
-    /* MOBILE tap-to-play: no autoplay; tap a video to play it; starting one pauses all others;
-       only the visible band loads its first frame (preload metadata), off-screen ones pause. */
-    function initTapMode(){
-      var all=[].slice.call(document.querySelectorAll('video'));
-      if(!all.length) return null;
-      var managed=all.filter(function(v){ return v.hasAttribute('data-auto'); });
-      var ovs=[];
-      managed.forEach(function(v){ try{v.pause();}catch(e){} v.preload='none'; v.style.cursor='pointer';
-        /* floating play-icon hint over each tappable video (pure visual; taps pass through to the video) */
-        var ov=document.createElement('div'); ov.setAttribute('aria-hidden','true');
-        ov.style.cssText='position:absolute;pointer-events:none;z-index:2147483000;display:flex;align-items:center;justify-content:center;transition:opacity .18s ease;';
-        ov.innerHTML='<span style="display:flex;align-items:center;justify-content:center;width:120px;height:120px;border-radius:50%;background:rgba(11,11,12,.5);box-shadow:0 6px 26px rgba(0,0,0,.28);"><svg width="52" height="52" viewBox="0 0 24 24" fill="#ffffff" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.29-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14z"/></svg></span>';
-        document.body.appendChild(ov); ovs.push({v:v,ov:ov});
-        v.addEventListener('play',function(){ ov.style.opacity='0'; });
-        v.addEventListener('pause',function(){ ov.style.opacity='1'; });
-      });
-      function place(){ ovs.forEach(function(o){ var r=o.v.getBoundingClientRect(); var x=window.pageXOffset||0,y=window.pageYOffset||0;
-        o.ov.style.left=(r.left+x)+'px'; o.ov.style.top=(r.top+y)+'px'; o.ov.style.width=r.width+'px'; o.ov.style.height=r.height+'px'; }); }
-      /* single active: whenever any video starts, pause every other video */
-      all.forEach(function(v){ v.addEventListener('play',function(){
-        all.forEach(function(o){ if(o!==v && !o.paused){ try{o.pause();}catch(e){} } }); }); });
-      /* tap a managed (control-less) video to toggle play/pause */
-      managed.forEach(function(v){ v.addEventListener('click',function(){
-        if(v.paused){ v.preload='auto'; var p=v.play(); if(p&&p.catch)p.catch(function(){}); } else { try{v.pause();}catch(e){} } }); });
-      var band=null;
-      function within(v){ var r=v.getBoundingClientRect(); var o=window.pageYOffset||0; var t=r.top+o,b=r.bottom+o; return b>band.t-300 && t<band.b+300; }
-      function apply(){ place(); if(!band) return;
-        managed.forEach(function(v){
-          if(within(v)){ if(v.preload!=='metadata' && v.preload!=='auto'){ v.preload='metadata'; try{v.load();}catch(e){} } }
-          else { if(!v.paused){ try{v.pause();}catch(e){} } }
-        }); }
-      window.addEventListener('resize',place); place();
-      return { setBand:function(t,b){ band={t:t,b:b}; apply(); }, refresh:function(){ apply(); } };
+    function setup(){
+      conv();
+      var secs=[].slice.call(document.querySelectorAll('.about,.skills,.exp,.contents,.thanks'));
+      function showAll(){ for(var i=0;i<secs.length;i++) secs[i].classList.add('deck-seen'); }
+      if(!('IntersectionObserver' in window)){ showAll(); return; }
+      var io=new IntersectionObserver(function(es){ for(var i=0;i<es.length;i++){ if(es[i].isIntersecting){ es[i].target.classList.add('deck-seen'); io.unobserve(es[i].target); } } },{threshold:0.12, rootMargin:'0px 0px -6% 0px'});
+      for(var i=0;i<secs.length;i++) io.observe(secs[i]);
+      setTimeout(showAll,4000); /* safety: never leave a section hidden */
     }
-
-    if (window.self!==window.top){
-      /* ---- INNER (real content inside the iframe) ---- */
-      document.documentElement.classList.add('deck-inner');
-      function u(s){ return s.replace(/(-?[\d.]+)(svh|dvh|lvh|vh)\b/g,function(_,n){return (parseFloat(n)*R)+'vw';}); }
-      function walk(rs){ for(var j=0;j<rs.length;j++){ var r=rs[j]; if(r.type===5) continue;
-        if(r.style){ for(var k=0;k<r.style.length;k++){ var p=r.style[k],v=r.style.getPropertyValue(p);
-          if(v.length<200 && /[\d.]+(svh|dvh|lvh|vh)\b/.test(v)) r.style.setProperty(p,u(v),r.style.getPropertyPriority(p)); } }
-        if(r.cssRules) walk(r.cssRules); } }
-      function conv(){ for(var i=0;i<document.styleSheets.length;i++){ var rr; try{rr=document.styleSheets[i].cssRules;}catch(e){continue;} walk(rr);} }
-      var rep=function(){ try{ parent.postMessage({__deckH:document.documentElement.scrollHeight},'*'); }catch(e){} };
-      var VM=null;
-      document.addEventListener('DOMContentLoaded',function(){ conv(); rep(); VM=initTapMode(); });
-      window.addEventListener('load',function(){ conv(); rep(); if(VM)VM.refresh();
-        [400,1200,2500].forEach(function(t){setTimeout(function(){rep(); if(VM)VM.refresh();},t);});
-        if(window.ResizeObserver){ try{ new ResizeObserver(function(){rep(); if(VM)VM.refresh();}).observe(document.body); }catch(e){} } });
-      window.addEventListener('resize',rep);
-      /* internal page links must navigate the REAL top window (fresh load -> own shell + hash + scroll reset) */
-      document.addEventListener('click',function(e){
-        var a=e.target&&e.target.closest?e.target.closest('a[href]'):null; if(!a) return;
-        if(a.target==='_blank') return; var href=a.getAttribute('href')||'';
-        if(/^[^#?]*\.html(\?[^#]*)?(#.*)?$/.test(href)){ e.preventDefault(); try{ top.location.href=a.href; }catch(err){ location.href=a.href; } }
-      }, true);
-      window.addEventListener('message',function(e){
-        if(!e.data) return;
-        if(e.data.__deckGoto!=null){
-          var id=e.data.__deckGoto, el=id?document.getElementById(id):null;
-          var y= el ? Math.round(el.getBoundingClientRect().top + (window.pageYOffset||0)) : 0;
-          try{ parent.postMessage({__deckGotoY:y},'*'); }catch(err){}
-        }
-        if(e.data.__deckVis && VM){ VM.setBand(e.data.__deckVis.t, e.data.__deckVis.b); }
-      });
-      return;
-    }
-
-    /* ---- TOP WINDOW ---- */
-    var isDeck = !!(window.matchMedia && window.matchMedia('(max-width:820px)').matches);
-    if(!isDeck){
-      /* plain desktop: no deck shell, just lazy-manage videos in place */
-      var go=function(){ initVideoMgr('self'); };
-      if(document.readyState!=='loading') go(); else document.addEventListener('DOMContentLoaded',go);
-      return;
-    }
-    /* ---- SHELL (top window on small screens) ---- */
-    document.documentElement.classList.add('deck-shell');
-    if('scrollRestoration' in history){ try{ history.scrollRestoration='manual'; }catch(e){} }
-    var GOTO=(location.hash && location.hash.length>1)? location.hash.slice(1) : null;
-    if(location.hash){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} }
-    var lockGoto=false;
-    ['touchstart','wheel','keydown'].forEach(function(ev){ window.addEventListener(ev,function(){lockGoto=true;},{passive:true}); });
-    document.addEventListener('DOMContentLoaded',function(){
-      window.scrollTo(0,0);
-      var h=document.createElement('div'); h.className='deck-frame';
-      var f=document.createElement('iframe'); f.src=location.pathname+location.search;
-      f.setAttribute('scrolling','no'); f.setAttribute('title','portfolio'); h.appendChild(f); document.body.appendChild(h);
-      var lastH=0, scale=1;
-      function postVis(){ if(!lastH) return; try{ f.contentWindow.postMessage({__deckVis:{t:(window.pageYOffset||0)/scale, b:((window.pageYOffset||0)+window.innerHeight)/scale}},'*'); }catch(e){} }
-      function ap(hh){ scale=window.innerWidth/DW; f.style.width=DW+'px'; if(hh){lastH=hh; f.style.height=hh+'px';}
-        f.style.transformOrigin='top left'; f.style.transform='scale('+scale+')'; h.style.height=(lastH*scale)+'px';
-        if(GOTO && !lockGoto && lastH){ try{ f.contentWindow.postMessage({__deckGoto:GOTO},'*'); }catch(e){} }
-        postVis(); }
-      var vraf=false;
-      function onScroll(){ if(!vraf){ vraf=true; requestAnimationFrame(function(){ postVis(); vraf=false; }); } }
-      window.addEventListener('scroll',onScroll,{passive:true});
-      window.addEventListener('message',function(e){
-        if(!e.data) return;
-        if(e.data.__deckH){ ap(e.data.__deckH); }
-        if(e.data.__deckGotoY!=null && !lockGoto){ window.scrollTo(0, Math.max(0, Math.round(e.data.__deckGotoY*scale))); postVis(); }
-      });
-      window.addEventListener('resize',function(){ ap(0); });
-      f.addEventListener('load',function(){ ap(lastH||window.innerHeight); });
-      if(GOTO){ var tries=0, iv=setInterval(function(){ tries++;
-        if(lockGoto||tries>30){ clearInterval(iv); return; }
-        if(lastH){ try{ f.contentWindow.postMessage({__deckGoto:GOTO},'*'); }catch(e){} } }, 200); }
-    });
+    if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',setup); } else { setup(); }
   })();
 </script>
 <title>Eleonora Benso — Design Portfolio</title>
@@ -434,22 +325,23 @@
   }
 
 
-  /* ===== MOBILE DECK MODE ===== */
-  html.deck-shell, html.deck-shell body{ background:var(--bg); }
-  /* the global html,body{height:100%} caps the shell to one screen tall, and iOS Safari
-     then refuses to scroll past the first viewport. height:auto lets it grow to the deck. */
-  html.deck-shell{ height:auto !important; min-height:0 !important; }
-  html.deck-shell body{ height:auto !important; min-height:0 !important; overflow-x:hidden; }
-  html.deck-shell body > *:not(.deck-frame){ display:none !important; }
-  html.deck-shell .deck-frame{ position:relative; width:100%; overflow:hidden; background:var(--bg); }
-  html.deck-shell .deck-frame iframe{ display:block; border:0; background:var(--bg); }
-  html.deck-inner, html.deck-inner body{ min-height:0 !important; height:auto !important; overflow-x:hidden; }
-  html.deck-inner body{ background:var(--bg); }
-  /* kill subpixel seams between scaled stacked frames (cream bleeds through on colored slides) */
-  html.deck-inner body > main, html.deck-inner body > section, html.deck-inner body > div{ margin-bottom:-1px !important; }
-  /* safety net: frame each section landscape */
-  html.deck-inner .wrap, html.deck-inner .about, html.deck-inner .skills,
-  html.deck-inner .exp, html.deck-inner .contents, html.deck-inner .thanks{ min-height:56.25vw; }
+    /* ===== MOBILE DECK (no iframe — browser zooms the 1440 layout, native scroll) ===== */
+  html.deck body{ overflow-x:hidden; }
+  /* each full-screen section becomes a small landscape frame (sized off the 1440 viewport) */
+  html.deck .wrap, html.deck .about, html.deck .skills,
+  html.deck .exp, html.deck .contents, html.deck .thanks{ min-height:56.25vw; }
+  /* per-section entrance as it scrolls into view (hero keeps its own native animation) */
+  html.deck{ --deck-rise:34px; }
+  html.deck .about, html.deck .skills, html.deck .exp,
+  html.deck .contents, html.deck .thanks{
+    opacity:0; transform:translateY(var(--deck-rise));
+    transition:opacity .7s ease, transform .7s ease;
+  }
+  html.deck .deck-seen{ opacity:1; transform:none; }
+  @media (prefers-reduced-motion:reduce){
+    html.deck .about, html.deck .skills, html.deck .exp,
+    html.deck .contents, html.deck .thanks{ opacity:1 !important; transform:none !important; transition:none; }
+  }
 </style>
 </head>
 <body>
