@@ -10,8 +10,8 @@
 
     /* shared lazy-video manager: play only videos in the visible band, pause the rest.
        runs INSIDE the iframe (band fed by shell) and on plain DESKTOP (own scroll). */
-    function initVideoMgr(mode){
-      var CAP=6, MARGIN=600;
+    function initVideoMgr(mode,cap){
+      var CAP=cap||6, MARGIN=600;
       var vids=[].slice.call(document.querySelectorAll('video[data-auto]'));
       if(!vids.length) return null;
       vids.forEach(function(v){ try{v.pause();}catch(e){} v.preload='none'; });
@@ -68,16 +68,17 @@
       return { setBand:function(t,b){ band={t:t,b:b}; apply(); }, refresh:function(){ apply(); } };
     }
 
-    /* ---- DESKTOP: autoplay visible videos in place (there is no iframe anywhere now) ---- */
+    /* ---- No iframe anywhere now. Desktop AND mobile both autoplay visible muted videos;
+       the tap-to-play overlays are gone (they hijacked scroll + drifted on iOS). ---- */
     var isDeck = !!(window.matchMedia && window.matchMedia('(max-width:820px)').matches);
     if(!isDeck){
       var go=function(){ initVideoMgr('self'); };
       if(document.readyState!=='loading') go(); else document.addEventListener('DOMContentLoaded',go);
       return;
     }
-    /* ---- MOBILE DECK (NO IFRAME): the browser renders the desktop layout at a fixed 1440px
-       viewport and zooms it to fit -> native scroll, no iframe, no height handshake. Videos stay
-       tap-to-play and only the ones near the viewport preload, so 19 videos can't blow memory. */
+    /* ---- MOBILE DECK (NO IFRAME): browser renders the desktop layout at a fixed 1440px viewport
+       and zooms it to fit -> native scroll. Muted videos autoplay as they scroll into view, capped
+       to a few at a time so memory stays safe on iOS. No overlays, nothing steals the scroll. */
     document.documentElement.classList.add('deck');
     var vp=document.querySelector('meta[name=viewport]');
     if(!vp){ vp=document.createElement('meta'); vp.setAttribute('name','viewport'); (document.head||document.documentElement).appendChild(vp); }
@@ -90,15 +91,8 @@
     function conv(){ try{ for(var i=0;i<document.styleSheets.length;i++){ var rr; try{rr=document.styleSheets[i].cssRules;}catch(e){continue;} walk(rr);} }catch(e){} }
     function setup(){
       conv();
-      var VM=initTapMode();
-      if(VM){
-        var raf=false, RAF=window.requestAnimationFrame||function(cb){return setTimeout(cb,16);};
-        function band(){ if(raf) return; raf=true; RAF(function(){ raf=false;
-          VM.setBand((window.pageYOffset||0),(window.pageYOffset||0)+window.innerHeight); }); }
-        window.addEventListener('scroll',band,{passive:true});
-        window.addEventListener('resize',band,{passive:true});
-        band(); [300,1000,2500].forEach(function(t){ setTimeout(band,t); });
-      }
+      var VM=initVideoMgr('self',4);   /* at most 4 videos playing at once on mobile */
+      if(VM){ [400,1200,2500].forEach(function(t){ setTimeout(VM.refresh,t); }); }
     }
     if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',setup); } else { setup(); }
   })();
@@ -1245,22 +1239,18 @@
   }
   /* ===== MOBILE DECK (no iframe — browser zooms the 1440 layout, native scroll) ===== */
   html.deck, html.deck body{ height:auto !important; min-height:0 !important; overflow-x:hidden; background:var(--bg); }
-  /* kill subpixel seams between stacked frames (cream bleeds through on colored slides) */
   html.deck body > main, html.deck body > section, html.deck body > div{ margin-bottom:-1px !important; }
-  /* MEET timeline crossfade -> stacked frames (no sticky/scroll-crossfade on the zoomed page) */
   html.deck .tl-slide{ height:auto !important; background:#000 !important; }
   html.deck .tl-slide .tl-sticky{ position:static !important; height:auto !important; overflow:visible !important;
     display:flex !important; flex-direction:column !important; align-items:center !important;
     gap:clamp(46px,7vw,120px) !important; padding:clamp(56px,8vw,140px) 0 !important; }
   html.deck .tl-slide .tl-img{ position:relative !important; left:auto !important; top:auto !important;
     transform:none !important; opacity:1 !important; display:block !important; }
-  /* Piazze campaign crossfade -> stacked; purple on wrappers so seams don't show cream */
   html.deck .pn34-stack{ height:auto !important; background:#7F04FA !important; }
   html.deck .pn34-stack .pn34-sticky{ position:static !important; height:auto !important; background:#7F04FA !important; }
   html.deck .pn34-stack .pn3,
   html.deck .pn34-stack .pn4,
   html.deck .pn34-stack .pn5{ position:relative !important; inset:auto !important; opacity:1 !important; margin-bottom:-1px !important; }
-  /* kill the 1px purple edge where a full-cover bg image doesn't reach the scaled section box */
   html.deck section[class^="pn"] > img[class$="-bg"]{
     top:-2px !important; left:-2px !important; right:auto !important; bottom:auto !important;
     width:calc(100% + 4px) !important; height:calc(100% + 4px) !important; }
