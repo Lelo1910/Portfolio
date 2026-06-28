@@ -107,6 +107,9 @@
     function conv(){ try{ for(var i=0;i<document.styleSheets.length;i++){ var rr; try{rr=document.styleSheets[i].cssRules;}catch(e){continue;} walk(rr);} }catch(e){} }
     function setup(){
       conv();
+      /* belt-and-suspenders: make every image non-draggable with vertical-only touch. Inline style
+         beats any cascade, so a touch on an image can't start a native drag (or zoom) -> scroll stays free. */
+      [].forEach.call(document.querySelectorAll('img'),function(im){ im.draggable=false; im.style.touchAction='pan-y'; im.style.webkitUserDrag='none'; });
       /* iOS: after the dynamic viewport + svh->vw conversion, nudge Safari to engage
          scrolling so the page doesn't sit waiting for a first tap. Invisible + harmless. */
       requestAnimationFrame(function(){
@@ -1268,7 +1271,12 @@
      (pan-y also disables pinch-zoom; deliberate trade for guaranteed scrolling on a scaled layout.) */
   html.deck, html.deck body, html.deck *{ touch-action:pan-y; -webkit-touch-callout:none;
     -webkit-user-select:none; user-select:none; }
-  html.deck img{ pointer-events:none; }          /* images stay inert */
+  /* A touch starting on an image was hijacking vertical scroll on BOTH iOS and Android. Two native
+     gestures can do that: double-tap zoom AND native image drag-and-drop. Kill both on images:
+     pan-y (no zoom/horizontal pan) + user-drag/draggable=false (no image drag). pointer-events:auto
+     keeps them real touch targets so pan-y actually applies. A tap then does nothing; scroll stays free. */
+  html.deck img{ pointer-events:auto; touch-action:pan-y;
+    -webkit-user-drag:none; user-drag:none; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
   html.deck video{ cursor:pointer; }              /* videos are tappable (tap-to-play) */
   html.deck body > main, html.deck body > section, html.deck body > div{ margin-bottom:-1px !important; }
   html.deck .tl-slide{ height:auto !important; background:#000 !important; }
