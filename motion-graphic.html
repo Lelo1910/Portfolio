@@ -69,7 +69,7 @@
         ov.appendChild(btn); par.appendChild(ov);
         var it={v:v,ov:ov,btn:btn,svg:btn.firstChild}; items.push(it);
         var seeked=false;
-        v.addEventListener('loadedmetadata',function(){ try{ if(!seeked && (v.currentTime||0)<0.05) v.currentTime=0.1; }catch(e){} position(); });
+        v.addEventListener('loadedmetadata',function(){ try{ if(!v.getAttribute('poster') && !seeked && (v.currentTime||0)<0.05) v.currentTime=0.1; }catch(e){} position(); });
         v.addEventListener('loadeddata',position);
         v.addEventListener('seeked',function(){ seeked=true; position(); });
         v.addEventListener('click',function(){
@@ -82,7 +82,13 @@
       });
       position();
       window.addEventListener('resize',position,{passive:true});
-      [250,800,2000].forEach(function(t){ setTimeout(position,t); });
+      window.addEventListener('load',position);
+      [250,800,2000,4000].forEach(function(t){ setTimeout(position,t); });
+      /* bulletproof: reposition the instant any video's box changes size, whatever the cause */
+      if(window.ResizeObserver){
+        var ro=new ResizeObserver(function(){ position(); });
+        items.forEach(function(it){ ro.observe(it.v); });
+      }
       function want(v){ if(v.preload==='auto') return; v.preload='metadata'; try{v.load();}catch(e){} }
       if(window.IntersectionObserver){
         var io=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ want(e.target); io.unobserve(e.target); } }); },{rootMargin:'300% 0px'});
@@ -200,7 +206,7 @@
   .ol-video .video-placeholder{width:100%; aspect-ratio:1920/1080; background:#000;}
   /* Oltre l'ascolto + Design Philology: video centrato + piu piccolo (come "L'ultima cena" in videography) */
   #oltre-lascolto, #design-philology{display:flex; flex-direction:column; align-items:center; justify-content:center;}
-  #oltre-lascolto video, #design-philology video{width:auto; height:clamp(300px,74vh,860px); max-width:100%; object-fit:cover;}
+  #oltre-lascolto video, #design-philology video{width:auto; height:clamp(300px,74vh,860px); max-width:100%; object-fit:cover; background:transparent;}
 
   /* ===================== .TASK / NEXT (We say stop -> Oltre l'ascolto) ===================== */
   .vi-next{
@@ -292,11 +298,11 @@
 
   <section class="ws-videos">
     <div class="wsv-row">
-      <video src="assets/video/ws-v1.mp4" muted loop playsinline preload="none" data-auto="1"></video>
-      <video src="assets/video/ws-v2.mp4" muted loop playsinline preload="none" data-auto="1"></video>
-      <video src="assets/video/ws-v3.mp4" muted loop playsinline preload="none" data-auto="1"></video>
-      <video src="assets/video/ws-v4.mp4" muted loop playsinline preload="none" data-auto="1"></video>
-      <video src="assets/video/ws-v5.mp4" muted loop playsinline preload="none" data-auto="1"></video>
+      <video src="assets/video/ws-v1.mp4" poster="assets/img/ws-v1-poster.webp" muted loop playsinline preload="none" data-auto="1"></video>
+      <video src="assets/video/ws-v2.mp4" poster="assets/img/ws-v2-poster.webp" muted loop playsinline preload="none" data-auto="1"></video>
+      <video src="assets/video/ws-v3.mp4" poster="assets/img/ws-v3-poster.webp" muted loop playsinline preload="none" data-auto="1"></video>
+      <video src="assets/video/ws-v4.mp4" poster="assets/img/ws-v4-poster.webp" muted loop playsinline preload="none" data-auto="1"></video>
+      <video src="assets/video/ws-v5.mp4" poster="assets/img/ws-v5-poster.webp" muted loop playsinline preload="none" data-auto="1"></video>
     </div>
   </section>
 
@@ -348,14 +354,14 @@
       <div class="track-wrap">
         <div class="track">
           <div class="frame ms-duo">
-            <div class="vwrap"><video src="assets/video/ms-v2.mp4" muted loop playsinline preload="none" data-auto="1"></video></div>
-            <div class="vwrap"><video src="assets/video/ms-v3.mp4" muted loop playsinline preload="none" data-auto="1"></video></div>
+            <div class="vwrap"><video src="assets/video/ms-v2.mp4" poster="assets/img/ms-v2-poster.webp" muted loop playsinline preload="none" data-auto="1"></video></div>
+            <div class="vwrap"><video src="assets/video/ms-v3.mp4" poster="assets/img/ms-v3-poster.webp" muted loop playsinline preload="none" data-auto="1"></video></div>
           </div>
           <div class="frame ms-wide">
-            <div class="vwrap"><video src="assets/video/ms-v1.mp4" muted loop playsinline preload="none" data-auto="1"></video></div>
+            <div class="vwrap"><video src="assets/video/ms-v1.mp4" poster="assets/img/ms-v1-poster.webp" muted loop playsinline preload="none" data-auto="1"></video></div>
           </div>
           <div class="frame ms-wide">
-            <div class="vwrap"><video src="assets/video/ms-v4.mp4" muted loop playsinline preload="none" data-auto="1"></video></div>
+            <div class="vwrap"><video src="assets/video/ms-v4.mp4" poster="assets/img/ms-v4-poster.webp" muted loop playsinline preload="none" data-auto="1"></video></div>
           </div>
         </div>
       </div>
