@@ -118,6 +118,9 @@
     function conv(){ try{ for(var i=0;i<document.styleSheets.length;i++){ var rr; try{rr=document.styleSheets[i].cssRules;}catch(e){continue;} walk(rr);} }catch(e){} }
     function setup(){
       conv();
+      /* anti-drag JS: inline style vince su qualsiasi cascata -> un tocco su una foto
+         non puo' avviare il drag nativo, lo scroll resta libero (come visual-identity). */
+      [].forEach.call(document.querySelectorAll('img'),function(im){ im.draggable=false; im.style.touchAction='pan-y'; im.style.webkitUserDrag='none'; });
       /* iOS: after the dynamic viewport + svh->vw conversion, nudge Safari to engage
          scrolling so the page doesn't sit waiting for a first tap. Invisible + harmless. */
       requestAnimationFrame(function(){
@@ -258,6 +261,10 @@
 
   /* ===== MOBILE DECK MODE ===== */
   html.deck, html.deck body{ min-height:0 !important; height:auto !important; overflow-x:hidden; }
+  /* touch: ogni gesto verticale resta uno scroll (identico a visual-identity) */
+  html.deck, html.deck body, html.deck *{ touch-action:pan-y; }
+  /* le immagini non sono trascinabili ne' selezionabili -> il dito non "aggancia" la foto */
+  html.deck img{ -webkit-user-drag:none; user-drag:none; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
   html.deck body{ background:var(--bg); }
   /* kill subpixel seams between scaled stacked frames (cream bleeds through on colored slides) */
   html.deck body > main, html.deck body > section, html.deck body > div{ margin-bottom:-1px !important; }
@@ -292,33 +299,33 @@
       <div class="track-wrap">
         <div class="track">
           <div class="frame duo">
-            <img src="assets/img/pc-1.jpg" width="1365" height="2048" alt="Portrait">
-            <img src="assets/img/pc-2.jpg" width="1365" height="2048" alt="Portrait">
+            <img src="assets/img/pc-1.webp" width="1365" height="2048" alt="Portrait" loading="lazy" decoding="async">
+            <img src="assets/img/pc-2.webp" width="1365" height="2048" alt="Portrait" loading="lazy" decoding="async">
           </div>
           <div class="frame duo">
-            <img src="assets/img/pc-3.jpg" width="1365" height="2048" alt="Portrait">
-            <img src="assets/img/pc-4.jpg" width="1365" height="2048" alt="Portrait">
+            <img src="assets/img/pc-3.webp" width="1365" height="2048" alt="Portrait" loading="lazy" decoding="async">
+            <img src="assets/img/pc-4.webp" width="1365" height="2048" alt="Portrait" loading="lazy" decoding="async">
           </div>
-          <div class="frame"><img src="assets/img/pc-5.jpg" width="2048" height="1365" alt="Close up"></div>
+          <div class="frame"><img src="assets/img/pc-5.webp" width="2048" height="1365" alt="Close up" loading="lazy" decoding="async"></div>
           <div class="frame duo">
-            <img src="assets/img/pc-6.jpg" width="1365" height="2048" alt="Portrait">
-            <img src="assets/img/pc-7.jpg" width="1365" height="2048" alt="Portrait">
-          </div>
-          <div class="frame duo">
-            <img src="assets/img/pc-8.jpg" width="1365" height="2048" alt="Portrait">
-            <img src="assets/img/pc-9.jpg" width="1365" height="2048" alt="Portrait">
+            <img src="assets/img/pc-6.webp" width="1365" height="2048" alt="Portrait" loading="lazy" decoding="async">
+            <img src="assets/img/pc-7.webp" width="1365" height="2048" alt="Portrait" loading="lazy" decoding="async">
           </div>
           <div class="frame duo">
-            <img src="assets/img/pc-11.jpg" width="1365" height="2048" alt="Portrait">
-            <img src="assets/img/pc-12.jpg" width="1365" height="2048" alt="Portrait">
+            <img src="assets/img/pc-8.webp" width="1365" height="2048" alt="Portrait" loading="lazy" decoding="async">
+            <img src="assets/img/pc-9.webp" width="1365" height="2048" alt="Portrait" loading="lazy" decoding="async">
           </div>
           <div class="frame duo">
-            <img src="assets/img/pc-13.jpg" width="1365" height="2048" alt="Portrait">
-            <img src="assets/img/pc-14.jpg" width="1365" height="2048" alt="Portrait">
+            <img src="assets/img/pc-11.webp" width="1365" height="2048" alt="Portrait" loading="lazy" decoding="async">
+            <img src="assets/img/pc-12.webp" width="1365" height="2048" alt="Portrait" loading="lazy" decoding="async">
           </div>
           <div class="frame duo">
-            <img src="assets/img/pc-15.jpg" width="1365" height="2048" alt="Portrait">
-            <img src="assets/img/pc-16.jpg" width="1365" height="2048" alt="Portrait">
+            <img src="assets/img/pc-13.webp" width="1365" height="2048" alt="Portrait" loading="lazy" decoding="async">
+            <img src="assets/img/pc-14.webp" width="1365" height="2048" alt="Portrait" loading="lazy" decoding="async">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/pc-15.webp" width="1365" height="2048" alt="Portrait" loading="lazy" decoding="async">
+            <img src="assets/img/pc-16.webp" width="1365" height="2048" alt="Portrait" loading="lazy" decoding="async">
           </div>
         </div>
       </div>
@@ -331,28 +338,28 @@
       <div class="track-wrap">
         <div class="track">
           <div class="frame duo">
-            <img src="assets/img/concert-1.jpg" width="1365" height="2048" alt="Concert">
-            <img src="assets/img/concert-2.jpg" width="1365" height="2048" alt="Concert">
+            <img src="assets/img/concert-1.webp" width="1365" height="2048" alt="Concert" loading="lazy" decoding="async">
+            <img src="assets/img/concert-2.webp" width="1365" height="2048" alt="Concert" loading="lazy" decoding="async">
           </div>
-          <div class="frame"><img src="assets/img/concert-3.jpg" width="2048" height="1365" alt="Concert"></div>
-          <div class="frame"><img src="assets/img/concert-4.jpg" width="2048" height="1365" alt="Concert"></div>
+          <div class="frame"><img src="assets/img/concert-3.webp" width="2048" height="1365" alt="Concert" loading="lazy" decoding="async"></div>
+          <div class="frame"><img src="assets/img/concert-4.webp" width="2048" height="1365" alt="Concert" loading="lazy" decoding="async"></div>
           <div class="frame duo">
-            <img src="assets/img/concert-5.jpg" width="1365" height="2048" alt="Concert">
-            <img src="assets/img/concert-6.jpg" width="1365" height="2048" alt="Concert">
+            <img src="assets/img/concert-5.webp" width="1365" height="2048" alt="Concert" loading="lazy" decoding="async">
+            <img src="assets/img/concert-6.webp" width="1365" height="2048" alt="Concert" loading="lazy" decoding="async">
           </div>
-          <div class="frame"><img src="assets/img/concert-7.jpg" width="2048" height="1365" alt="Concert"></div>
-          <div class="frame"><img src="assets/img/concert-8.jpg" width="2048" height="1365" alt="Concert"></div>
-          <div class="frame"><img src="assets/img/concert-9.jpg" width="2048" height="1365" alt="Concert"></div>
-          <div class="frame"><img src="assets/img/concert-10.jpg" width="2048" height="1365" alt="Concert"></div>
+          <div class="frame"><img src="assets/img/concert-7.webp" width="2048" height="1365" alt="Concert" loading="lazy" decoding="async"></div>
+          <div class="frame"><img src="assets/img/concert-8.webp" width="2048" height="1365" alt="Concert" loading="lazy" decoding="async"></div>
+          <div class="frame"><img src="assets/img/concert-9.webp" width="2048" height="1365" alt="Concert" loading="lazy" decoding="async"></div>
+          <div class="frame"><img src="assets/img/concert-10.webp" width="2048" height="1365" alt="Concert" loading="lazy" decoding="async"></div>
           <div class="frame duo">
-            <img src="assets/img/concert-11.jpg" width="1365" height="2048" alt="Concert">
-            <img src="assets/img/concert-12.jpg" width="1365" height="2048" alt="Concert">
+            <img src="assets/img/concert-11.webp" width="1365" height="2048" alt="Concert" loading="lazy" decoding="async">
+            <img src="assets/img/concert-12.webp" width="1365" height="2048" alt="Concert" loading="lazy" decoding="async">
           </div>
           <div class="frame duo">
-            <img src="assets/img/concert-13.jpg" width="1365" height="2048" alt="Concert">
-            <img src="assets/img/concert-14.jpg" width="1365" height="2048" alt="Concert">
+            <img src="assets/img/concert-13.webp" width="1365" height="2048" alt="Concert" loading="lazy" decoding="async">
+            <img src="assets/img/concert-14.webp" width="1365" height="2048" alt="Concert" loading="lazy" decoding="async">
           </div>
-          <div class="frame"><img src="assets/img/concert-15.jpg" width="2048" height="1365" alt="Concert"></div>
+          <div class="frame"><img src="assets/img/concert-15.webp" width="2048" height="1365" alt="Concert" loading="lazy" decoding="async"></div>
         </div>
       </div>
       <div class="cap">Wide and medium shots</div>
@@ -374,14 +381,14 @@
     <div class="pin">
       <div class="track-wrap">
         <div class="track">
-          <div class="frame"><img src="assets/img/rattery.png" width="3508" height="2480" alt="A Day in the Rattery — title"></div>
-          <div class="frame"><img src="assets/img/rattery-2.png" width="3508" height="2480" alt="A day in the rattery"></div>
-          <div class="frame"><img src="assets/img/rattery-3.png" width="3508" height="2480" alt="A day in the rattery"></div>
-          <div class="frame"><img src="assets/img/rattery-4.png" width="3508" height="2480" alt="A day in the rattery"></div>
-          <div class="frame"><img src="assets/img/rattery-5.png" width="3508" height="2480" alt="A day in the rattery"></div>
-          <div class="frame"><img src="assets/img/rattery-6.png" width="3508" height="2480" alt="A day in the rattery"></div>
-          <div class="frame"><img src="assets/img/rattery-7.png" width="3508" height="2480" alt="A day in the rattery"></div>
-          <div class="frame"><img src="assets/img/rattery-8.png" width="3508" height="2480" alt="A day in the rattery"></div>
+          <div class="frame"><img src="assets/img/rattery.webp" width="3508" height="2480" alt="A Day in the Rattery — title" loading="lazy" decoding="async"></div>
+          <div class="frame"><img src="assets/img/rattery-2.webp" width="3508" height="2480" alt="A day in the rattery" loading="lazy" decoding="async"></div>
+          <div class="frame"><img src="assets/img/rattery-3.webp" width="3508" height="2480" alt="A day in the rattery" loading="lazy" decoding="async"></div>
+          <div class="frame"><img src="assets/img/rattery-4.webp" width="3508" height="2480" alt="A day in the rattery" loading="lazy" decoding="async"></div>
+          <div class="frame"><img src="assets/img/rattery-5.webp" width="3508" height="2480" alt="A day in the rattery" loading="lazy" decoding="async"></div>
+          <div class="frame"><img src="assets/img/rattery-6.webp" width="3508" height="2480" alt="A day in the rattery" loading="lazy" decoding="async"></div>
+          <div class="frame"><img src="assets/img/rattery-7.webp" width="3508" height="2480" alt="A day in the rattery" loading="lazy" decoding="async"></div>
+          <div class="frame"><img src="assets/img/rattery-8.webp" width="3508" height="2480" alt="A day in the rattery" loading="lazy" decoding="async"></div>
         </div>
       </div>
       <div class="cap">A day in the rattery</div>
@@ -390,7 +397,7 @@
 
   <section class="area51">
     <div class="vid">
-      <video controls playsinline poster="assets/img/area51-poster.jpg" preload="none">
+      <video controls playsinline poster="assets/img/area51-poster.webp" preload="none">
         <source src="assets/video/area51.mp4" type="video/mp4">
       </video>
     </div>
@@ -412,60 +419,60 @@
     <div class="pin">
       <div class="track-wrap">
         <div class="track">
-          <div class="frame"><img src="assets/img/animals-1.jpg" width="2048" height="1365" alt="Animals"></div>
+          <div class="frame"><img src="assets/img/animals-1.webp" width="2048" height="1365" alt="Animals" loading="lazy" decoding="async"></div>
           <div class="frame duo">
-            <img src="assets/img/animals-2.jpg" width="1152" height="2048" alt="Animals">
-            <img src="assets/img/animals-3.jpg" width="1365" height="2048" alt="Animals">
+            <img src="assets/img/animals-2.webp" width="1152" height="2048" alt="Animals" loading="lazy" decoding="async">
+            <img src="assets/img/animals-3.webp" width="1365" height="2048" alt="Animals" loading="lazy" decoding="async">
           </div>
           <div class="frame duo">
-            <img src="assets/img/animals-4.jpg" width="1365" height="2048" alt="Animals">
-            <img src="assets/img/animals-5.jpg" width="1365" height="2048" alt="Animals">
+            <img src="assets/img/animals-4.webp" width="1365" height="2048" alt="Animals" loading="lazy" decoding="async">
+            <img src="assets/img/animals-5.webp" width="1365" height="2048" alt="Animals" loading="lazy" decoding="async">
           </div>
           <div class="frame duo">
-            <img src="assets/img/animals-6.jpg" width="1365" height="2048" alt="Animals">
-            <img src="assets/img/animals-7.jpg" width="1365" height="2048" alt="Animals">
+            <img src="assets/img/animals-6.webp" width="1365" height="2048" alt="Animals" loading="lazy" decoding="async">
+            <img src="assets/img/animals-7.webp" width="1365" height="2048" alt="Animals" loading="lazy" decoding="async">
           </div>
           <div class="frame duo">
-            <img src="assets/img/animals-8.jpg" width="1365" height="2048" alt="Animals">
-            <img src="assets/img/animals-9.jpg" width="1365" height="2048" alt="Animals">
+            <img src="assets/img/animals-8.webp" width="1365" height="2048" alt="Animals" loading="lazy" decoding="async">
+            <img src="assets/img/animals-9.webp" width="1365" height="2048" alt="Animals" loading="lazy" decoding="async">
           </div>
-          <div class="frame"><img src="assets/img/animals-10.jpg" width="2048" height="1365" alt="Animals"></div>
+          <div class="frame"><img src="assets/img/animals-10.webp" width="2048" height="1365" alt="Animals" loading="lazy" decoding="async"></div>
           <div class="frame duo">
-            <img src="assets/img/animals-11.jpg" width="1365" height="2048" alt="Animals">
-            <img src="assets/img/animals-12.jpg" width="1365" height="2048" alt="Animals">
-          </div>
-          <div class="frame duo">
-            <img src="assets/img/animals-13.jpg" width="1365" height="2048" alt="Animals">
-            <img src="assets/img/animals-14.jpg" width="1365" height="2048" alt="Animals">
+            <img src="assets/img/animals-11.webp" width="1365" height="2048" alt="Animals" loading="lazy" decoding="async">
+            <img src="assets/img/animals-12.webp" width="1365" height="2048" alt="Animals" loading="lazy" decoding="async">
           </div>
           <div class="frame duo">
-            <img src="assets/img/animals-15.jpg" width="1365" height="2048" alt="Animals">
-            <img src="assets/img/animals-16.jpg" width="1365" height="2048" alt="Animals">
+            <img src="assets/img/animals-13.webp" width="1365" height="2048" alt="Animals" loading="lazy" decoding="async">
+            <img src="assets/img/animals-14.webp" width="1365" height="2048" alt="Animals" loading="lazy" decoding="async">
           </div>
           <div class="frame duo">
-            <img src="assets/img/animals-17.jpg" width="1365" height="2048" alt="Animals">
-            <img src="assets/img/animals-18.jpg" width="1365" height="2048" alt="Animals">
+            <img src="assets/img/animals-15.webp" width="1365" height="2048" alt="Animals" loading="lazy" decoding="async">
+            <img src="assets/img/animals-16.webp" width="1365" height="2048" alt="Animals" loading="lazy" decoding="async">
           </div>
           <div class="frame duo">
-            <img src="assets/img/animals-19.jpg" width="1365" height="2048" alt="Animals">
-            <img src="assets/img/animals-20.jpg" width="1365" height="2048" alt="Animals">
-          </div>
-          <div class="frame"><img src="assets/img/animals-21.jpg" width="2048" height="1365" alt="Butterfly"></div>
-          <div class="frame duo">
-            <img src="assets/img/animals-22.jpg" width="1365" height="2048" alt="Animals">
-            <img src="assets/img/animals-23.jpg" width="1365" height="2048" alt="Animals">
+            <img src="assets/img/animals-17.webp" width="1365" height="2048" alt="Animals" loading="lazy" decoding="async">
+            <img src="assets/img/animals-18.webp" width="1365" height="2048" alt="Animals" loading="lazy" decoding="async">
           </div>
           <div class="frame duo">
-            <img src="assets/img/animals-24.jpg" width="1365" height="2048" alt="Animals">
-            <img src="assets/img/animals-25.jpg" width="1365" height="2048" alt="Animals">
+            <img src="assets/img/animals-19.webp" width="1365" height="2048" alt="Animals" loading="lazy" decoding="async">
+            <img src="assets/img/animals-20.webp" width="1365" height="2048" alt="Animals" loading="lazy" decoding="async">
+          </div>
+          <div class="frame"><img src="assets/img/animals-21.webp" width="2048" height="1365" alt="Butterfly" loading="lazy" decoding="async"></div>
+          <div class="frame duo">
+            <img src="assets/img/animals-22.webp" width="1365" height="2048" alt="Animals" loading="lazy" decoding="async">
+            <img src="assets/img/animals-23.webp" width="1365" height="2048" alt="Animals" loading="lazy" decoding="async">
           </div>
           <div class="frame duo">
-            <img src="assets/img/animals-26.jpg" width="1365" height="2048" alt="Animals">
-            <img src="assets/img/animals-27.jpg" width="1365" height="2048" alt="Animals">
+            <img src="assets/img/animals-24.webp" width="1365" height="2048" alt="Animals" loading="lazy" decoding="async">
+            <img src="assets/img/animals-25.webp" width="1365" height="2048" alt="Animals" loading="lazy" decoding="async">
           </div>
           <div class="frame duo">
-            <img src="assets/img/animals-28.jpg" width="1365" height="2048" alt="Budgie">
-            <img src="assets/img/animals-29.jpg" width="1365" height="2048" alt="Dog">
+            <img src="assets/img/animals-26.webp" width="1365" height="2048" alt="Animals" loading="lazy" decoding="async">
+            <img src="assets/img/animals-27.webp" width="1365" height="2048" alt="Animals" loading="lazy" decoding="async">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/animals-28.webp" width="1365" height="2048" alt="Budgie" loading="lazy" decoding="async">
+            <img src="assets/img/animals-29.webp" width="1365" height="2048" alt="Dog" loading="lazy" decoding="async">
           </div>
         </div>
       </div>
@@ -478,21 +485,21 @@
       <div class="track-wrap">
         <div class="track">
           <div class="frame duo">
-            <img src="assets/img/people-1.jpg" width="1365" height="2048" alt="People">
-            <img src="assets/img/people-2.jpg" width="1365" height="2048" alt="People">
+            <img src="assets/img/people-1.jpg" width="1365" height="2048" alt="People" loading="lazy" decoding="async">
+            <img src="assets/img/people-2.jpg" width="1365" height="2048" alt="People" loading="lazy" decoding="async">
           </div>
-          <div class="frame"><img src="assets/img/people-3.jpg" width="2048" height="1152" alt="People"></div>
+          <div class="frame"><img src="assets/img/people-3.jpg" width="2048" height="1152" alt="People" loading="lazy" decoding="async"></div>
           <div class="frame duo">
-            <img src="assets/img/people-4.jpg" width="1365" height="2048" alt="People">
-            <img src="assets/img/people-5.jpg" width="1365" height="2048" alt="People">
-          </div>
-          <div class="frame duo">
-            <img src="assets/img/people-6.jpg" width="1365" height="2048" alt="People">
-            <img src="assets/img/people-7.jpg" width="1365" height="2048" alt="People">
+            <img src="assets/img/people-4.jpg" width="1365" height="2048" alt="People" loading="lazy" decoding="async">
+            <img src="assets/img/people-5.jpg" width="1365" height="2048" alt="People" loading="lazy" decoding="async">
           </div>
           <div class="frame duo">
-            <img src="assets/img/people-8.jpg" width="1152" height="2048" alt="People">
-            <img src="assets/img/people-9.jpg" width="1152" height="2048" alt="People">
+            <img src="assets/img/people-6.jpg" width="1365" height="2048" alt="People" loading="lazy" decoding="async">
+            <img src="assets/img/people-7.jpg" width="1365" height="2048" alt="People" loading="lazy" decoding="async">
+          </div>
+          <div class="frame duo">
+            <img src="assets/img/people-8.jpg" width="1152" height="2048" alt="People" loading="lazy" decoding="async">
+            <img src="assets/img/people-9.jpg" width="1152" height="2048" alt="People" loading="lazy" decoding="async">
           </div>
         </div>
       </div>
@@ -505,34 +512,34 @@
       <div class="track-wrap">
         <div class="track">
           <div class="frame duo">
-            <img src="assets/img/protests-1.jpg" width="4000" height="6000" alt="Protests">
-            <img src="assets/img/protests-2.jpg" width="4000" height="6000" alt="Protests">
+            <img src="assets/img/protests-1.jpg" width="4000" height="6000" alt="Protests" loading="lazy" decoding="async">
+            <img src="assets/img/protests-2.jpg" width="4000" height="6000" alt="Protests" loading="lazy" decoding="async">
           </div>
           <div class="frame duo">
-            <img src="assets/img/protests-3.jpg" width="4000" height="6000" alt="Protests">
-            <img src="assets/img/protests-4.jpg" width="4000" height="6000" alt="Protests">
+            <img src="assets/img/protests-3.jpg" width="4000" height="6000" alt="Protests" loading="lazy" decoding="async">
+            <img src="assets/img/protests-4.jpg" width="4000" height="6000" alt="Protests" loading="lazy" decoding="async">
           </div>
           <div class="frame duo">
-            <img src="assets/img/protests-5.jpg" width="3793" height="5690" alt="Protests">
-            <img src="assets/img/protests-6.jpg" width="4000" height="6000" alt="Protests">
+            <img src="assets/img/protests-5.jpg" width="3793" height="5690" alt="Protests" loading="lazy" decoding="async">
+            <img src="assets/img/protests-6.jpg" width="4000" height="6000" alt="Protests" loading="lazy" decoding="async">
           </div>
-          <div class="frame"><img src="assets/img/protests-7.jpg" width="6000" height="4000" alt="Protests"></div>
-          <div class="frame"><img src="assets/img/protests-8.jpg" width="6000" height="4000" alt="Protests"></div>
-          <div class="frame"><img src="assets/img/protests-9.jpg" width="6000" height="4000" alt="Protests"></div>
+          <div class="frame"><img src="assets/img/protests-7.jpg" width="6000" height="4000" alt="Protests" loading="lazy" decoding="async"></div>
+          <div class="frame"><img src="assets/img/protests-8.jpg" width="6000" height="4000" alt="Protests" loading="lazy" decoding="async"></div>
+          <div class="frame"><img src="assets/img/protests-9.jpg" width="6000" height="4000" alt="Protests" loading="lazy" decoding="async"></div>
           <div class="frame duo">
-            <img src="assets/img/protests-10.jpg" width="4000" height="6000" alt="Protests">
-            <img src="assets/img/protests-11.jpg" width="4000" height="6000" alt="Protests">
+            <img src="assets/img/protests-10.jpg" width="4000" height="6000" alt="Protests" loading="lazy" decoding="async">
+            <img src="assets/img/protests-11.jpg" width="4000" height="6000" alt="Protests" loading="lazy" decoding="async">
           </div>
-          <div class="frame"><img src="assets/img/protests-12.jpg" width="5678" height="3785" alt="Protests"></div>
-          <div class="frame"><img src="assets/img/protests-13.jpg" width="6000" height="4000" alt="Protests"></div>
+          <div class="frame"><img src="assets/img/protests-12.jpg" width="5678" height="3785" alt="Protests" loading="lazy" decoding="async"></div>
+          <div class="frame"><img src="assets/img/protests-13.jpg" width="6000" height="4000" alt="Protests" loading="lazy" decoding="async"></div>
           <div class="frame duo">
-            <img src="assets/img/protests-14.jpg" width="4000" height="6000" alt="Protests">
-            <img src="assets/img/protests-15.jpg" width="4000" height="6000" alt="Protests">
+            <img src="assets/img/protests-14.jpg" width="4000" height="6000" alt="Protests" loading="lazy" decoding="async">
+            <img src="assets/img/protests-15.jpg" width="4000" height="6000" alt="Protests" loading="lazy" decoding="async">
           </div>
-          <div class="frame"><img src="assets/img/protests-16.jpg" width="6000" height="4000" alt="Protests"></div>
-          <div class="frame"><img src="assets/img/protests-17.jpg" width="6000" height="4000" alt="Protests"></div>
-          <div class="frame"><img src="assets/img/protests-18.jpg" width="6000" height="4000" alt="Protests"></div>
-          <div class="frame"><img src="assets/img/protests-dx.jpg" width="4000" height="6000" alt="Protests"></div>
+          <div class="frame"><img src="assets/img/protests-16.jpg" width="6000" height="4000" alt="Protests" loading="lazy" decoding="async"></div>
+          <div class="frame"><img src="assets/img/protests-17.jpg" width="6000" height="4000" alt="Protests" loading="lazy" decoding="async"></div>
+          <div class="frame"><img src="assets/img/protests-18.jpg" width="6000" height="4000" alt="Protests" loading="lazy" decoding="async"></div>
+          <div class="frame"><img src="assets/img/protests-dx.jpg" width="4000" height="6000" alt="Protests" loading="lazy" decoding="async"></div>
         </div>
       </div>
       <div class="cap">Protests</div>
@@ -555,20 +562,20 @@
       <div class="track-wrap">
         <div class="track">
           <div class="frame duo">
-            <img src="assets/img/grading-1.jpg" width="1365" height="2048" alt="Color grading process">
-            <img src="assets/img/grading-2.jpg" width="1365" height="2048" alt="Color grading process">
+            <img src="assets/img/grading-1.jpg" width="1365" height="2048" alt="Color grading process" loading="lazy" decoding="async">
+            <img src="assets/img/grading-2.jpg" width="1365" height="2048" alt="Color grading process" loading="lazy" decoding="async">
           </div>
           <div class="frame duo">
-            <img src="assets/img/grading-3.jpg" width="1365" height="2048" alt="Color grading process">
-            <img src="assets/img/grading-4.jpg" width="1365" height="2048" alt="Color grading process">
+            <img src="assets/img/grading-3.jpg" width="1365" height="2048" alt="Color grading process" loading="lazy" decoding="async">
+            <img src="assets/img/grading-4.jpg" width="1365" height="2048" alt="Color grading process" loading="lazy" decoding="async">
           </div>
           <div class="frame duo">
-            <img src="assets/img/grading-5.jpg" width="1365" height="2048" alt="Color grading process">
-            <img src="assets/img/grading-6.jpg" width="1365" height="2048" alt="Color grading process">
+            <img src="assets/img/grading-5.jpg" width="1365" height="2048" alt="Color grading process" loading="lazy" decoding="async">
+            <img src="assets/img/grading-6.jpg" width="1365" height="2048" alt="Color grading process" loading="lazy" decoding="async">
           </div>
           <div class="frame duo">
-            <img src="assets/img/grading-8.jpg" width="1365" height="2048" alt="Color grading process">
-            <img src="assets/img/grading-7.jpg" width="1365" height="2048" alt="Color grading process">
+            <img src="assets/img/grading-8.jpg" width="1365" height="2048" alt="Color grading process" loading="lazy" decoding="async">
+            <img src="assets/img/grading-7.jpg" width="1365" height="2048" alt="Color grading process" loading="lazy" decoding="async">
           </div>
         </div>
       </div>
