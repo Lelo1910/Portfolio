@@ -120,7 +120,7 @@
       conv();
       /* anti-drag JS: inline style vince su qualsiasi cascata -> un tocco su una foto
          non puo' avviare il drag nativo, lo scroll resta libero (come visual-identity). */
-      [].forEach.call(document.querySelectorAll('img'),function(im){ im.draggable=false; im.style.touchAction='pan-y pinch-zoom'; im.style.webkitUserDrag='none'; });
+      [].forEach.call(document.querySelectorAll('img'),function(im){ im.draggable=false; im.style.touchAction='manipulation'; im.style.webkitUserDrag='none'; });
       /* i video usano l'icona tap-to-play: via i controls nativi su mobile */
       [].forEach.call(document.querySelectorAll('video[data-auto]'),function(v){ v.removeAttribute('controls'); });
       /* iOS: after the dynamic viewport + svh->vw conversion, nudge Safari to engage
@@ -243,7 +243,7 @@
 
   /* ===== MOBILE DECK MODE ===== */
   html.deck, html.deck body{ min-height:0 !important; height:auto !important; overflow-x:hidden; }
-  html.deck, html.deck body, html.deck *{ touch-action:pan-y pinch-zoom; }
+  html.deck, html.deck body, html.deck *{ touch-action:manipulation; }
   html.deck img{ -webkit-user-drag:none; user-drag:none; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
   html.deck body{ background:var(--bg); }
   /* kill subpixel seams between scaled stacked frames (cream bleeds through on colored slides) */
@@ -331,37 +331,37 @@
       <div class="track-wrap">
         <div class="track">
           <div class="frame duo">
-            <img src="assets/img/pp/1.jpg" width="1365" height="2048" alt="Photography" loading="lazy" decoding="async">
-            <img src="assets/img/pp/2.jpg" width="1365" height="2048" alt="Photography" loading="lazy" decoding="async">
+            <img src="assets/img/pp/1.webp" width="1365" height="2048" alt="Photography" loading="lazy" decoding="async">
+            <img src="assets/img/pp/2.webp" width="1365" height="2048" alt="Photography" loading="lazy" decoding="async">
           </div>
           <div class="frame duo">
-            <img src="assets/img/pp/3.jpg" width="1365" height="2048" alt="Photography" loading="lazy" decoding="async">
-            <img src="assets/img/pp/4.jpg" width="1365" height="2048" alt="Photography" loading="lazy" decoding="async">
+            <img src="assets/img/pp/3.webp" width="1365" height="2048" alt="Photography" loading="lazy" decoding="async">
+            <img src="assets/img/pp/4.webp" width="1365" height="2048" alt="Photography" loading="lazy" decoding="async">
           </div>
           <div class="frame duo">
-            <img src="assets/img/pp/5.jpg" width="1365" height="2048" alt="Photography" loading="lazy" decoding="async">
-            <img src="assets/img/pp/6.jpg" width="1112" height="1600" alt="Photography" loading="lazy" decoding="async">
+            <img src="assets/img/pp/5.webp" width="1365" height="2048" alt="Photography" loading="lazy" decoding="async">
+            <img src="assets/img/pp/6.webp" width="1112" height="1600" alt="Photography" loading="lazy" decoding="async">
           </div>
           <div class="frame duo">
-            <img src="assets/img/pp/7.jpg" width="1365" height="2048" alt="Photography" loading="lazy" decoding="async">
-            <img src="assets/img/pp/8.jpg" width="1365" height="2048" alt="Photography" loading="lazy" decoding="async">
+            <img src="assets/img/pp/7.webp" width="1365" height="2048" alt="Photography" loading="lazy" decoding="async">
+            <img src="assets/img/pp/8.webp" width="1365" height="2048" alt="Photography" loading="lazy" decoding="async">
           </div>
-          <div class="frame"><img src="assets/img/pp/9.jpg" width="2048" height="1536" alt="Photography" loading="lazy" decoding="async"></div>
-          <div class="frame"><img src="assets/img/pp/10.jpg" width="2048" height="1365" alt="Photography" loading="lazy" decoding="async"></div>
-          <div class="frame"><img src="assets/img/pp/11.jpg" width="2048" height="1365" alt="Photography" loading="lazy" decoding="async"></div>
+          <div class="frame"><img src="assets/img/pp/9.webp" width="2048" height="1536" alt="Photography" loading="lazy" decoding="async"></div>
+          <div class="frame"><img src="assets/img/pp/10.webp" width="2048" height="1365" alt="Photography" loading="lazy" decoding="async"></div>
+          <div class="frame"><img src="assets/img/pp/11.webp" width="2048" height="1365" alt="Photography" loading="lazy" decoding="async"></div>
           <div class="frame duo">
-            <img src="assets/img/pp/12.jpg" width="1365" height="2048" alt="Photography" loading="lazy" decoding="async">
-            <img src="assets/img/pp/13.jpg" width="1365" height="2048" alt="Photography" loading="lazy" decoding="async">
+            <img src="assets/img/pp/12.webp" width="1365" height="2048" alt="Photography" loading="lazy" decoding="async">
+            <img src="assets/img/pp/13.webp" width="1365" height="2048" alt="Photography" loading="lazy" decoding="async">
           </div>
           <div class="frame duo">
             <img src="assets/img/pp/14.jpg" width="1365" height="2048" alt="Photography" loading="lazy" decoding="async">
             <img src="assets/img/pp/15.jpg" width="1365" height="2048" alt="Photography" loading="lazy" decoding="async">
           </div>
-          <div class="frame"><img src="assets/img/pp/16.jpg" width="2048" height="1536" alt="Photography" loading="lazy" decoding="async"></div>
-          <div class="frame"><img src="assets/img/pp/17.jpg" width="2048" height="1152" alt="Photography" loading="lazy" decoding="async"></div>
-          <div class="frame"><img src="assets/img/pp/18.jpg" width="2048" height="1152" alt="Photography" loading="lazy" decoding="async"></div>
-          <div class="frame"><img src="assets/img/pp/19.jpg" width="2048" height="1365" alt="Photography" loading="lazy" decoding="async"></div>
-          <div class="frame"><img src="assets/img/pp/20.jpg" width="2048" height="1152" alt="Photography" loading="lazy" decoding="async"></div>
+          <div class="frame"><img src="assets/img/pp/16.webp" width="2048" height="1536" alt="Photography" loading="lazy" decoding="async"></div>
+          <div class="frame"><img src="assets/img/pp/17.webp" width="2048" height="1152" alt="Photography" loading="lazy" decoding="async"></div>
+          <div class="frame"><img src="assets/img/pp/18.webp" width="2048" height="1152" alt="Photography" loading="lazy" decoding="async"></div>
+          <div class="frame"><img src="assets/img/pp/19.webp" width="2048" height="1365" alt="Photography" loading="lazy" decoding="async"></div>
+          <div class="frame"><img src="assets/img/pp/20.webp" width="2048" height="1152" alt="Photography" loading="lazy" decoding="async"></div>
           <div class="frame"><img src="assets/img/pp/21.jpg" width="2048" height="1152" alt="Photography" loading="lazy" decoding="async"></div>
           <div class="frame"><img src="assets/img/pp/22.jpg" width="2048" height="1365" alt="Photography" loading="lazy" decoding="async"></div>
           <div class="frame"><img src="assets/img/pp/23.jpg" width="2048" height="1536" alt="Photography" loading="lazy" decoding="async"></div>
