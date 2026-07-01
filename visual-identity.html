@@ -65,7 +65,7 @@
         ov.appendChild(btn); par.appendChild(ov);
         var it={v:v,ov:ov,btn:btn,svg:btn.firstChild}; items.push(it);
         var seeked=false;
-        v.addEventListener('loadedmetadata',function(){ try{ if(!v.getAttribute('poster') && !seeked && (v.currentTime||0)<0.05) v.currentTime=0.1; }catch(e){} position(); });
+        v.addEventListener('loadedmetadata',function(){ try{ if(!seeked && (v.currentTime||0)<0.05) v.currentTime=0.1; }catch(e){} position(); });
         v.addEventListener('loadeddata',position);
         v.addEventListener('seeked',function(){ seeked=true; position(); });
         v.addEventListener('click',function(){
@@ -120,6 +120,9 @@
     function conv(){ try{ for(var i=0;i<document.styleSheets.length;i++){ var rr; try{rr=document.styleSheets[i].cssRules;}catch(e){continue;} walk(rr);} }catch(e){} }
     function setup(){
       conv();
+      /* anti-drag JS: inline style vince su qualsiasi cascata -> un tocco su una foto
+         non puo' avviare il drag nativo, lo scroll resta libero. */
+      [].forEach.call(document.querySelectorAll('img'),function(im){ im.draggable=false; im.style.touchAction='pan-y'; im.style.webkitUserDrag='none'; });
       /* iOS: after the dynamic viewport + svh->vw conversion, nudge Safari to engage
          scrolling so the page doesn't sit waiting for a first tap. Invisible + harmless. */
       requestAnimationFrame(function(){
@@ -1275,6 +1278,10 @@
   }
   /* ===== MOBILE DECK (no iframe — browser zooms the 1440 layout, native scroll) ===== */
   html.deck, html.deck body{ height:auto !important; min-height:0 !important; overflow-x:hidden; background:var(--bg); }
+  /* touch: ogni gesto verticale resta uno scroll */
+  html.deck, html.deck body, html.deck *{ touch-action:pan-y; }
+  /* le immagini non sono trascinabili ne' selezionabili -> il dito non "aggancia" la foto */
+  html.deck img{ -webkit-user-drag:none; user-drag:none; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
   /* (experiment) touch hacks removed: no touch-action / user-select / pointer-events overrides.
      The deck scrolls natively, like the index page does. */
   /* PERF: the per-section grain overlays use mix-blend-mode:multiply (~26 of them) -> very expensive
@@ -1302,7 +1309,7 @@
   <main class="project">
     <div class="p-head">
       <div class="p-head-left">
-        <img class="ast" src="assets/img/intro.webp" alt="">
+        <img class="ast" src="assets/img/intro.webp" alt="" loading="lazy" decoding="async">
         <span class="num">01.</span>
       </div>
       <span class="name">Visual Identity</span>
@@ -1318,12 +1325,12 @@
 
   <section class="fc-board">
     <div class="fc-col">
-      <div class="fc-panel marks"><img src="assets/img/board.webp" alt="FantaCycling logo mark construction"></div>
-      <div class="fc-panel sagace"><img src="assets/img/board-2.webp" alt="Sagace typeface"></div>
+      <div class="fc-panel marks"><img src="assets/img/board.webp" alt="FantaCycling logo mark construction" loading="lazy" decoding="async"></div>
+      <div class="fc-panel sagace"><img src="assets/img/board-2.webp" alt="Sagace typeface" loading="lazy" decoding="async"></div>
     </div>
     <div class="fc-col">
-      <div class="fc-panel logos-w"><img src="assets/img/board-3.webp" alt="FantaCycling logo lockups (light)"></div>
-      <div class="fc-panel logos-k"><img src="assets/img/board-4.webp" alt="FantaCycling logo lockups (dark)"></div>
+      <div class="fc-panel logos-w"><img src="assets/img/board-3.webp" alt="FantaCycling logo lockups (light)" loading="lazy" decoding="async"></div>
+      <div class="fc-panel logos-k"><img src="assets/img/board-4.webp" alt="FantaCycling logo lockups (dark)" loading="lazy" decoding="async"></div>
       <div class="fc-colors">
         <div class="fc-c-yellow"></div><div class="fc-c-navy"></div><div class="fc-c-peri"></div>
         <div class="fc-c-red"></div><div class="fc-c-lav"></div>
@@ -1333,41 +1340,41 @@
   </section>
 
 
-<section class="fc-riders"><img src="assets/img/riders.webp" alt="Fantacycling — two cyclists illustration" decoding="async"></section>
+<section class="fc-riders"><img src="assets/img/riders.webp" alt="Fantacycling — two cyclists illustration" decoding="async" loading="lazy" decoding="async"></section>
 
 <section class="fc-ads">
-  <div class="fc-ad top"><img src="assets/img/ad1.webp" alt="Fantacycling — affissione pensilina" decoding="async"></div>
-  <div class="fc-ad bot"><img src="assets/img/ad1-2.webp" alt="Fantacycling — cartellone / billboard" decoding="async"></div>
+  <div class="fc-ad top"><img src="assets/img/ad1.webp" alt="Fantacycling — affissione pensilina" decoding="async" loading="lazy" decoding="async"></div>
+  <div class="fc-ad bot"><img src="assets/img/ad1-2.webp" alt="Fantacycling — cartellone / billboard" decoding="async" loading="lazy" decoding="async"></div>
 </section>
 
 <section class="fc-ads2">
-  <div class="fc-ad2 top"><img src="assets/img/ad2.webp" alt="Fantacycling — biglietti da visita" decoding="async"></div>
-  <div class="fc-ad2 bot"><img src="assets/img/ad2-2.webp" alt="Fantacycling — striscione / billboard" decoding="async"></div>
+  <div class="fc-ad2 top"><img src="assets/img/ad2.webp" alt="Fantacycling — biglietti da visita" decoding="async" loading="lazy" decoding="async"></div>
+  <div class="fc-ad2 bot"><img src="assets/img/ad2-2.webp" alt="Fantacycling — striscione / billboard" decoding="async" loading="lazy" decoding="async"></div>
 </section>
 
 <section class="fc-prod">
-  <div class="col-l"><img src="assets/img/prod1.webp" alt="Fantacycling — borraccia" decoding="async"></div>
+  <div class="col-l"><img src="assets/img/prod1.webp" alt="Fantacycling — borraccia" decoding="async" loading="lazy" decoding="async"></div>
   <div class="col-r">
-    <div class="cell top"><img src="assets/img/prod1-2.webp" alt="Fantacycling — guanti" decoding="async"></div>
-    <div class="cell bot"><img src="assets/img/prod1-3.webp" alt="Fantacycling — calzini" decoding="async"></div>
+    <div class="cell top"><img src="assets/img/prod1-2.webp" alt="Fantacycling — guanti" decoding="async" loading="lazy" decoding="async"></div>
+    <div class="cell bot"><img src="assets/img/prod1-3.webp" alt="Fantacycling — calzini" decoding="async" loading="lazy" decoding="async"></div>
   </div>
 </section>
 
 <section class="fc-prod2">
-  <div class="col-l"><img src="assets/img/prod2.webp" alt="Fantacycling — sacca" decoding="async"></div>
-  <div class="col-r"><img src="assets/img/prod2-2.webp" alt="Fantacycling — taccuino e penna" decoding="async"></div>
+  <div class="col-l"><img src="assets/img/prod2.webp" alt="Fantacycling — sacca" decoding="async" loading="lazy" decoding="async"></div>
+  <div class="col-r"><img src="assets/img/prod2-2.webp" alt="Fantacycling — taccuino e penna" decoding="async" loading="lazy" decoding="async"></div>
 </section>
 
 <section class="fc-kit">
-  <img src="assets/img/kit.webp" alt="Fantacycling — divisa (maglia e pantaloncini), fronte e retro" decoding="async">
+  <img src="assets/img/kit.webp" alt="Fantacycling — divisa (maglia e pantaloncini), fronte e retro" decoding="async" loading="lazy" decoding="async">
 </section>
 
 <section class="fc-social">
-  <img src="assets/img/social.webp" alt="Fantacycling — social media: profilo Instagram, post, caroselli, icona" decoding="async">
+  <img src="assets/img/social.webp" alt="Fantacycling — social media: profilo Instagram, post, caroselli, icona" decoding="async" loading="lazy" decoding="async">
 </section>
 
 <section class="fc-app">
-  <img src="assets/img/app.webp" alt="Fantacycling — app UI: home, racers, racer sheet, my team, app icon" decoding="async">
+  <img src="assets/img/app.webp" alt="Fantacycling — app UI: home, racers, racer sheet, my team, app icon" decoding="async" loading="lazy" decoding="async">
 </section>
 
 <section class="fc-video">
@@ -1390,24 +1397,24 @@
 
 <section class="ma-slide" id="meet-archive">
     <div class="ma-left">
-      <img class="ma-text" src="assets/img/meet-text.svg" alt="MEET ARCHIVE — The archive narrates the fundamental evolutionary steps of digital culture. It's a meeting point between the past and the present, a timeline of the research and experimentation process from the birth of the digital technologies.">
+      <img class="ma-text" src="assets/img/meet-text.svg" alt="MEET ARCHIVE — The archive narrates the fundamental evolutionary steps of digital culture. It's a meeting point between the past and the present, a timeline of the research and experimentation process from the birth of the digital technologies." loading="lazy" decoding="async">
     </div>
     <div class="ma-right">
-      <img class="ma-photo" src="assets/img/meet-photo.webp" alt="MEET Archive exhibition - Le Radici del Nuovo">
+      <img class="ma-photo" src="assets/img/meet-photo.webp" alt="MEET Archive exhibition - Le Radici del Nuovo" loading="lazy" decoding="async">
     </div>
   </section>
 
 <section class="mb-slide">
     <div class="mb-stage">
-      <img class="mb-img" src="assets/img/moodboard.webp" alt="Moodboard composition - eroded concrete, dust, flip phone">
-      <img class="mb-labels" src="assets/img/moodboard-labels.svg" alt="sedimention, erosion, time, memory of past technology">
+      <img class="mb-img" src="assets/img/moodboard.webp" alt="Moodboard composition - eroded concrete, dust, flip phone" loading="lazy" decoding="async">
+      <img class="mb-labels" src="assets/img/moodboard-labels.svg" alt="sedimention, erosion, time, memory of past technology" loading="lazy" decoding="async">
     </div>
-    <img class="mb-title" src="assets/img/moodboard-title.svg" alt="MOODBOARD">
+    <img class="mb-title" src="assets/img/moodboard-title.svg" alt="MOODBOARD" loading="lazy" decoding="async">
   </section>
 <section class="tl-slide">
     <div class="tl-sticky">
-      <img class="tl-img tl-base" src="assets/img/timeline.webp" alt="Timeline of obsolete technology (photographs): Floppy Disk 1971, Bandai Tamagotchi 1996, BlackBerry Bold 9000 2008">
-      <img class="tl-img tl-over" src="assets/img/timeline2.webp" alt="The same timeline rendered as colored particle point-clouds">
+      <img class="tl-img tl-base" src="assets/img/timeline.webp" alt="Timeline of obsolete technology (photographs): Floppy Disk 1971, Bandai Tamagotchi 1996, BlackBerry Bold 9000 2008" loading="lazy" decoding="async">
+      <img class="tl-img tl-over" src="assets/img/timeline2.webp" alt="The same timeline rendered as colored particle point-clouds" loading="lazy" decoding="async">
     </div>
   </section>
 <section class="fin-slide">
@@ -1427,217 +1434,217 @@
   </section>
 <section class="pn-hero" id="piazze-negate">
     <!-- STEP 3: sfondo + foto + titolo -->
-    <img class="pn-photo" src="assets/img/pn-photo.webp" alt="Piazza pubblica affollata — bambini che giocano, ping pong, tavolini (collage a blocchi)" decoding="async">
-    <img class="pn-title" src="assets/img/pn-title.svg" alt="PIAZZE NEGATE" decoding="async">
-    <img class="pn-sub" src="assets/img/pn-subtitle.svg" alt="What is a city without a place to meet?" decoding="async">
+    <img class="pn-photo" src="assets/img/pn-photo.webp" alt="Piazza pubblica affollata — bambini che giocano, ping pong, tavolini (collage a blocchi)" decoding="async" loading="lazy" decoding="async">
+    <img class="pn-title" src="assets/img/pn-title.svg" alt="PIAZZE NEGATE" decoding="async" loading="lazy" decoding="async">
+    <img class="pn-sub" src="assets/img/pn-subtitle.svg" alt="What is a city without a place to meet?" decoding="async" loading="lazy" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
 <section class="pn2">
     <!-- SLIDE 2: skyline (basso sx) + campaign question + paragrafo + logo. Tutto sotto il noise. -->
-    <img class="pn2-sky" src="assets/img/pn2-skyline.webp" alt="" aria-hidden="true" decoding="async">
-    <img class="pn2-cq" src="assets/img/pn2-campaign.svg" alt="Our campaign question" decoding="async">
-    <img class="pn2-txt" src="assets/img/pn2-text.svg" alt="How can communication design act as a critical practice to expose the ways Milan's public squares fail their citizens?" decoding="async">
-    <img class="pn2-logo" src="assets/img/pn2-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <img class="pn2-sky" src="assets/img/pn2-skyline.webp" alt="" aria-hidden="true" decoding="async" loading="lazy" decoding="async">
+    <img class="pn2-cq" src="assets/img/pn2-campaign.svg" alt="Our campaign question" decoding="async" loading="lazy" decoding="async">
+    <img class="pn2-txt" src="assets/img/pn2-text.svg" alt="How can communication design act as a critical practice to expose the ways Milan's public squares fail their citizens?" decoding="async" loading="lazy" decoding="async">
+    <img class="pn2-logo" src="assets/img/pn2-logo.svg" alt="PIAZZE NEGATE" decoding="async" loading="lazy" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
 <div class="pn34-stack">
    <div class="pn34-sticky">
     <section class="pn3">
     <!-- SLIDE 3 (base): resta visibile sotto -->
-    <img class="pn3-cq" src="assets/img/pn3-campaign.webp" alt="Our campaign system" decoding="async">
-    <img class="pn3-txt" src="assets/img/pn3-text.webp" alt="Territorial collaborative lab — primary artefact: annotation through stickers, interactive information totem, floor graffiti" decoding="async">
-    <img class="pn3-logo" src="assets/img/pn2-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <img class="pn3-cq" src="assets/img/pn3-campaign.webp" alt="Our campaign system" decoding="async" loading="lazy" decoding="async">
+    <img class="pn3-txt" src="assets/img/pn3-text.webp" alt="Territorial collaborative lab — primary artefact: annotation through stickers, interactive information totem, floor graffiti" decoding="async" loading="lazy" decoding="async">
+    <img class="pn3-logo" src="assets/img/pn2-logo.svg" alt="PIAZZE NEGATE" decoding="async" loading="lazy" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
     <section class="pn4">
     <!-- SLIDE 4 (overlay): fade-in sopra la slide 3 mentre si scrolla, copre tutto -->
-    <img class="pn4-cq" src="assets/img/pn3-campaign.webp" alt="Our campaign system" decoding="async">
-    <img class="pn4-txt" src="assets/img/pn4-text.webp" alt="Pubblic communication — secondary artefact: Instagram page, website about piazzas" decoding="async">
-    <img class="pn4-logo" src="assets/img/pn2-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <img class="pn4-cq" src="assets/img/pn3-campaign.webp" alt="Our campaign system" decoding="async" loading="lazy" decoding="async">
+    <img class="pn4-txt" src="assets/img/pn4-text.webp" alt="Pubblic communication — secondary artefact: Instagram page, website about piazzas" decoding="async" loading="lazy" decoding="async">
+    <img class="pn4-logo" src="assets/img/pn2-logo.svg" alt="PIAZZE NEGATE" decoding="async" loading="lazy" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
     <section class="pn5">
     <!-- SLIDE 5 (overlay): fade-in sopra PUBBLIC COMMUNICATION mentre si scrolla -->
-    <img class="pn5-cq" src="assets/img/pn3-campaign.webp" alt="Our campaign system" decoding="async">
-    <img class="pn5-txt" src="assets/img/pn5-text.webp" alt="Local advertisement — tertiary artefact: informative poster, floor graffiti" decoding="async">
-    <img class="pn5-logo" src="assets/img/pn2-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <img class="pn5-cq" src="assets/img/pn3-campaign.webp" alt="Our campaign system" decoding="async" loading="lazy" decoding="async">
+    <img class="pn5-txt" src="assets/img/pn5-text.webp" alt="Local advertisement — tertiary artefact: informative poster, floor graffiti" decoding="async" loading="lazy" decoding="async">
+    <img class="pn5-logo" src="assets/img/pn2-logo.svg" alt="PIAZZE NEGATE" decoding="async" loading="lazy" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
    </div>
 </div>
 <section class="pn6">
     <!-- SLIDE 6: TERRITORIAL COLLABORATIVE LABORATORY (titolo) + paragrafo + skyline + logo. Statica. -->
-    <img class="pn6-sky" src="assets/img/pn6-skyline.webp" alt="" aria-hidden="true" decoding="async">
-    <img class="pn6-cq" src="assets/img/pn6-campaign.svg" alt="Territorial collaborative laboratory — artefatto primario" decoding="async">
-    <img class="pn6-txt" src="assets/img/pn6-text.svg" alt="The lab runs every three weeks, from 2 to 6 pm, moving through Milan's municipal districts with the goal of covering the entire city by year's end." decoding="async">
-    <img class="pn6-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <img class="pn6-sky" src="assets/img/pn6-skyline.webp" alt="" aria-hidden="true" decoding="async" loading="lazy" decoding="async">
+    <img class="pn6-cq" src="assets/img/pn6-campaign.svg" alt="Territorial collaborative laboratory — artefatto primario" decoding="async" loading="lazy" decoding="async">
+    <img class="pn6-txt" src="assets/img/pn6-text.svg" alt="The lab runs every three weeks, from 2 to 6 pm, moving through Milan's municipal districts with the goal of covering the entire city by year's end." decoding="async" loading="lazy" decoding="async">
+    <img class="pn6-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async" loading="lazy" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
 <section class="pn7">
     <!-- SLIDE 7: FLOOR GRAFFITI (Piazza Bausan). Foto + titolo(svg) + annotazione(png trasp.) + logo. Layout = full_slide. -->
-    <img class="pn7-bg" src="assets/img/sfondo.webp" alt="Floor graffiti in Piazza Bausan: 'Questo e' il cuore di Piazza Bausan. Lo senti pulsare?' con QR code, dipinto sul pavimento in porfido" decoding="async">
-    <img class="pn7-title" src="assets/img/pn7-title.svg" alt="FLOOR GRAFFITI — 1 H BEFORE" decoding="async">
-    <img class="pn7-note" src="assets/img/pn7-annotation.webp" alt="Question about the piazza" decoding="async">
-    <img class="pn7-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <img class="pn7-bg" src="assets/img/sfondo.webp" alt="Floor graffiti in Piazza Bausan: 'Questo e' il cuore di Piazza Bausan. Lo senti pulsare?' con QR code, dipinto sul pavimento in porfido" decoding="async" loading="lazy" decoding="async">
+    <img class="pn7-title" src="assets/img/pn7-title.svg" alt="FLOOR GRAFFITI — 1 H BEFORE" decoding="async" loading="lazy" decoding="async">
+    <img class="pn7-note" src="assets/img/pn7-annotation.webp" alt="Question about the piazza" decoding="async" loading="lazy" decoding="async">
+    <img class="pn7-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async" loading="lazy" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
 <section class="pn8">
     <!-- SLIDE 8: TOTEM (artefatto). Layout = full_slide: titolo + griglia foto + 2 etichette + logo. -->
-    <img class="pn8-title" src="assets/img/pn8-title.svg" alt="TOTEM — 1 H BEFORE" decoding="async">
-    <img class="pn8-grid" src="assets/img/pn8-grid.webp" alt="Totem in Piazza Bausan: pannello informazioni, istruzioni passo-passo, pannelli interattivi 'IO HO PARTECIPATO!' e 'COME VIVI PIAZZA BAUSAN?', persone che partecipano" decoding="async">
-    <img class="pn8-info" src="assets/img/pn8-info.svg" alt="Informations + instructions" decoding="async">
-    <img class="pn8-pan" src="assets/img/pn8-panels.svg" alt="Panels for interaction" decoding="async">
-    <img class="pn8-logo" src="assets/img/pn-logo-bg.svg" alt="PIAZZE NEGATE" decoding="async">
+    <img class="pn8-title" src="assets/img/pn8-title.svg" alt="TOTEM — 1 H BEFORE" decoding="async" loading="lazy" decoding="async">
+    <img class="pn8-grid" src="assets/img/pn8-grid.webp" alt="Totem in Piazza Bausan: pannello informazioni, istruzioni passo-passo, pannelli interattivi 'IO HO PARTECIPATO!' e 'COME VIVI PIAZZA BAUSAN?', persone che partecipano" decoding="async" loading="lazy" decoding="async">
+    <img class="pn8-info" src="assets/img/pn8-info.svg" alt="Informations + instructions" decoding="async" loading="lazy" decoding="async">
+    <img class="pn8-pan" src="assets/img/pn8-panels.svg" alt="Panels for interaction" decoding="async" loading="lazy" decoding="async">
+    <img class="pn8-logo" src="assets/img/pn-logo-bg.svg" alt="PIAZZE NEGATE" decoding="async" loading="lazy" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
 <section class="pn9">
     <!-- SLIDE 9: EXPLAINATORY POSTCARD + STICKERS (start of lab). Sfondo full-bleed (cartoline) + titolo(svg) + logo. -->
-    <img class="pn9-bg" src="assets/img/pn9-bg.webp" alt="Cartolina 'GRAZIE per aver preso parte al nostro laboratorio' e sticker 'AMO QUESTA PIAZZA PERCHE' / LA CHIAMEREI PIAZZA SE' di Piazze Negate su sfondo viola" decoding="async">
-    <img class="pn9-title" src="assets/img/pn9-title.svg" alt="EXPLAINATORY POSTCARD + STICKERS — START OF LAB" decoding="async">
-    <img class="pn9-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <img class="pn9-bg" src="assets/img/pn9-bg.webp" alt="Cartolina 'GRAZIE per aver preso parte al nostro laboratorio' e sticker 'AMO QUESTA PIAZZA PERCHE' / LA CHIAMEREI PIAZZA SE' di Piazze Negate su sfondo viola" decoding="async" loading="lazy" decoding="async">
+    <img class="pn9-title" src="assets/img/pn9-title.svg" alt="EXPLAINATORY POSTCARD + STICKERS — START OF LAB" decoding="async" loading="lazy" decoding="async">
+    <img class="pn9-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async" loading="lazy" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
 <section class="pn10">
     <!-- SLIDE 10: STICKERS (start of lab) — titolo(svg) + immagine card + logo. In fondo. -->
-    <img class="pn10-cq" src="assets/img/pn10-title.svg" alt="STICKERS — START OF LAB" decoding="async">
-    <img class="pn10-txt" src="assets/img/pn10-cards.webp" alt="Sticker da compilare di Piazze Negate: 'AMO QUESTA PIAZZA PERCHE' (verde) e 'LA CHIAMEREI PIAZZA SE' (viola), con icone cuore e lampadina" decoding="async">
-    <img class="pn10-leg" src="assets/img/pn10-legend.svg" alt="Legenda: appreciation = cuore, suggestion = lampadina" decoding="async">
-    <img class="pn10-n1" src="assets/img/pn10-note1.svg" alt="I love this piazza because" decoding="async">
-    <img class="pn10-n2" src="assets/img/pn10-note2.svg" alt="I would call it piazza if" decoding="async">
-    <img class="pn10-logo" src="assets/img/pn-logo-bg.svg" alt="PIAZZE NEGATE" decoding="async">
+    <img class="pn10-cq" src="assets/img/pn10-title.svg" alt="STICKERS — START OF LAB" decoding="async" loading="lazy" decoding="async">
+    <img class="pn10-txt" src="assets/img/pn10-cards.webp" alt="Sticker da compilare di Piazze Negate: 'AMO QUESTA PIAZZA PERCHE' (verde) e 'LA CHIAMEREI PIAZZA SE' (viola), con icone cuore e lampadina" decoding="async" loading="lazy" decoding="async">
+    <img class="pn10-leg" src="assets/img/pn10-legend.svg" alt="Legenda: appreciation = cuore, suggestion = lampadina" decoding="async" loading="lazy" decoding="async">
+    <img class="pn10-n1" src="assets/img/pn10-note1.svg" alt="I love this piazza because" decoding="async" loading="lazy" decoding="async">
+    <img class="pn10-n2" src="assets/img/pn10-note2.svg" alt="I would call it piazza if" decoding="async" loading="lazy" decoding="async">
+    <img class="pn10-logo" src="assets/img/pn-logo-bg.svg" alt="PIAZZE NEGATE" decoding="async" loading="lazy" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
 <section class="pn11">
     <!-- SLIDE 11: copia di EXPLAINATORY POSTCARD (start of lab) — da personalizzare. -->
-    <img class="pn11-bg" src="assets/img/pn11-bg.webp" alt="Cartolina 'GRAZIE per aver preso parte al nostro laboratorio' e sticker di Piazze Negate su sfondo viola" decoding="async">
-    <img class="pn11-title" src="assets/img/pn11-title.svg" alt="EXPLAINATORY POSTCARD + STICKERS — START OF LAB" decoding="async">
-    <img class="pn11-logo" src="assets/img/pn11-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <img class="pn11-bg" src="assets/img/pn11-bg.webp" alt="Cartolina 'GRAZIE per aver preso parte al nostro laboratorio' e sticker di Piazze Negate su sfondo viola" decoding="async" loading="lazy" decoding="async">
+    <img class="pn11-title" src="assets/img/pn11-title.svg" alt="EXPLAINATORY POSTCARD + STICKERS — START OF LAB" decoding="async" loading="lazy" decoding="async">
+    <img class="pn11-logo" src="assets/img/pn11-logo.svg" alt="PIAZZE NEGATE" decoding="async" loading="lazy" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
 <section class="pn12">
     <!-- SLIDE 12 (copia di pn10): STICKERS (start of lab) — titolo(svg) + immagine card + logo. In fondo. -->
-    <img class="pn12-cq" src="assets/img/pn12-title.svg" alt="STICKERS — START OF LAB" decoding="async">
-    <img class="pn12-txt" src="assets/img/pn12-cards.webp" alt="Sticker da compilare di Piazze Negate: 'AMO QUESTA PIAZZA PERCHE' (verde) e 'LA CHIAMEREI PIAZZA SE' (viola), con icone cuore e lampadina" decoding="async">
-    <img class="pn12-leg" src="assets/img/pn12-legend.svg" alt="Legenda: appreciation = cuore, suggestion = lampadina" decoding="async">
-    <img class="pn12-n1" src="assets/img/pn12-note1.svg" alt="I love this piazza because" decoding="async">
-    <img class="pn12-n2" src="assets/img/pn12-note2.svg" alt="I would call it piazza if" decoding="async">
-    <img class="pn12-logo" src="assets/img/pn-logo-bg.svg" alt="PIAZZE NEGATE" decoding="async">
+    <img class="pn12-cq" src="assets/img/pn12-title.svg" alt="STICKERS — START OF LAB" decoding="async" loading="lazy" decoding="async">
+    <img class="pn12-txt" src="assets/img/pn12-cards.webp" alt="Sticker da compilare di Piazze Negate: 'AMO QUESTA PIAZZA PERCHE' (verde) e 'LA CHIAMEREI PIAZZA SE' (viola), con icone cuore e lampadina" decoding="async" loading="lazy" decoding="async">
+    <img class="pn12-leg" src="assets/img/pn12-legend.svg" alt="Legenda: appreciation = cuore, suggestion = lampadina" decoding="async" loading="lazy" decoding="async">
+    <img class="pn12-n1" src="assets/img/pn12-note1.svg" alt="I love this piazza because" decoding="async" loading="lazy" decoding="async">
+    <img class="pn12-n2" src="assets/img/pn12-note2.svg" alt="I would call it piazza if" decoding="async" loading="lazy" decoding="async">
+    <img class="pn12-logo" src="assets/img/pn-logo-bg.svg" alt="PIAZZE NEGATE" decoding="async" loading="lazy" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
 <section class="pn13">
     <!-- SLIDE 13: SECONDARY STICKERS — titolo (1.svg) + 2 card a sx + 2 foto a dx (allineate titolo/logo) + logo -->
-    <img class="pn13-cq" src="assets/img/pn13-title.svg" alt="SECONDARY STICKERS — SUBJECTIVE PERSONAL OPINIONS" decoding="async">
-    <img class="pn13-photos" src="assets/img/pn13-photos.webp" alt="Due foto in esterna: sticker verde compilato su un cordolo coi fiori, e sticker viola compilato a mano" decoding="async">
-    <img class="pn13-cards" src="assets/img/pn13-cards.webp" alt="Due sticker: QUESTO SPAZIO VERDE MI PIACE PERCHE (verde) e VORREI CHE QUESTO SPAZIO VERDE (viola)" decoding="async">
-    <img class="pn13-logo" src="assets/img/pn-logo-bg.svg" alt="PIAZZE NEGATE" decoding="async">
+    <img class="pn13-cq" src="assets/img/pn13-title.svg" alt="SECONDARY STICKERS — SUBJECTIVE PERSONAL OPINIONS" decoding="async" loading="lazy" decoding="async">
+    <img class="pn13-photos" src="assets/img/pn13-photos.webp" alt="Due foto in esterna: sticker verde compilato su un cordolo coi fiori, e sticker viola compilato a mano" decoding="async" loading="lazy" decoding="async">
+    <img class="pn13-cards" src="assets/img/pn13-cards.webp" alt="Due sticker: QUESTO SPAZIO VERDE MI PIACE PERCHE (verde) e VORREI CHE QUESTO SPAZIO VERDE (viola)" decoding="async" loading="lazy" decoding="async">
+    <img class="pn13-logo" src="assets/img/pn-logo-bg.svg" alt="PIAZZE NEGATE" decoding="async" loading="lazy" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
 <section class="pn14">
     <!-- SLIDE 14: INSTAGRAM PAGE / SECONDARY ARTIFACT — titolo + paragrafo + skyline(svg) + logo. Statica. -->
-    <img class="pn14-sky" src="assets/img/pn14-skyline.svg" alt="" aria-hidden="true" decoding="async">
-    <img class="pn14-cq" src="assets/img/pn14-title.svg" alt="INSTAGRAM PAGE — SECONDARY ARTIFACT" decoding="async">
-    <img class="pn14-txt" src="assets/img/pn14-text.svg" alt="Instagram is the project's most immediate channel, where the lab's visual identity takes shape and the story of Milan's piazze stays alive, continuous, and open to participation and dialogue." decoding="async">
-    <img class="pn14-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <img class="pn14-sky" src="assets/img/pn14-skyline.svg" alt="" aria-hidden="true" decoding="async" loading="lazy" decoding="async">
+    <img class="pn14-cq" src="assets/img/pn14-title.svg" alt="INSTAGRAM PAGE — SECONDARY ARTIFACT" decoding="async" loading="lazy" decoding="async">
+    <img class="pn14-txt" src="assets/img/pn14-text.svg" alt="Instagram is the project's most immediate channel, where the lab's visual identity takes shape and the story of Milan's piazze stays alive, continuous, and open to participation and dialogue." decoding="async" loading="lazy" decoding="async">
+    <img class="pn14-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async" loading="lazy" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
 <section class="pn15">
     <!-- SLIDE 15: INSTAGRAM PAGE / HIGHLIGHTS — sfondo grigio + titolo + 4 video IG (highlights) + striscia icone/label + logo. -->
-    <img class="pn15-bg" src="assets/img/pn15-bg.webp" alt="" aria-hidden="true" decoding="async">
-    <img class="pn15-cq" src="assets/img/pn15-title.svg" alt="INSTAGRAM PAGE — HIGHLIGHTS" decoding="async">
+    <img class="pn15-bg" src="assets/img/pn15-bg.webp" alt="" aria-hidden="true" decoding="async" loading="lazy" decoding="async">
+    <img class="pn15-cq" src="assets/img/pn15-title.svg" alt="INSTAGRAM PAGE — HIGHLIGHTS" decoding="async" loading="lazy" decoding="async">
     <video class="pn15-vid pn15-v1" src="assets/video/pn15-v1.mp4" poster="assets/img/pn15-v1-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
     <video class="pn15-vid pn15-v2" src="assets/video/pn15-v2.mp4" poster="assets/img/pn15-v2-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
     <video class="pn15-vid pn15-v3" src="assets/video/pn15-v3.mp4" poster="assets/img/pn15-v3-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
     <video class="pn15-vid pn15-v4" src="assets/video/pn15-v4.mp4" poster="assets/img/pn15-v4-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
-    <img class="pn15-icons" src="assets/img/pn15-icons.webp" alt="Perché Piazze Negate? · Il nostro laboratorio · Come partecipare · Voce dei cittadini" decoding="async">
-    <img class="pn15-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <img class="pn15-icons" src="assets/img/pn15-icons.webp" alt="Perché Piazze Negate? · Il nostro laboratorio · Come partecipare · Voce dei cittadini" decoding="async" loading="lazy" decoding="async">
+    <img class="pn15-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async" loading="lazy" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
 <section class="pn16">
     <!-- SLIDE 16: INSTAGRAM PAGE / PINNED POSTS — sfondo grigio + titolo + 2 post IG + logo. -->
-    <img class="pn16-bg" src="assets/img/pn15-bg.webp" alt="" aria-hidden="true" decoding="async">
-    <img class="pn16-cq" src="assets/img/pn16-title.svg" alt="INSTAGRAM PAGE — PINNED POSTS" decoding="async">
+    <img class="pn16-bg" src="assets/img/pn15-bg.webp" alt="" aria-hidden="true" decoding="async" loading="lazy" decoding="async">
+    <img class="pn16-cq" src="assets/img/pn16-title.svg" alt="INSTAGRAM PAGE — PINNED POSTS" decoding="async" loading="lazy" decoding="async">
     <video class="pn16-post pn16-p1" src="assets/video/pn16-v1.mp4" poster="assets/img/pn16-v1-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
     <video class="pn16-post pn16-p2" src="assets/video/pn16-v2.mp4" poster="assets/img/pn16-v2-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
-    <img class="pn16-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <img class="pn16-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async" loading="lazy" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
 <section class="pn17">
     <!-- SLIDE 17: INSTAGRAM PAGE / LAB PROMOTION (copia di pn16 con nuovo titolo) — sfondo + titolo + 2 post + logo. -->
-    <img class="pn17-bg" src="assets/img/pn15-bg.webp" alt="" aria-hidden="true" decoding="async">
-    <img class="pn17-cq" src="assets/img/pn17-title.svg" alt="INSTAGRAM PAGE — LAB PROMOTION" decoding="async">
+    <img class="pn17-bg" src="assets/img/pn15-bg.webp" alt="" aria-hidden="true" decoding="async" loading="lazy" decoding="async">
+    <img class="pn17-cq" src="assets/img/pn17-title.svg" alt="INSTAGRAM PAGE — LAB PROMOTION" decoding="async" loading="lazy" decoding="async">
     <video class="pn17-post pn17-p1" src="assets/video/pn17-v1.mp4" poster="assets/img/pn17-v1-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
-    <img class="pn17-phone" src="assets/img/pn17-phone.webp" alt="Story Instagram: Laboratorio Piazza Bausan 20/01/26" decoding="async">
-    <img class="pn17-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <img class="pn17-phone" src="assets/img/pn17-phone.webp" alt="Story Instagram: Laboratorio Piazza Bausan 20/01/26" decoding="async" loading="lazy" decoding="async">
+    <img class="pn17-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async" loading="lazy" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
 <section class="pn18">
     <!-- SLIDE 18: INSTAGRAM PAGE / VISITING THE PIAZZA — INFORMATIVE POSTS (copia di pn16 con nuovo titolo). -->
-    <img class="pn18-bg" src="assets/img/pn15-bg.webp" alt="" aria-hidden="true" decoding="async">
-    <img class="pn18-cq" src="assets/img/pn18-title.svg" alt="INSTAGRAM PAGE — VISITING THE PIAZZA, INFORMATIVE POSTS" decoding="async">
+    <img class="pn18-bg" src="assets/img/pn15-bg.webp" alt="" aria-hidden="true" decoding="async" loading="lazy" decoding="async">
+    <img class="pn18-cq" src="assets/img/pn18-title.svg" alt="INSTAGRAM PAGE — VISITING THE PIAZZA, INFORMATIVE POSTS" decoding="async" loading="lazy" decoding="async">
     <video class="pn18-post pn18-p1" src="assets/video/pn18-v1.mp4" poster="assets/img/pn18-v1-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
     <video class="pn18-post pn18-p2" src="assets/video/pn18-v2.mp4" poster="assets/img/pn18-v2-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
-    <img class="pn18-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <img class="pn18-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async" loading="lazy" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
 <section class="pn19">
     <!-- SLIDE 19: INSTAGRAM PAGE / STORIES DURING LAB (copia di pn18 con nuovo titolo). -->
-    <img class="pn19-bg" src="assets/img/pn15-bg.webp" alt="" aria-hidden="true" decoding="async">
-    <img class="pn19-cq" src="assets/img/pn19-title.svg" alt="INSTAGRAM PAGE — STORIES DURING LAB" decoding="async">
+    <img class="pn19-bg" src="assets/img/pn15-bg.webp" alt="" aria-hidden="true" decoding="async" loading="lazy" decoding="async">
+    <img class="pn19-cq" src="assets/img/pn19-title.svg" alt="INSTAGRAM PAGE — STORIES DURING LAB" decoding="async" loading="lazy" decoding="async">
     <video class="pn19-post pn19-p1" src="assets/video/pn19-v1.mp4" poster="assets/img/pn19-v1-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
     <video class="pn19-post pn19-p2" src="assets/video/pn19-v2.mp4" poster="assets/img/pn19-v2-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
-    <img class="pn19-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <img class="pn19-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async" loading="lazy" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
 
 <section class="pn20">
     <!-- SLIDE 20: INSTAGRAM PAGE / LAB RESULTS (copia di pn19 con nuovo titolo LAB RESULTS). -->
-    <img class="pn20-bg" src="assets/img/pn15-bg.webp" alt="" aria-hidden="true" decoding="async">
-    <img class="pn20-cq" src="assets/img/pn20-title.svg" alt="INSTAGRAM PAGE — LAB RESULTS" decoding="async">
+    <img class="pn20-bg" src="assets/img/pn15-bg.webp" alt="" aria-hidden="true" decoding="async" loading="lazy" decoding="async">
+    <img class="pn20-cq" src="assets/img/pn20-title.svg" alt="INSTAGRAM PAGE — LAB RESULTS" decoding="async" loading="lazy" decoding="async">
     <video class="pn20-post pn20-p2" src="assets/video/pn20-v1.mp4" poster="assets/img/pn20-v1-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
-    <img class="pn20-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <img class="pn20-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async" loading="lazy" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
 
 <section class="pn21">
     <!-- SLIDE 21: WEBSITE / SECONDARY ARTIFACT — titolo + paragrafo + skyline(svg) + logo. Statica. -->
-    <img class="pn21-sky" src="assets/img/pn21-skyline.svg" alt="" aria-hidden="true" decoding="async">
-    <img class="pn21-cq" src="assets/img/pn21-title.svg" alt="WEBSITE — SECONDARY ARTIFACT" decoding="async">
-    <img class="pn21-txt" src="assets/img/pn21-text.svg" alt="The website is an open archive where annotations, testimonies and reflections collected in the field come together into a living map of Milan's piazze, to be read slowly, revisited, and put in relation with each other." decoding="async">
-    <img class="pn21-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <img class="pn21-sky" src="assets/img/pn21-skyline.svg" alt="" aria-hidden="true" decoding="async" loading="lazy" decoding="async">
+    <img class="pn21-cq" src="assets/img/pn21-title.svg" alt="WEBSITE — SECONDARY ARTIFACT" decoding="async" loading="lazy" decoding="async">
+    <img class="pn21-txt" src="assets/img/pn21-text.svg" alt="The website is an open archive where annotations, testimonies and reflections collected in the field come together into a living map of Milan's piazze, to be read slowly, revisited, and put in relation with each other." decoding="async" loading="lazy" decoding="async">
+    <img class="pn21-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async" loading="lazy" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
 
 <section class="pn22">
     <!-- SLIDE 22: WEBSITE / NAVIGATION (copia di pn20 con nuovo titolo). -->
-    <img class="pn22-bg" src="assets/img/pn15-bg.webp" alt="" aria-hidden="true" decoding="async">
-    <img class="pn22-cq" src="assets/img/pn22-title.svg" alt="WEBSITE — NAVIGATION" decoding="async">
+    <img class="pn22-bg" src="assets/img/pn15-bg.webp" alt="" aria-hidden="true" decoding="async" loading="lazy" decoding="async">
+    <img class="pn22-cq" src="assets/img/pn22-title.svg" alt="WEBSITE — NAVIGATION" decoding="async" loading="lazy" decoding="async">
     <video class="pn22-post pn22-p2" src="assets/video/pn22-v1.mp4" poster="assets/img/pn22-v1-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
-    <img class="pn22-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <img class="pn22-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async" loading="lazy" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
 
 <section class="pn23">
     <!-- SLIDE 23: copia di pn21 — titolo + paragrafo + skyline(svg) + logo. Statica. -->
-    <img class="pn23-sky" src="assets/img/pn23-skyline.svg" alt="" aria-hidden="true" decoding="async">
-    <img class="pn23-cq" src="assets/img/pn23-title.svg" alt="OFFLINE PROMOTION — TERTIARY ARTIFACT" decoding="async">
-    <img class="pn23-txt" src="assets/img/pn23-text.svg" alt="Posters and floor graffiti bring the project into the urban space itself, meeting people in their daily routines before the lab even begins, sparking curiosity and inviting them to participate." decoding="async">
-    <img class="pn23-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <img class="pn23-sky" src="assets/img/pn23-skyline.svg" alt="" aria-hidden="true" decoding="async" loading="lazy" decoding="async">
+    <img class="pn23-cq" src="assets/img/pn23-title.svg" alt="OFFLINE PROMOTION — TERTIARY ARTIFACT" decoding="async" loading="lazy" decoding="async">
+    <img class="pn23-txt" src="assets/img/pn23-text.svg" alt="Posters and floor graffiti bring the project into the urban space itself, meeting people in their daily routines before the lab even begins, sparking curiosity and inviting them to participate." decoding="async" loading="lazy" decoding="async">
+    <img class="pn23-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async" loading="lazy" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
 
 <section class="pn24">
     <!-- SLIDE 24: copia di pn11 (TOTEM INTERACTION), ultima. -->
-    <img class="pn24-bg" src="assets/img/pn24-bg.webp" alt="Poster Piazze Negate 'UN LABORATORIO PARTECIPATIVO PER TORNARE A VIVERE LE PIAZZE INSIEME' affisso su un muro" decoding="async">
-    <img class="pn24-title" src="assets/img/pn24-title.svg" alt="OFFLINE PROMOTION — POSTERS" decoding="async">
-    <img class="pn24-logo" src="assets/img/pn11-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <img class="pn24-bg" src="assets/img/pn24-bg.webp" alt="Poster Piazze Negate 'UN LABORATORIO PARTECIPATIVO PER TORNARE A VIVERE LE PIAZZE INSIEME' affisso su un muro" decoding="async" loading="lazy" decoding="async">
+    <img class="pn24-title" src="assets/img/pn24-title.svg" alt="OFFLINE PROMOTION — POSTERS" decoding="async" loading="lazy" decoding="async">
+    <img class="pn24-logo" src="assets/img/pn11-logo.svg" alt="PIAZZE NEGATE" decoding="async" loading="lazy" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
 
 <section class="pn25">
     <!-- SLIDE 25: copia di pn24 (OFFLINE PROMOTION / POSTERS), ultima. -->
-    <img class="pn25-bg" src="assets/img/pn25-bg.webp" alt="Floor graffiti Piazze Negate '20/01 POST LEZIONE IN PIAZZA BAUSAN. PENSIAMOLA INSIEME.' con QR code sulla pavimentazione, skater di passaggio" decoding="async">
-    <img class="pn25-title" src="assets/img/pn24-title.svg" alt="OFFLINE PROMOTION — POSTERS" decoding="async">
-    <img class="pn25-logo" src="assets/img/pn11-logo.svg" alt="PIAZZE NEGATE" decoding="async">
+    <img class="pn25-bg" src="assets/img/pn25-bg.webp" alt="Floor graffiti Piazze Negate '20/01 POST LEZIONE IN PIAZZA BAUSAN. PENSIAMOLA INSIEME.' con QR code sulla pavimentazione, skater di passaggio" decoding="async" loading="lazy" decoding="async">
+    <img class="pn25-title" src="assets/img/pn24-title.svg" alt="OFFLINE PROMOTION — POSTERS" decoding="async" loading="lazy" decoding="async">
+    <img class="pn25-logo" src="assets/img/pn11-logo.svg" alt="PIAZZE NEGATE" decoding="async" loading="lazy" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
 
