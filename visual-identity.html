@@ -42,27 +42,6 @@
       var vids=[].slice.call(document.querySelectorAll('video[data-auto]'));
       if(!vids.length) return;
       var items=[];
-      vids.forEach(function(v){
-        try{v.pause();}catch(e){}
-        v.preload='none'; v.removeAttribute('autoplay'); v.style.cursor='pointer';
-        var par=v.parentElement;
-        if(getComputedStyle(par).position==='static'){ par.style.position='relative'; }
-        var ov=document.createElement('div'); ov.setAttribute('aria-hidden','true');
-        ov.style.cssText='position:absolute;pointer-events:none;z-index:20;display:flex;align-items:center;justify-content:center;transition:opacity .2s ease;';
-        var btn=document.createElement('span');
-        btn.style.cssText='display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(11,11,12,.55);box-shadow:0 6px 26px rgba(0,0,0,.3);';
-        btn.innerHTML='<svg viewBox="0 0 24 24" fill="#ffffff" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.29-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14z"/></svg>';
-        ov.appendChild(btn); par.appendChild(ov);
-        var it={v:v,ov:ov,btn:btn,svg:btn.firstChild};
-        items.push(it);
-        v.addEventListener('click',function(){
-          if(v.paused){ v.preload='auto'; try{v.load();}catch(e){} var pr=v.play(); if(pr&&pr.catch)pr.catch(function(){}); }
-          else{ try{v.pause();}catch(e){} }
-        });
-        v.addEventListener('play',function(){ ov.style.opacity='0';
-          items.forEach(function(o){ if(o.v!==v && !o.v.paused){ try{o.v.pause();}catch(e){} } }); });
-        v.addEventListener('pause',function(){ ov.style.opacity='1'; });
-      });
       function position(){
         items.forEach(function(it){
           var v=it.v, w=v.offsetWidth, h=v.offsetHeight;
@@ -73,12 +52,46 @@
           var sz=Math.round(d*0.46); it.svg.setAttribute('width',sz); it.svg.setAttribute('height',sz);
         });
       }
+      vids.forEach(function(v){
+        try{v.pause();}catch(e){}
+        v.removeAttribute('autoplay'); v.style.cursor='pointer';
+        var par=v.parentElement;
+        if(getComputedStyle(par).position==='static'){ par.style.position='relative'; }
+        var ov=document.createElement('div'); ov.setAttribute('aria-hidden','true');
+        ov.style.cssText='position:absolute;pointer-events:none;z-index:20;display:flex;align-items:center;justify-content:center;transition:opacity .2s ease;';
+        var btn=document.createElement('span');
+        btn.style.cssText='display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(11,11,12,.55);box-shadow:0 6px 26px rgba(0,0,0,.3);';
+        btn.innerHTML='<svg viewBox="0 0 24 24" fill="#ffffff" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.29-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14z"/></svg>';
+        ov.appendChild(btn); par.appendChild(ov);
+        var it={v:v,ov:ov,btn:btn,svg:btn.firstChild}; items.push(it);
+        var seeked=false;
+        v.addEventListener('loadedmetadata',function(){ try{ if(!v.getAttribute('poster') && !seeked && (v.currentTime||0)<0.05) v.currentTime=0.1; }catch(e){} position(); });
+        v.addEventListener('loadeddata',position);
+        v.addEventListener('seeked',function(){ seeked=true; position(); });
+        v.addEventListener('click',function(){
+          if(v.paused){ v.preload='auto'; try{v.load();}catch(e){} var pr=v.play(); if(pr&&pr.catch)pr.catch(function(){}); }
+          else{ try{v.pause();}catch(e){} }
+        });
+        v.addEventListener('play',function(){ ov.style.opacity='0';
+          items.forEach(function(o){ if(o.v!==v && !o.v.paused){ try{o.v.pause();}catch(e){} } }); });
+        v.addEventListener('pause',function(){ ov.style.opacity='1'; });
+      });
       position();
       window.addEventListener('resize',position,{passive:true});
-      [250,800,2000].forEach(function(t){ setTimeout(position,t); });
-      function cull(){ var vh=window.innerHeight;
-        items.forEach(function(it){ var r=it.v.getBoundingClientRect();
-          if((r.bottom<-vh || r.top>vh+vh) && !it.v.paused){ try{it.v.pause();}catch(e){} } }); }
+      window.addEventListener('load',position);
+      [250,800,2000,4000].forEach(function(t){ setTimeout(position,t); });
+      /* bulletproof: reposition the instant any video's box changes size, whatever the cause */
+      if(window.ResizeObserver){
+        var ro=new ResizeObserver(function(){ position(); });
+        items.forEach(function(it){ ro.observe(it.v); });
+      }
+      function want(v){ if(v.preload==='auto') return; v.preload='metadata'; try{v.load();}catch(e){} }
+      if(window.IntersectionObserver){
+        var io=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ want(e.target); io.unobserve(e.target); } }); },{rootMargin:'300% 0px'});
+        items.forEach(function(it){ io.observe(it.v); });
+      } else { items.forEach(function(it){ want(it.v); }); }
+      function cull(){ var vh=window.innerHeight; items.forEach(function(it){ var r=it.v.getBoundingClientRect();
+        if((r.bottom<-vh || r.top>vh+vh) && !it.v.paused){ try{it.v.pause();}catch(e){} } }); }
       var raf=false;
       window.addEventListener('scroll',function(){ if(!raf){ raf=true; requestAnimationFrame(function(){ cull(); raf=false; }); } },{passive:true});
     }
@@ -1398,9 +1411,9 @@
     </div>
   </section>
 <section class="fin-slide">
-    <video src="assets/video/floppy.mp4" muted loop playsinline preload="none" data-auto="1"></video>
-    <video src="assets/video/tamagotchi.mp4" muted loop playsinline preload="none" data-auto="1"></video>
-    <video src="assets/video/blackberry.mp4" muted loop playsinline preload="none" data-auto="1"></video>
+    <video src="assets/video/floppy.mp4" poster="assets/img/floppy-poster.webp" muted loop playsinline preload="none" data-auto="1"></video>
+    <video src="assets/video/tamagotchi.mp4" poster="assets/img/tamagotchi-poster.webp" muted loop playsinline preload="none" data-auto="1"></video>
+    <video src="assets/video/blackberry.mp4" poster="assets/img/blackberry-poster.webp" muted loop playsinline preload="none" data-auto="1"></video>
   </section>
 <section class="vi-next">
     <h3 class="task-h">.TASK</h3>
@@ -1531,10 +1544,10 @@
     <!-- SLIDE 15: INSTAGRAM PAGE / HIGHLIGHTS — sfondo grigio + titolo + 4 video IG (highlights) + striscia icone/label + logo. -->
     <img class="pn15-bg" src="assets/img/pn15-bg.webp" alt="" aria-hidden="true" decoding="async">
     <img class="pn15-cq" src="assets/img/pn15-title.svg" alt="INSTAGRAM PAGE — HIGHLIGHTS" decoding="async">
-    <video class="pn15-vid pn15-v1" src="assets/video/pn15-v1.mp4" loop muted playsinline preload="none" data-auto="1"></video>
-    <video class="pn15-vid pn15-v2" src="assets/video/pn15-v2.mp4" loop muted playsinline preload="none" data-auto="1"></video>
-    <video class="pn15-vid pn15-v3" src="assets/video/pn15-v3.mp4" loop muted playsinline preload="none" data-auto="1"></video>
-    <video class="pn15-vid pn15-v4" src="assets/video/pn15-v4.mp4" loop muted playsinline preload="none" data-auto="1"></video>
+    <video class="pn15-vid pn15-v1" src="assets/video/pn15-v1.mp4" poster="assets/img/pn15-v1-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
+    <video class="pn15-vid pn15-v2" src="assets/video/pn15-v2.mp4" poster="assets/img/pn15-v2-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
+    <video class="pn15-vid pn15-v3" src="assets/video/pn15-v3.mp4" poster="assets/img/pn15-v3-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
+    <video class="pn15-vid pn15-v4" src="assets/video/pn15-v4.mp4" poster="assets/img/pn15-v4-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
     <img class="pn15-icons" src="assets/img/pn15-icons.webp" alt="Perché Piazze Negate? · Il nostro laboratorio · Come partecipare · Voce dei cittadini" decoding="async">
     <img class="pn15-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
@@ -1543,8 +1556,8 @@
     <!-- SLIDE 16: INSTAGRAM PAGE / PINNED POSTS — sfondo grigio + titolo + 2 post IG + logo. -->
     <img class="pn16-bg" src="assets/img/pn15-bg.webp" alt="" aria-hidden="true" decoding="async">
     <img class="pn16-cq" src="assets/img/pn16-title.svg" alt="INSTAGRAM PAGE — PINNED POSTS" decoding="async">
-    <video class="pn16-post pn16-p1" src="assets/video/pn16-v1.mp4" loop muted playsinline preload="none" data-auto="1"></video>
-    <video class="pn16-post pn16-p2" src="assets/video/pn16-v2.mp4" loop muted playsinline preload="none" data-auto="1"></video>
+    <video class="pn16-post pn16-p1" src="assets/video/pn16-v1.mp4" poster="assets/img/pn16-v1-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
+    <video class="pn16-post pn16-p2" src="assets/video/pn16-v2.mp4" poster="assets/img/pn16-v2-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
     <img class="pn16-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
@@ -1552,7 +1565,7 @@
     <!-- SLIDE 17: INSTAGRAM PAGE / LAB PROMOTION (copia di pn16 con nuovo titolo) — sfondo + titolo + 2 post + logo. -->
     <img class="pn17-bg" src="assets/img/pn15-bg.webp" alt="" aria-hidden="true" decoding="async">
     <img class="pn17-cq" src="assets/img/pn17-title.svg" alt="INSTAGRAM PAGE — LAB PROMOTION" decoding="async">
-    <video class="pn17-post pn17-p1" src="assets/video/pn17-v1.mp4" loop muted playsinline preload="none" data-auto="1"></video>
+    <video class="pn17-post pn17-p1" src="assets/video/pn17-v1.mp4" poster="assets/img/pn17-v1-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
     <img class="pn17-phone" src="assets/img/pn17-phone.webp" alt="Story Instagram: Laboratorio Piazza Bausan 20/01/26" decoding="async">
     <img class="pn17-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
@@ -1561,8 +1574,8 @@
     <!-- SLIDE 18: INSTAGRAM PAGE / VISITING THE PIAZZA — INFORMATIVE POSTS (copia di pn16 con nuovo titolo). -->
     <img class="pn18-bg" src="assets/img/pn15-bg.webp" alt="" aria-hidden="true" decoding="async">
     <img class="pn18-cq" src="assets/img/pn18-title.svg" alt="INSTAGRAM PAGE — VISITING THE PIAZZA, INFORMATIVE POSTS" decoding="async">
-    <video class="pn18-post pn18-p1" src="assets/video/pn18-v1.mp4" loop muted playsinline preload="none" data-auto="1"></video>
-    <video class="pn18-post pn18-p2" src="assets/video/pn18-v2.mp4" loop muted playsinline preload="none" data-auto="1"></video>
+    <video class="pn18-post pn18-p1" src="assets/video/pn18-v1.mp4" poster="assets/img/pn18-v1-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
+    <video class="pn18-post pn18-p2" src="assets/video/pn18-v2.mp4" poster="assets/img/pn18-v2-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
     <img class="pn18-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
@@ -1570,8 +1583,8 @@
     <!-- SLIDE 19: INSTAGRAM PAGE / STORIES DURING LAB (copia di pn18 con nuovo titolo). -->
     <img class="pn19-bg" src="assets/img/pn15-bg.webp" alt="" aria-hidden="true" decoding="async">
     <img class="pn19-cq" src="assets/img/pn19-title.svg" alt="INSTAGRAM PAGE — STORIES DURING LAB" decoding="async">
-    <video class="pn19-post pn19-p1" src="assets/video/pn19-v1.mp4" loop muted playsinline preload="none" data-auto="1"></video>
-    <video class="pn19-post pn19-p2" src="assets/video/pn19-v2.mp4" loop muted playsinline preload="none" data-auto="1"></video>
+    <video class="pn19-post pn19-p1" src="assets/video/pn19-v1.mp4" poster="assets/img/pn19-v1-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
+    <video class="pn19-post pn19-p2" src="assets/video/pn19-v2.mp4" poster="assets/img/pn19-v2-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
     <img class="pn19-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
@@ -1580,7 +1593,7 @@
     <!-- SLIDE 20: INSTAGRAM PAGE / LAB RESULTS (copia di pn19 con nuovo titolo LAB RESULTS). -->
     <img class="pn20-bg" src="assets/img/pn15-bg.webp" alt="" aria-hidden="true" decoding="async">
     <img class="pn20-cq" src="assets/img/pn20-title.svg" alt="INSTAGRAM PAGE — LAB RESULTS" decoding="async">
-    <video class="pn20-post pn20-p2" src="assets/video/pn20-v1.mp4" loop muted playsinline preload="none" data-auto="1"></video>
+    <video class="pn20-post pn20-p2" src="assets/video/pn20-v1.mp4" poster="assets/img/pn20-v1-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
     <img class="pn20-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
@@ -1598,7 +1611,7 @@
     <!-- SLIDE 22: WEBSITE / NAVIGATION (copia di pn20 con nuovo titolo). -->
     <img class="pn22-bg" src="assets/img/pn15-bg.webp" alt="" aria-hidden="true" decoding="async">
     <img class="pn22-cq" src="assets/img/pn22-title.svg" alt="WEBSITE — NAVIGATION" decoding="async">
-    <video class="pn22-post pn22-p2" src="assets/video/pn22-v1.mp4" loop muted playsinline preload="none" data-auto="1"></video>
+    <video class="pn22-post pn22-p2" src="assets/video/pn22-v1.mp4" poster="assets/img/pn22-v1-poster.webp" loop muted playsinline preload="none" data-auto="1"></video>
     <img class="pn22-logo" src="assets/img/pn6-logo.svg" alt="PIAZZE NEGATE" decoding="async">
     <div class="pn-noise" aria-hidden="true"></div>
   </section>
@@ -1637,6 +1650,7 @@
   </section>
 <script>/* tl-crossfade */
 (function(){
+  if(document.documentElement.classList.contains('deck')) return; /* deck: immagini impilate via CSS (opacity:1), niente lavoro per frame */
   var slide=document.querySelector('.tl-slide');
   if(!slide) return;
   var over=slide.querySelector('.tl-over');
@@ -1657,6 +1671,7 @@
 </script>
 <script>/* pn4-fadein */
 (function(){
+  if(document.documentElement.classList.contains('deck')) return; /* deck: pn3/pn4/pn5 impilate via CSS (opacity:1), niente lavoro per frame */
   var stack=document.querySelector('.pn34-stack');
   if(!stack) return;
   var over=stack.querySelector('.pn4');
