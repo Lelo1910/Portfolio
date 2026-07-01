@@ -1270,6 +1270,10 @@
   html.deck, html.deck body{ height:auto !important; min-height:0 !important; overflow-x:hidden; background:var(--bg); }
   /* (experiment) touch hacks removed: no touch-action / user-select / pointer-events overrides.
      The deck scrolls natively, like the index page does. */
+  /* PERF: the per-section grain overlays use mix-blend-mode:multiply (~26 of them) -> very expensive
+     to recomposite every frame while scrolling = the choppiness. Drop them in deck mode only (desktop
+     keeps the grain). If this fixes it, we bake the grain into the bg images to keep the look. */
+  html.deck .pn-noise{ display:none !important; }
   html.deck body > main, html.deck body > section, html.deck body > div{ margin-bottom:-1px !important; }
   html.deck .tl-slide{ height:auto !important; background:#000 !important; }
   html.deck .tl-slide .tl-sticky{ position:static !important; height:auto !important; overflow:visible !important;
