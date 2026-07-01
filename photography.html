@@ -120,7 +120,7 @@
       conv();
       /* anti-drag JS: inline style vince su qualsiasi cascata -> un tocco su una foto
          non puo' avviare il drag nativo, lo scroll resta libero (come visual-identity). */
-      [].forEach.call(document.querySelectorAll('img'),function(im){ im.draggable=false; im.style.touchAction='pan-y'; im.style.webkitUserDrag='none'; });
+      [].forEach.call(document.querySelectorAll('img'),function(im){ im.draggable=false; im.style.touchAction='pan-y pinch-zoom'; im.style.webkitUserDrag='none'; });
       /* iOS: after the dynamic viewport + svh->vw conversion, nudge Safari to engage
          scrolling so the page doesn't sit waiting for a first tap. Invisible + harmless. */
       requestAnimationFrame(function(){
@@ -262,7 +262,7 @@
   /* ===== MOBILE DECK MODE ===== */
   html.deck, html.deck body{ min-height:0 !important; height:auto !important; overflow-x:hidden; }
   /* touch: ogni gesto verticale resta uno scroll (identico a visual-identity) */
-  html.deck, html.deck body, html.deck *{ touch-action:pan-y; }
+  html.deck, html.deck body, html.deck *{ touch-action:pan-y pinch-zoom; }
   /* le immagini non sono trascinabili ne' selezionabili -> il dito non "aggancia" la foto */
   html.deck img{ -webkit-user-drag:none; user-drag:none; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
   html.deck body{ background:var(--bg); }

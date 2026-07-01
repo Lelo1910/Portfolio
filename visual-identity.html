@@ -122,7 +122,7 @@
       conv();
       /* anti-drag JS: inline style vince su qualsiasi cascata -> un tocco su una foto
          non puo' avviare il drag nativo, lo scroll resta libero. */
-      [].forEach.call(document.querySelectorAll('img'),function(im){ im.draggable=false; im.style.touchAction='pan-y'; im.style.webkitUserDrag='none'; });
+      [].forEach.call(document.querySelectorAll('img'),function(im){ im.draggable=false; im.style.touchAction='pan-y pinch-zoom'; im.style.webkitUserDrag='none'; });
       /* iOS: after the dynamic viewport + svh->vw conversion, nudge Safari to engage
          scrolling so the page doesn't sit waiting for a first tap. Invisible + harmless. */
       requestAnimationFrame(function(){
@@ -1279,7 +1279,7 @@
   /* ===== MOBILE DECK (no iframe — browser zooms the 1440 layout, native scroll) ===== */
   html.deck, html.deck body{ height:auto !important; min-height:0 !important; overflow-x:hidden; background:var(--bg); }
   /* touch: ogni gesto verticale resta uno scroll */
-  html.deck, html.deck body, html.deck *{ touch-action:pan-y; }
+  html.deck, html.deck body, html.deck *{ touch-action:pan-y pinch-zoom; }
   /* le immagini non sono trascinabili ne' selezionabili -> il dito non "aggancia" la foto */
   html.deck img{ -webkit-user-drag:none; user-drag:none; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
   /* (experiment) touch hacks removed: no touch-action / user-select / pointer-events overrides.
