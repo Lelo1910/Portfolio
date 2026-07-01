@@ -38,31 +38,14 @@
        offsetLeft/Top -> the icon rides along on scroll with NO per-scroll repositioning, so it can't
        drift on iOS momentum. Tap a video to play/pause; starting one pauses the others; videos more
        than a screen off-viewport pause to spare iOS memory. */
+    /* MOBILE tap-to-play WITH PREVIEW: each video shows its first frame as a thumbnail (via a tiny
+       seek), then a play-icon on top; tap to play/pause. Showing a frame also gives the <video> real
+       dimensions, and we reposition the icon the moment those arrive -> icons land dead-centre.
+       Preview frames are loaded lazily (near the viewport) so we never decode every clip at once. */
     function initTapToPlay(){
       var vids=[].slice.call(document.querySelectorAll('video[data-auto]'));
       if(!vids.length) return;
       var items=[];
-      vids.forEach(function(v){
-        try{v.pause();}catch(e){}
-        v.preload='none'; v.removeAttribute('autoplay'); v.style.cursor='pointer';
-        var par=v.parentElement;
-        if(getComputedStyle(par).position==='static'){ par.style.position='relative'; }
-        var ov=document.createElement('div'); ov.setAttribute('aria-hidden','true');
-        ov.style.cssText='position:absolute;pointer-events:none;z-index:20;display:flex;align-items:center;justify-content:center;transition:opacity .2s ease;';
-        var btn=document.createElement('span');
-        btn.style.cssText='display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(11,11,12,.55);box-shadow:0 6px 26px rgba(0,0,0,.3);';
-        btn.innerHTML='<svg viewBox="0 0 24 24" fill="#ffffff" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.29-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14z"/></svg>';
-        ov.appendChild(btn); par.appendChild(ov);
-        var it={v:v,ov:ov,btn:btn,svg:btn.firstChild};
-        items.push(it);
-        v.addEventListener('click',function(){
-          if(v.paused){ v.preload='auto'; try{v.load();}catch(e){} var pr=v.play(); if(pr&&pr.catch)pr.catch(function(){}); }
-          else{ try{v.pause();}catch(e){} }
-        });
-        v.addEventListener('play',function(){ ov.style.opacity='0';
-          items.forEach(function(o){ if(o.v!==v && !o.v.paused){ try{o.v.pause();}catch(e){} } }); });
-        v.addEventListener('pause',function(){ ov.style.opacity='1'; });
-      });
       function position(){
         items.forEach(function(it){
           var v=it.v, w=v.offsetWidth, h=v.offsetHeight;
@@ -73,12 +56,40 @@
           var sz=Math.round(d*0.46); it.svg.setAttribute('width',sz); it.svg.setAttribute('height',sz);
         });
       }
+      vids.forEach(function(v){
+        try{v.pause();}catch(e){}
+        v.removeAttribute('autoplay'); v.style.cursor='pointer';
+        var par=v.parentElement;
+        if(getComputedStyle(par).position==='static'){ par.style.position='relative'; }
+        var ov=document.createElement('div'); ov.setAttribute('aria-hidden','true');
+        ov.style.cssText='position:absolute;pointer-events:none;z-index:20;display:flex;align-items:center;justify-content:center;transition:opacity .2s ease;';
+        var btn=document.createElement('span');
+        btn.style.cssText='display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(11,11,12,.55);box-shadow:0 6px 26px rgba(0,0,0,.3);';
+        btn.innerHTML='<svg viewBox="0 0 24 24" fill="#ffffff" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.29-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14z"/></svg>';
+        ov.appendChild(btn); par.appendChild(ov);
+        var it={v:v,ov:ov,btn:btn,svg:btn.firstChild}; items.push(it);
+        var seeked=false;
+        v.addEventListener('loadedmetadata',function(){ try{ if(!seeked && (v.currentTime||0)<0.05) v.currentTime=0.1; }catch(e){} position(); });
+        v.addEventListener('loadeddata',position);
+        v.addEventListener('seeked',function(){ seeked=true; position(); });
+        v.addEventListener('click',function(){
+          if(v.paused){ v.preload='auto'; try{v.load();}catch(e){} var pr=v.play(); if(pr&&pr.catch)pr.catch(function(){}); }
+          else{ try{v.pause();}catch(e){} }
+        });
+        v.addEventListener('play',function(){ ov.style.opacity='0';
+          items.forEach(function(o){ if(o.v!==v && !o.v.paused){ try{o.v.pause();}catch(e){} } }); });
+        v.addEventListener('pause',function(){ ov.style.opacity='1'; });
+      });
       position();
       window.addEventListener('resize',position,{passive:true});
       [250,800,2000].forEach(function(t){ setTimeout(position,t); });
-      function cull(){ var vh=window.innerHeight;
-        items.forEach(function(it){ var r=it.v.getBoundingClientRect();
-          if((r.bottom<-vh || r.top>vh+vh) && !it.v.paused){ try{it.v.pause();}catch(e){} } }); }
+      function want(v){ if(v.preload==='auto') return; v.preload='metadata'; try{v.load();}catch(e){} }
+      if(window.IntersectionObserver){
+        var io=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ want(e.target); io.unobserve(e.target); } }); },{rootMargin:'300% 0px'});
+        items.forEach(function(it){ io.observe(it.v); });
+      } else { items.forEach(function(it){ want(it.v); }); }
+      function cull(){ var vh=window.innerHeight; items.forEach(function(it){ var r=it.v.getBoundingClientRect();
+        if((r.bottom<-vh || r.top>vh+vh) && !it.v.paused){ try{it.v.pause();}catch(e){} } }); }
       var raf=false;
       window.addEventListener('scroll',function(){ if(!raf){ raf=true; requestAnimationFrame(function(){ cull(); raf=false; }); } },{passive:true});
     }
@@ -189,7 +200,7 @@
   .ol-video .video-placeholder{width:100%; aspect-ratio:1920/1080; background:#000;}
   /* Oltre l'ascolto + Design Philology: video centrato + piu piccolo (come "L'ultima cena" in videography) */
   #oltre-lascolto, #design-philology{display:flex; flex-direction:column; align-items:center; justify-content:center;}
-  #oltre-lascolto video, #design-philology video{width:auto; height:clamp(300px,74vh,860px); max-width:100%; object-fit:contain;}
+  #oltre-lascolto video, #design-philology video{width:auto; height:clamp(300px,74vh,860px); max-width:100%; object-fit:cover;}
 
   /* ===================== .TASK / NEXT (We say stop -> Oltre l'ascolto) ===================== */
   .vi-next{
