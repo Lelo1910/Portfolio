@@ -94,6 +94,57 @@
       window.addEventListener('scroll',function(){ if(!raf){ raf=true; requestAnimationFrame(function(){ cull(); raf=false; }); } },{passive:true});
     }
 
+    /* MOBILE showcase fix (Area 51 / A part of us): dentro il deck 1440 Android disegna la barra dei
+       controlli nativi a scala FISICA del telefono -> barra gigante fuori posto. Quindi: niente
+       controlli inline; play-icon come gli altri video; il tap apre il player a SCHERMO INTERO,
+       dove i controlli nativi sono alla scala giusta. Uscire dal fullscreen mette in pausa. */
+    function initShowcaseFS(){
+      var vids=[].slice.call(document.querySelectorAll('video[controls]:not([data-auto])'));
+      if(!vids.length) return;
+      vids.forEach(function(v){
+        v.removeAttribute('controls'); v.style.cursor='pointer';
+        var par=v.parentElement;
+        if(getComputedStyle(par).position==='static'){ par.style.position='relative'; }
+        var ov=document.createElement('div'); ov.setAttribute('aria-hidden','true');
+        ov.style.cssText='position:absolute;pointer-events:none;z-index:20;display:flex;align-items:center;justify-content:center;transition:opacity .2s ease;';
+        var btn=document.createElement('span');
+        btn.style.cssText='display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(11,11,12,.55);box-shadow:0 6px 26px rgba(0,0,0,.3);';
+        btn.innerHTML='<svg viewBox="0 0 24 24" fill="#ffffff" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.29-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14z"/></svg>';
+        ov.appendChild(btn); par.appendChild(ov);
+        function position(){
+          var w=v.offsetWidth,h=v.offsetHeight;
+          ov.style.left=v.offsetLeft+'px'; ov.style.top=v.offsetTop+'px';
+          ov.style.width=w+'px'; ov.style.height=h+'px';
+          var d=Math.max(40,Math.min(96,Math.round(Math.min(w,h)*0.4)));
+          btn.style.width=d+'px'; btn.style.height=d+'px';
+          var sz=Math.round(d*0.46); btn.firstChild.setAttribute('width',sz); btn.firstChild.setAttribute('height',sz);
+        }
+        v.addEventListener('loadedmetadata',position); v.addEventListener('loadeddata',position);
+        window.addEventListener('resize',position,{passive:true});
+        [0,250,800,2000].forEach(function(t){ setTimeout(position,t); });
+        function leaveFS(){ try{v.pause();}catch(e){} v.removeAttribute('controls'); }
+        function onFS(){ var f=document.fullscreenElement||document.webkitFullscreenElement; if(f!==v) leaveFS(); }
+        document.addEventListener('fullscreenchange',onFS);
+        document.addEventListener('webkitfullscreenchange',onFS);
+        v.addEventListener('webkitendfullscreen',leaveFS); /* player nativo iPhone */
+        v.addEventListener('click',function(){
+          var f=document.fullscreenElement||document.webkitFullscreenElement;
+          if(f===v) return; /* in fullscreen ci pensa il player nativo */
+          if(!v.paused){ try{v.pause();}catch(e){} return; }
+          v.setAttribute('controls','');
+          var pr=v.play(); if(pr&&pr.catch)pr.catch(function(){});
+          try{
+            if(v.requestFullscreen){ v.requestFullscreen(); }
+            else if(v.webkitRequestFullscreen){ v.webkitRequestFullscreen(); }
+            else if(v.webkitEnterFullscreen){ v.webkitEnterFullscreen(); }
+            else { v.removeAttribute('controls'); }
+          }catch(e){ v.removeAttribute('controls'); }
+        });
+        v.addEventListener('play',function(){ ov.style.opacity='0'; });
+        v.addEventListener('pause',function(){ ov.style.opacity='1'; });
+      });
+    }
+
     /* ---- No iframe anywhere. DESKTOP autoplays visible muted videos. MOBILE uses tap-to-play:
        no autoplay; a play-icon sits over each video; overlays are anchored to the video's container
        so they don't drift on iOS, and touch-action:pan-y keeps a tap from hijacking scroll. ---- */
@@ -129,6 +180,7 @@
         /* MOBILE: tap-to-play (no autoplay) -> videos decode only when tapped, which also keeps the
            scroll smooth. Each video gets a play-icon anchored to its container (drift-free). */
         initTapToPlay();
+        initShowcaseFS();
       });
     }
     if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',setup); } else { setup(); }
@@ -274,6 +326,11 @@
   html.deck .ph-pair .track{ display:block !important; height:auto !important; transform:none !important; }
   html.deck .ph-pair .frame{ min-height:56.25vw !important; }
   html.deck .ph-pair .frame + .frame{ margin-top:clamp(22px,3vw,46px); }
+  /* deck: caption grigia PRIMA delle foto della gallery (su desktop sta in basso nel pin sticky
+     e la vedi subito; stackata in verticale finiva in coda). knob: --deck-cap-gap = aria sotto la caption. */
+  html.deck{ --deck-cap-gap: clamp(14px,2vw,26px); }
+  html.deck .ph-pair .cap{ order:-1; margin-bottom:var(--deck-cap-gap); }
+
 </style>
 </head>
 <body>
